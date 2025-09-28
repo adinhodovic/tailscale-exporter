@@ -5,28 +5,11 @@ local dashboard = g.dashboard;
 local row = g.panel.row;
 local grid = g.util.grid;
 
-local variable = dashboard.variable;
-local datasource = variable.datasource;
-local query = variable.query;
-local custom = variable.custom;
-local prometheus = g.query.prometheus;
-
-local timeSeries = g.panel.timeSeries;
 local table = g.panel.table;
-local stat = g.panel.stat;
-
-// TimeSeries
-local tsOptions = timeSeries.options;
-local tsStandardOptions = timeSeries.standardOptions;
-local tsFieldConfig = timeSeries.fieldConfig;
-local tsCustom = tsFieldConfig.defaults.custom;
-local tsLegend = tsOptions.legend;
 
 // Table
-local tbOptions = table.options;
 local tbStandardOptions = table.standardOptions;
 local tbQueryOptions = table.queryOptions;
-local tbPanelOptions = table.panelOptions;
 local tbOverride = tbStandardOptions.override;
 
 {
@@ -87,11 +70,11 @@ local tbOverride = tbStandardOptions.override;
         ||| % defaultFilters,
 
         nameserversTotal: |||
-          count(
+          sum(
             tailscale_dns_nameservers_info{
               %(tailnet)s
             }
-          )
+          ) by (nameserver)
         ||| % defaultFilters,
 
         magicDnsEnabled: |||
@@ -416,12 +399,33 @@ local tbOverride = tbStandardOptions.override;
             description='The total number of keys in the selected tailnet.',
           ),
 
-        nameserversTotalStat:
-          dashboardUtil.statPanel(
-            'DNS Nameservers',
-            'short',
+        nameserversTotalTable:
+          dashboardUtil.tablePanel(
+            'Nameservers',
+            'string',
             queries.nameserversTotal,
-            description='The total number of DNS nameservers configured for the selected tailnet.',
+            description='A table showing the nameservers configured for the selected tailnet.',
+            sortBy={ name: 'Nameserver', desc: false },
+            transformations=[
+              tbQueryOptions.transformation.withId(
+                'organize'
+              ) +
+              tbQueryOptions.transformation.withOptions(
+                {
+                  renameByName: {
+                    nameserver: 'Nameserver',
+                  },
+                  indexByName: {
+                    nameserver: 0,
+                    Value: 1,
+                  },
+                  excludeByName: {
+                    Time: true,
+                    Value: true,
+                  },
+                }
+              ),
+            ],
           ),
 
         magicDnsEnabledStat:
@@ -827,6 +831,7 @@ local tbOverride = tbStandardOptions.override;
                   },
                   excludeByName: {
                     Time: true,
+                    '#Value #A': true,
                     job: true,
                     container: true,
                     instance: true,
@@ -872,7 +877,7 @@ local tbOverride = tbStandardOptions.override;
             panels.devicesTotalStat,
             panels.devicesOnlineTotalStat,
             panels.keysTotalStat,
-            panels.nameserversTotalStat,
+            panels.nameserversTotalTable,
             panels.magicDnsEnabledStat,
           ],
           panelWidth=4,

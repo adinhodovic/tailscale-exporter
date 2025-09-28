@@ -6,7 +6,6 @@ local annotation = g.dashboard.annotation;
 local variable = dashboard.variable;
 local datasource = variable.datasource;
 local query = variable.query;
-local custom = variable.custom;
 local prometheus = g.query.prometheus;
 
 local stat = g.panel.stat;
@@ -39,8 +38,6 @@ local tsLegend = tsOptions.legend;
 local tbOptions = table.options;
 local tbStandardOptions = table.standardOptions;
 local tbQueryOptions = table.queryOptions;
-local tbPanelOptions = table.panelOptions;
-local tbOverride = tbStandardOptions.override;
 
 {
   // Bypasses grafana.com/dashboards validator

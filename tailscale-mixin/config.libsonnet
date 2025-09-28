@@ -1,7 +1,3 @@
-local g = import 'github.com/grafana/grafonnet/gen/grafonnet-latest/main.libsonnet';
-local annotation = g.dashboard.annotation;
-local dashboard = g.dashboard;
-
 {
   _config+:: {
     local this = self,

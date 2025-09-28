@@ -5,35 +5,10 @@ local dashboard = g.dashboard;
 local row = g.panel.row;
 local grid = g.util.grid;
 
-local variable = dashboard.variable;
-local datasource = variable.datasource;
-local query = variable.query;
-local custom = variable.custom;
-local prometheus = g.query.prometheus;
-
-local timeSeries = g.panel.timeSeries;
 local table = g.panel.table;
-local stat = g.panel.stat;
-
-// Stat
-local stOptions = stat.options;
-local stStandardOptions = stat.standardOptions;
-local stQueryOptions = stat.queryOptions;
-local stPanelOptions = stat.panelOptions;
-
-// TimeSeries
-local tsOptions = timeSeries.options;
-local tsStandardOptions = timeSeries.standardOptions;
-local tsFieldConfig = timeSeries.fieldConfig;
-local tsCustom = tsFieldConfig.defaults.custom;
-local tsLegend = tsOptions.legend;
 
 // Table
-local tbOptions = table.options;
-local tbStandardOptions = table.standardOptions;
 local tbQueryOptions = table.queryOptions;
-local tbPanelOptions = table.panelOptions;
-local tbOverride = tbStandardOptions.override;
 
 {
   local dashboardName = 'tailscale-machine',

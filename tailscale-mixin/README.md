@@ -4,8 +4,7 @@ A set of Grafana dashboards and Prometheus alerts for the Tailscale using the me
 
 ## How to use
 
-This mixin is designed to be vendored into the repo with your infrastructure config.
-To do this, use [jsonnet-bundler](https://github.com/jsonnet-bundler/jsonnet-bundler):
+This mixin is designed to be vendored into the repo with your infrastructure config. To do this, use [jsonnet-bundler](https://github.com/jsonnet-bundler/jsonnet-bundler):
 
 You then have three options for deploying your dashboards
 
@@ -23,10 +22,7 @@ Build the mixin:
 make
 ```
 
-The `prometheus_alerts.yaml` file then need to passed
-to your Prometheus server, and the files in `dashboards_out` need to be imported
-into you Grafana server. The exact details will vary depending on how you deploy your
-monitoring stack.
+The `prometheus_alerts.yaml` file then need to passed to your Prometheus server, and the files in `dashboards_out` need to be imported into you Grafana server. The exact details vary depending on how you deploy your monitoring stack.
 
 ## Alerts
 

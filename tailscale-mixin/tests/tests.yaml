@@ -1,0 +1,6 @@
+# yamllint disable rule:line-length
+---
+rule_files:
+  - prometheus_alerts.yaml
+
+tests:
