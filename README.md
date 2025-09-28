@@ -110,7 +110,3 @@ scrape_configs:
 ## Metrics
 
 You can find the full list of metrics in the [METRICS.md](./docs/METRICS.md) file.
-
-## License
-
-This project is licensed under the MIT License - see the LICENSE file for details.
