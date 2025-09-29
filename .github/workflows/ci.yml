@@ -2,12 +2,16 @@ name: CI
 
 on:
   push:
+    branches:
+      - main
     paths:
+      - "**"
       - "!tailscale-mixin/**"
   pull_request:
     branches:
       - main
     paths:
+      - "**"
       - "!tailscale-mixin/**"
 
 jobs:
