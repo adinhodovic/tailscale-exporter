@@ -56,6 +56,9 @@ service:
   # This sets the ports more information can be found here: https://kubernetes.io/docs/concepts/services-networking/service/#field-spec-ports
   port: 9250
 
+# This is for setting up environment variables more information can be found here: https://kubernetes.io/docs/tasks/inject-data-application/environment-variable-expose-pod-information/
+env: []
+
 # This block is for setting up the ingress for more information can be found here: https://kubernetes.io/docs/concepts/services-networking/ingress/
 ingress:
   enabled: false
