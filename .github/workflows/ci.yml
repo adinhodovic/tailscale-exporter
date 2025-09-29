@@ -37,8 +37,8 @@ jobs:
           install-mode: goinstall
           version: latest
 
-      # - name: Build
-      #   run: make build
-      #
+      - name: Build
+        run: make build
+
       - name: Run unit tests
         run: go install github.com/go-delve/delve/cmd/dlv@latest && go test ./... -v -covermode=count -coverprofile=coverage.txt
