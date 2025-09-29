@@ -39,14 +39,23 @@ func TestTailscaleDevicesCollector_Update(t *testing.T) {
 							UpdateAvailable:           false,
 							KeyExpiryDisabled:         false,
 							BlocksIncomingConnections: false,
-							Addresses:                 []string{"100.64.0.1", "fd7a:115c:a1e0:ab12:4843:cd96:6255:6a6a"},
-							Created:                   tailscale.Time{Time: time.Unix(1609459200, 0)},
-							LastSeen:                  tailscale.Time{Time: time.Unix(1612137600, 0)},
-							Expires:                   tailscale.Time{Time: time.Unix(1640995200, 0)},
-							MachineKey:                "mkey:abcd1234",
-							NodeKey:                   "nodekey:efgh5678",
-							AdvertisedRoutes:          []string{"192.168.1.0/24"},
-							EnabledRoutes:             []string{"192.168.1.0/24"},
+							Addresses: []string{
+								"100.64.0.1",
+								"fd7a:115c:a1e0:ab12:4843:cd96:6255:6a6a",
+							},
+							Created: tailscale.Time{
+								Time: time.Unix(1609459200, 0),
+							},
+							LastSeen: tailscale.Time{
+								Time: time.Unix(1612137600, 0),
+							},
+							Expires: tailscale.Time{
+								Time: time.Unix(1640995200, 0),
+							},
+							MachineKey:       "mkey:abcd1234",
+							NodeKey:          "nodekey:efgh5678",
+							AdvertisedRoutes: []string{"192.168.1.0/24"},
+							EnabledRoutes:    []string{"192.168.1.0/24"},
 							ClientConnectivity: &tailscale.ClientConnectivity{
 								DERPLatency: map[string]tailscale.DERPRegion{
 									"nyc": {LatencyMilliseconds: 50},

@@ -12,7 +12,6 @@ import (
 	"tailscale.com/client/tailscale/v2"
 )
 
-
 func TestTailscaleKeysCollector_Update(t *testing.T) {
 	logger := slog.Default()
 

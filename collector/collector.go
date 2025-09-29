@@ -116,7 +116,11 @@ type DevicesAPI interface {
 
 // UsersAPI is the subset of *tailscale.UsersResource you actually use
 type UsersAPI interface {
-	List(ctx context.Context, userType *tailscale.UserType, role *tailscale.UserRole) ([]tailscale.User, error)
+	List(
+		ctx context.Context,
+		userType *tailscale.UserType,
+		role *tailscale.UserRole,
+	) ([]tailscale.User, error)
 }
 
 // TailnetSettingsAPI is the subset of *tailscale.TailnetSettingsResource you actually use

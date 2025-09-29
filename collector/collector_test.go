@@ -2,6 +2,7 @@ package collector
 
 import (
 	"context"
+
 	"github.com/prometheus/client_golang/prometheus"
 	"tailscale.com/client/tailscale/v2"
 )
@@ -75,7 +76,11 @@ type MockUsersClient struct {
 	usersErr error
 }
 
-func (m *MockUsersClient) List(ctx context.Context, userType *tailscale.UserType, role *tailscale.UserRole) ([]tailscale.User, error) {
+func (m *MockUsersClient) List(
+	ctx context.Context,
+	userType *tailscale.UserType,
+	role *tailscale.UserRole,
+) ([]tailscale.User, error) {
 	if m.usersErr != nil {
 		return nil, m.usersErr
 	}

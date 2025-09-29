@@ -11,7 +11,6 @@ import (
 	"tailscale.com/client/tailscale/v2"
 )
 
-
 func TestTailscaleDNSCollector_Update(t *testing.T) {
 	logger := slog.Default()
 
