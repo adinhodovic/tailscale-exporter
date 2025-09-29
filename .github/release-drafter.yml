@@ -1,0 +1,85 @@
+---
+name-template: "$RESOLVED_VERSION"
+tag-template: "$RESOLVED_VERSION"
+categories:
+  - title: "Features"
+    labels:
+      - "feat"
+  - title: "Bug Fixes"
+    labels:
+      - "fix"
+      - "revert"
+  - title: "Maintenance"
+    labels:
+      - "build"
+      - "chore"
+      - "ci"
+      - "docs"
+      - "style"
+      - "refactor"
+      - "perf"
+      - "test"
+change-template: "- $TITLE @$AUTHOR (#$NUMBER)"
+change-title-escapes: '\<*_&' # You can add # and @ to disable mentions, and add ` to disable code blocks.
+version-resolver:
+  major:
+    labels:
+      - "major"
+  minor:
+    labels:
+      - "feat"
+  patch:
+    labels:
+      - "fix"
+      - "build"
+      - "chore"
+      - "ci"
+      - "docs"
+      - "style"
+      - "refactor"
+      - "perf"
+      - "test"
+      - "revert"
+  default: patch
+template: |
+  ## Changes
+
+  $CHANGES
+
+autolabeler:
+  - label: "major"
+    body:
+      - "/BREAKING CHANGE.*/"
+  - label: "feat"
+    title:
+      - "/^feat.*: .*/"
+  - label: "fix"
+    title:
+      - "/^fix.*: .*/"
+  - label: "chore"
+    title:
+      - "/^chore.*:.*/"
+  - label: "ci"
+    title:
+      - "/^ci.*:.*/"
+  - label: "build"
+    title:
+      - "/^build.*:.*/"
+  - label: "style"
+    title:
+      - "/^style.*:.*/"
+  - label: "refactor"
+    title:
+      - "/^refactor.*:.*/"
+  - label: "perf"
+    title:
+      - "/^perf.*:.*/"
+  - label: "test"
+    title:
+      - "/^test.*:.*/"
+  - label: "docs"
+    title:
+      - "/^docs.*:.*/"
+  - label: "revert"
+    title:
+      - "/^revert.*:.*/"
