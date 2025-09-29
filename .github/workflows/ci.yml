@@ -7,12 +7,14 @@ on:
     paths:
       - "**"
       - "!tailscale-mixin/**"
+      - "!deploy/**"
   pull_request:
     branches:
       - main
     paths:
       - "**"
       - "!tailscale-mixin/**"
+      - "!deploy/**"
 
 jobs:
   build:
