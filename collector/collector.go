@@ -77,17 +77,80 @@ func registerCollector(
 type Collector interface {
 	Update(
 		ctx context.Context,
-		client *tailscale.Client,
+		client TailscaleClient,
 		ch chan<- prometheus.Metric,
 	) error
 }
 
 // TailscaleCollector collects comprehensive Tailscale metrics.
 type TailscaleCollector struct {
-	client *tailscale.Client
+	client TailscaleClient
 
 	Collectors map[string]Collector
 	logger     *slog.Logger
+}
+
+type TailscaleClient interface {
+	Keys() KeysAPI
+	DNS() DNSAPI
+	Devices() DevicesAPI
+	Users() UsersAPI
+	TailnetSettings() TailnetSettingsAPI
+}
+
+// KeysAPI is the subset of *tailscale.KeysResource you actually use
+type KeysAPI interface {
+	List(ctx context.Context, all bool) ([]tailscale.Key, error)
+}
+
+// DNSAPI is the subset of *tailscale.DNSResource you actually use
+type DNSAPI interface {
+	Nameservers(ctx context.Context) ([]string, error)
+	Preferences(ctx context.Context) (*tailscale.DNSPreferences, error)
+}
+
+// DevicesAPI is the subset of *tailscale.DevicesResource you actually use
+type DevicesAPI interface {
+	List(ctx context.Context) ([]tailscale.Device, error)
+}
+
+// UsersAPI is the subset of *tailscale.UsersResource you actually use
+type UsersAPI interface {
+	List(ctx context.Context, userType *tailscale.UserType, role *tailscale.UserRole) ([]tailscale.User, error)
+}
+
+// TailnetSettingsAPI is the subset of *tailscale.TailnetSettingsResource you actually use
+type TailnetSettingsAPI interface {
+	Get(ctx context.Context) (*tailscale.TailnetSettings, error)
+}
+
+// TailscaleClientWrapper wraps the real tailscale.Client to implement our TailscaleClient interface
+type TailscaleClientWrapper struct {
+	client *tailscale.Client
+}
+
+func NewTailscaleClientWrapper(client *tailscale.Client) *TailscaleClientWrapper {
+	return &TailscaleClientWrapper{client: client}
+}
+
+func (w *TailscaleClientWrapper) Keys() KeysAPI {
+	return w.client.Keys()
+}
+
+func (w *TailscaleClientWrapper) DNS() DNSAPI {
+	return w.client.DNS()
+}
+
+func (w *TailscaleClientWrapper) Devices() DevicesAPI {
+	return w.client.Devices()
+}
+
+func (w *TailscaleClientWrapper) Users() UsersAPI {
+	return w.client.Users()
+}
+
+func (w *TailscaleClientWrapper) TailnetSettings() TailnetSettingsAPI {
+	return w.client.TailnetSettings()
 }
 
 // NewTailscaleCollector creates the Tailscale collector.
@@ -124,7 +187,7 @@ func NewTailscaleCollector(
 		HTTP:    httpClient,
 		Tailnet: tailnet,
 	}
-	t.client = client
+	t.client = NewTailscaleClientWrapper(client)
 
 	return t, nil
 }
@@ -155,7 +218,7 @@ func execute(
 	ctx context.Context,
 	name string,
 	c Collector,
-	client *tailscale.Client,
+	client TailscaleClient,
 	ch chan<- prometheus.Metric,
 	logger *slog.Logger,
 ) {

@@ -5,7 +5,6 @@ import (
 	"log/slog"
 
 	"github.com/prometheus/client_golang/prometheus"
-	"tailscale.com/client/tailscale/v2"
 )
 
 const usersSubsystem = "users"
@@ -53,7 +52,7 @@ func NewTailscaleUsersCollector(config collectorConfig) (Collector, error) {
 
 func (c TailscaleUsersCollector) Update(
 	ctx context.Context,
-	client *tailscale.Client,
+	client TailscaleClient,
 	ch chan<- prometheus.Metric,
 ) error {
 	c.log.DebugContext(ctx, "Collecting users metrics")

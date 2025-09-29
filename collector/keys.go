@@ -5,7 +5,6 @@ import (
 	"log/slog"
 
 	"github.com/prometheus/client_golang/prometheus"
-	"tailscale.com/client/tailscale/v2"
 )
 
 const keysSubsystem = "keys"
@@ -49,7 +48,7 @@ func NewTailscaleKeysCollector(config collectorConfig) (Collector, error) {
 
 func (c TailscaleKeysCollector) Update(
 	ctx context.Context,
-	client *tailscale.Client,
+	client TailscaleClient,
 	ch chan<- prometheus.Metric,
 ) error {
 	c.log.Debug("Collecting keys metrics")

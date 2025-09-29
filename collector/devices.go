@@ -6,7 +6,6 @@ import (
 	"time"
 
 	"github.com/prometheus/client_golang/prometheus"
-	"tailscale.com/client/tailscale/v2"
 )
 
 const devicesSubsystem = "devices"
@@ -137,7 +136,7 @@ func NewTailscaleDevicesCollector(config collectorConfig) (Collector, error) {
 
 func (c TailscaleDevicesCollector) Update(
 	ctx context.Context,
-	client *tailscale.Client,
+	client TailscaleClient,
 	ch chan<- prometheus.Metric,
 ) error {
 	c.log.DebugContext(ctx, "Collecting devices metrics")
