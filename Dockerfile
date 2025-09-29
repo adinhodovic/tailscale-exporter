@@ -25,6 +25,6 @@ COPY --from=builder /app/tailscale-exporter .
 
 USER tailscale-exporter
 
-EXPOSE 9090
+EXPOSE 9250
 
 CMD ["./tailscale-exporter"]

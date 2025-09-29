@@ -54,7 +54,7 @@ func Execute() {
 func init() {
 	// Global flags
 	rootCmd.PersistentFlags().
-		StringVarP(&listenAddress, "listen-address", "l", ":9090", "Address to listen on for web interface and telemetry")
+		StringVarP(&listenAddress, "listen-address", "l", ":9250", "Address to listen on for web interface and telemetry")
 	rootCmd.PersistentFlags().
 		StringVarP(&metricsPath, "metrics-path", "m", "/metrics", "Path under which to expose metrics")
 	rootCmd.PersistentFlags().

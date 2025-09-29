@@ -77,7 +77,7 @@ export TAILSCALE_TAILNET="your-tailnet-name"
 ./tailscale-exporter
 ```
 
-The exporter will start on port 9090 by default and expose metrics at `/metrics`.
+The exporter will start on port 9250 by default and expose metrics at `/metrics`.
 
 ### Command Line Options
 
@@ -86,7 +86,7 @@ The exporter will start on port 9090 by default and expose metrics at `/metrics`
 
 Flags:
   -h, --help                         help for tailscale-exporter
-  -l, --listen-address string        Address to listen on for web interface and telemetry (default ":9090")
+  -l, --listen-address string        Address to listen on for web interface and telemetry (default ":9250")
   -m, --metrics-path string          Path under which to expose metrics (default "/metrics")
       --oauth-client-id string       OAuth client ID (can also be set via TAILSCALE_OAUTH_CLIENT_ID environment variable)
       --oauth-client-secret string   OAuth client secret (can also be set via TAILSCALE_OAUTH_CLIENT_SECRET environment variable)
@@ -102,7 +102,7 @@ Add the following to your `prometheus.yml`:
 scrape_configs:
   - job_name: 'tailscale-exporter'
     static_configs:
-      - targets: ['localhost:9090']
+      - targets: ['localhost:9250']
     scrape_interval: 30s
     metrics_path: /metrics
 ```
