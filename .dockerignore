@@ -8,3 +8,6 @@ air
 
 .git
 .gitignore
+
+./deploy
+./tailscale-mixin
