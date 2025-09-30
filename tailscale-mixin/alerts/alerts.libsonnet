@@ -5,25 +5,6 @@
       {
         name: 'tailscale-tailnet-alerts',
         rules: std.prune([
-          if $._config.tailscaleDeviceNotUpdatedEnabled then {
-            alert: 'TailscaleDeviceNotUpdated',
-            expr: |||
-              sum(
-                tailscale_devices_update_available{}
-              ) by (tailnet, name, id)
-              == 1
-            ||| % $._config,
-            'for': $._config.tailscaleDeviceNotUpdatedFor,
-            annotations: {
-              summary: 'Tailscale Device has an update available',
-              description: 'Tailscale Device {{ $labels.name }} (ID: {{ $labels.id }}) in Tailnet {{ $labels.tailnet }} has an update available for longer than %(tailscaleDeviceNotUpdatedFor)s.' % $._config,
-              dashboard_url: $._config.dashboardUrls['tailscale-overview'] + clusterVariableQueryString,
-            },
-            labels: {
-              severity: $._config.tailscaleDeviceNotUpdatedSeverity,
-              mixin: 'tailscale',
-            },
-          },
           if $._config.tailscaleDeviceUnauthorizedEnabled then {
             alert: 'TailscaleDeviceUnauthorized',
             expr: |||
@@ -75,7 +56,6 @@
               )
               < %(tailscaleUserRecentlyCreatedThreshold)s
             ||| % $._config,
-            'for': $._config.tailscaleUserRecentlyCreatedFor,
             annotations: {
               summary: 'Tailscale User Recently Created',
               description: 'Tailscale User {{ $labels.login_name }} (ID: {{ $labels.id }}) in Tailnet {{ $labels.tailnet }} was created within the last %(tailscaleUserRecentlyCreatedThreshold)s seconds.' % $._config,

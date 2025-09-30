@@ -14,10 +14,6 @@
     tailscaledSelector: 'job=~".*"',
 
     // Tailnet
-    tailscaleDeviceNotUpdatedEnabled: true,
-    tailscaleDeviceNotUpdatedFor: '30d',
-    tailscaleDeviceNotUpdatedSeverity: 'warning',
-
     tailscaleDeviceUnauthorizedEnabled: true,
     tailscaleDeviceUnauthorizedFor: '15m',
     tailscaleDeviceUnauthorizedSeverity: 'warning',
@@ -25,6 +21,10 @@
     tailscaleUserUnapprovedEnabled: true,
     tailscaleUserUnapprovedFor: '15m',
     tailscaleUserUnapprovedSeverity: 'warning',
+
+    tailscaleUserRecentlyCreatedEnabled: true,
+    tailscaleUserRecentlyCreatedSeverity: 'info',
+    tailscaleUserRecentlyCreatedThreshold: '300',  // Seconds
 
     // Tailscaled
     tailscaledMachineUnapprovedRoutesEnabled: true,
@@ -36,11 +36,6 @@
     tailscaledMachineHighOutboundDroppedPacketsFor: '15m',
     tailscaledMachineHighOutboundDroppedPacketsSeverity: 'warning',
     tailscaledMachineHighOutboundDroppedPacketsThreshold: '50',
-
-    tailscaleUserRecentlyCreatedEnabled: true,
-    tailscaleUserRecentlyCreatedFor: '0m',
-    tailscaleUserRecentlyCreatedSeverity: 'info',
-    tailscaleUserRecentlyCreatedThreshold: '300',  // Seconds
 
     grafanaUrl: 'https://grafana.com',
 

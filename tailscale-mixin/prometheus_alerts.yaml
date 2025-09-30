@@ -1,20 +1,6 @@
 "groups":
 - "name": "tailscale-tailnet-alerts"
   "rules":
-  - "alert": "TailscaleDeviceNotUpdated"
-    "annotations":
-      "dashboard_url": "https://grafana.com/d/tailscale-mixin-over-k12e/tailscale-overview"
-      "description": "Tailscale Device {{ $labels.name }} (ID: {{ $labels.id }}) in Tailnet {{ $labels.tailnet }} has an update available for longer than 30d."
-      "summary": "Tailscale Device has an update available"
-    "expr": |
-      sum(
-        tailscale_devices_update_available{}
-      ) by (tailnet, name, id)
-      == 1
-    "for": "30d"
-    "labels":
-      "mixin": "tailscale"
-      "severity": "warning"
   - "alert": "TailscaleDeviceUnauthorized"
     "annotations":
       "dashboard_url": "https://grafana.com/d/tailscale-mixin-over-k12e/tailscale-overview"
@@ -58,7 +44,6 @@
         ) by (tailnet, id, login_name)
       )
       < 300
-    "for": "0m"
     "labels":
       "mixin": "tailscale"
       "severity": "info"

@@ -4,28 +4,6 @@ rule_files:
   - ../prometheus_alerts.yaml
 
 tests:
-  # TailscaleDeviceNotUpdated Alert Test
-  - interval: 5m
-    input_series:
-      - series: 'tailscale_devices_update_available{tailnet="test-tailnet", name="test-device-1", id="device-123"}'
-        values: "1+0x8928" # Device has update available for 31 days (> 30d in real scenario)
-      - series: 'tailscale_devices_update_available{tailnet="test-tailnet", name="test-device-2", id="device-456"}'
-        values: "0+0x8928" # Device does not have update available
-    alert_rule_test:
-      - eval_time: 31d
-        alertname: TailscaleDeviceNotUpdated
-        exp_alerts:
-          - exp_labels:
-              tailnet: test-tailnet
-              name: test-device-1
-              id: device-123
-              severity: warning
-              mixin: tailscale
-            exp_annotations:
-              summary: "Tailscale Device has an update available"
-              description: "Tailscale Device test-device-1 (ID: device-123) in Tailnet test-tailnet has an update available for longer than 30d."
-              dashboard_url: "https://grafana.com/d/tailscale-mixin-over-k12e/tailscale-overview"
-
   # TailscaleDeviceUnauthorized Alert Test
   - interval: 1m
     input_series:
