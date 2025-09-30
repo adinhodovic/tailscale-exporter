@@ -15,6 +15,9 @@ on:
       - "**"
       - "!tailscale-mixin/**"
       - "!deploy/**"
+  release:
+    types:
+      - published
 
 jobs:
   test:
