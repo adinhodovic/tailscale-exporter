@@ -100,6 +100,15 @@ local tbQueryOptions = table.queryOptions;
               }[1h]
             )
           ) by (tailscale_machine)
+          /
+          sum(
+            increase(
+              tailscaled_outbound_packets_total{
+                %(tailscaled)s
+              }[1h]
+            )
+          ) by (tailscale_machine)
+          * 100
           > 0
         ||| % defaultFilters,
 
@@ -337,7 +346,7 @@ local tbQueryOptions = table.queryOptions;
         tailscaledMachinesWithDroppedPacketsTable:
           dashboardUtil.tablePanel(
             'Machines with Dropped Packets (1h)',
-            'short',
+            'percent',
             queries.tailscaledMachinesWithDroppedPackets1h,
             description='A table panel showing the Tailscale machines with dropped packets in the last hour.',
             sortBy={ name: 'Dropped Packets', desc: true },

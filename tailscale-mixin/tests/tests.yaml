@@ -1,6 +1,142 @@
 # yamllint disable rule:line-length
 ---
 rule_files:
-  - prometheus_alerts.yaml
+  - ../prometheus_alerts.yaml
 
 tests:
+  # TailscaleDeviceNotUpdated Alert Test
+  - interval: 5m
+    input_series:
+      - series: 'tailscale_devices_update_available{tailnet="test-tailnet", name="test-device-1", id="device-123"}'
+        values: "1+0x8928" # Device has update available for 31 days (> 30d in real scenario)
+      - series: 'tailscale_devices_update_available{tailnet="test-tailnet", name="test-device-2", id="device-456"}'
+        values: "0+0x8928" # Device does not have update available
+    alert_rule_test:
+      - eval_time: 31d
+        alertname: TailscaleDeviceNotUpdated
+        exp_alerts:
+          - exp_labels:
+              tailnet: test-tailnet
+              name: test-device-1
+              id: device-123
+              severity: warning
+              mixin: tailscale
+            exp_annotations:
+              summary: "Tailscale Device has an update available"
+              description: "Tailscale Device test-device-1 (ID: device-123) in Tailnet test-tailnet has an update available for longer than 30d."
+              dashboard_url: "https://grafana.com/d/tailscale-mixin-over-k12e/tailscale-overview"
+
+  # TailscaleDeviceUnauthorized Alert Test
+  - interval: 1m
+    input_series:
+      - series: 'tailscale_devices_authorized{tailnet="test-tailnet", name="test-device-3", id="device-789"}'
+        values: "0+0x16" # Device is unauthorized for 16 minutes (> 15m)
+      - series: 'tailscale_devices_authorized{tailnet="test-tailnet", name="test-device-4", id="device-101"}'
+        values: "1+0x16" # Device is authorized
+    alert_rule_test:
+      - eval_time: 16m
+        alertname: TailscaleDeviceUnauthorized
+        exp_alerts:
+          - exp_labels:
+              tailnet: test-tailnet
+              name: test-device-3
+              id: device-789
+              severity: warning
+              mixin: tailscale
+            exp_annotations:
+              summary: "Tailscale Device is Unauthorized"
+              description: "Tailscale Device test-device-3 (ID: device-789) in Tailnet test-tailnet is unauthorized. Please authorize it in the Tailscale admin console."
+              dashboard_url: "https://grafana.com/d/tailscale-mixin-over-k12e/tailscale-overview"
+
+  # TailscaleUserUnapproved Alert Test
+  - interval: 1m
+    input_series:
+      - series: 'tailscale_users_info{tailnet="test-tailnet", login_name="user1@example.com", id="user-123", status="needs-approval"}'
+        values: "1+0x16" # User needs approval for 16 minutes (> 15m)
+      - series: 'tailscale_users_info{tailnet="test-tailnet", login_name="user2@example.com", id="user-456", status="approved"}'
+        values: "1+0x16" # User is approved
+    alert_rule_test:
+      - eval_time: 15m
+        alertname: TailscaleUserUnapproved
+        exp_alerts:
+          - exp_labels:
+              tailnet: test-tailnet
+              login_name: user1@example.com
+              id: user-123
+              severity: warning
+              mixin: tailscale
+            exp_annotations:
+              summary: "Tailscale User is Unapproved"
+              description: "Tailscale User user1@example.com (ID: user-123) in Tailnet test-tailnet is unapproved. Please approve it in the Tailscale admin console."
+              dashboard_url: "https://grafana.com/d/tailscale-mixin-over-k12e/tailscale-overview"
+
+  # TailscaleUserRecentlyCreated Alert Test
+  - interval: 1m
+    input_series:
+      # User created 1 hour ago (within 24h threshold, should alert)
+      - series: 'tailscale_users_created_timestamp{tailnet="test-tailnet", login_name="newuser@example.com", id="user-new"}'
+        values: "0+0x10" # Unix timestamp: 2022-01-01 00:00:00 - 1 hour
+    alert_rule_test:
+      - eval_time: 1m
+        alertname: TailscaleUserRecentlyCreated
+        exp_alerts:
+          - exp_labels:
+              tailnet: test-tailnet
+              login_name: newuser@example.com
+              id: user-new
+              severity: info
+              mixin: tailscale
+            exp_annotations:
+              summary: "Tailscale User Recently Created"
+              description: "Tailscale User newuser@example.com (ID: user-new) in Tailnet test-tailnet was created within the last 300 seconds."
+              dashboard_url: "https://grafana.com/d/tailscale-mixin-over-k12e/tailscale-overview"
+
+  # TailscaledMachineUnapprovedRoutes Alert Test
+  - interval: 1m
+    input_series:
+      - series: 'tailscaled_advertised_routes{tailscale_machine="machine-1"}'
+        values: "10+0x16" # 10 advertised routes
+      - series: 'tailscaled_approved_routes{tailscale_machine="machine-1"}'
+        values: "7+0x16" # 7 approved routes (30% unapproved, > 10% threshold)
+      - series: 'tailscaled_advertised_routes{tailscale_machine="machine-2"}'
+        values: "20+0x16" # 20 advertised routes
+      - series: 'tailscaled_approved_routes{tailscale_machine="machine-2"}'
+        values: "19+0x16" # 19 approved routes (5% unapproved, < 10% threshold, should not alert)
+    alert_rule_test:
+      - eval_time: 16m
+        alertname: TailscaledMachineUnapprovedRoutes
+        exp_alerts:
+          - exp_labels:
+              tailscale_machine: machine-1
+              severity: warning
+              mixin: tailscale
+            exp_annotations:
+              summary: "Tailscaled Machine has Unapproved Routes"
+              description: "Tailscaled Machine machine-1 has unapproved routes for longer than 15m."
+              dashboard_url: "https://grafana.com/d/tailscaled-mixin-over-k12e/tailscale-machine?var-tailscale_machine=machine-1"
+
+  # TailscaledMachineHighOutboundDroppedPackets Alert Test
+  - interval: 1m
+    input_series:
+      # Machine with high dropped packet rate (60% > 50% threshold)
+      - series: 'tailscaled_outbound_dropped_packets_total{tailscale_machine="machine-3"}'
+        values: "0+60x16" # 60 dropped packets per minute
+      - series: 'tailscaled_outbound_packets_total{tailscale_machine="machine-3"}'
+        values: "0+100x16" # 100 total packets per minute
+      # Machine with acceptable dropped packet rate (40% < 50% threshold)
+      - series: 'tailscaled_outbound_dropped_packets_total{tailscale_machine="machine-4"}'
+        values: "0+40x16" # 40 dropped packets per minute
+      - series: 'tailscaled_outbound_packets_total{tailscale_machine="machine-4"}'
+        values: "0+100x16" # 100 total packets per minute
+    alert_rule_test:
+      - eval_time: 16m
+        alertname: TailscaledMachineHighOutboundDroppedPackets
+        exp_alerts:
+          - exp_labels:
+              tailscale_machine: machine-3
+              severity: warning
+              mixin: tailscale
+            exp_annotations:
+              summary: "Tailscaled Machine has High Outbound Dropped Packets"
+              description: "Tailscaled Machine machine-3 has a high rate of outbound dropped packets (>50%) for longer than 15m."
+              dashboard_url: "https://grafana.com/d/tailscaled-mixin-over-k12e/tailscale-machine?var-tailscale_machine=machine-3"

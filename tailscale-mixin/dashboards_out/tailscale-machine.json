@@ -477,7 +477,7 @@
          "description": "A table panel showing the Tailscale machines with dropped packets in the last hour.",
          "fieldConfig": {
             "defaults": {
-               "unit": "short"
+               "unit": "percent"
             },
             "overrides": [ ]
          },
@@ -506,7 +506,7 @@
                   "type": "prometheus",
                   "uid": "$datasource"
                },
-               "expr": "sum(\n  increase(\n    tailscaled_outbound_dropped_packets_total{\n      cluster=\"$cluster\"\n,\njob=~\"$job\"\n\n    }[1h]\n  )\n) by (tailscale_machine)\n> 0\n",
+               "expr": "sum(\n  increase(\n    tailscaled_outbound_dropped_packets_total{\n      cluster=\"$cluster\"\n,\njob=~\"$job\"\n\n    }[1h]\n  )\n) by (tailscale_machine)\n/\nsum(\n  increase(\n    tailscaled_outbound_packets_total{\n      cluster=\"$cluster\"\n,\njob=~\"$job\"\n\n    }[1h]\n  )\n) by (tailscale_machine)\n* 100\n> 0\n",
                "format": "table",
                "instant": true
             }
