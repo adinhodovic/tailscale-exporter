@@ -3,4 +3,4 @@ cmd = "go build -o ./bin/tailscale-exporter ./cmd/tailscale-exporter"
 bin = "bin/tailscale-exporter"
 full_bin = "APP_ENV=dev ./bin/tailscale-exporter"
 include_ext = ["go"]
-exclude_dir = ["bin", "vendor"]
+exclude_dir = ["bin", "vendor", "tailscale-mixin", "deploy"]

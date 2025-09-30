@@ -2,34 +2,19 @@
 
 A Prometheus exporter for Tailscale that provides tailnet-level metrics using the Tailscale API.
 
-This repository also contains the `tailscale-mixin` that provides Prometheus alerts and rules and Grafana dashboard for tailnet-level metrics but also machine metrics.
+This repository also contains the `tailscale-mixin` that provides Prometheus alerts and rules and Grafana dashboard for tailnet-level metrics. You can find the dashboards in `./tailscale-mixin/dashboards_out/`.
+
+The `tailscale-mixin` also has dashboards and alerts for client side `machine` metrics. You can find the dashboards in `./tailscale-mixin/dashboards_out/`. Jump to the [Client Side Machine Metrics](#client-side-machine-metrics) section for more information.
+
+![Grafana Dashboard](./docs/images/grafana-overview-1.png)
 
 ## Features
 
-- **Comprehensive Device Metrics**: Detailed per-device metrics including:
-  - Device information with rich labels (name, hostname, OS, user, etc.)
-  - Online/offline status and last seen timestamps
-  - Authorization and external device status
-  - Client version and update availability
-  - Network connectivity and latency measurements
-  - Route advertisement and enablement
-  - Key expiry settings and timestamps
-- **API Key Management**: Metrics for all API keys including:
-  - Key information and descriptions
-  - Expiration and creation timestamps
-  - Revocation status
-- **DNS Configuration**: DNS settings monitoring including:
-  - MagicDNS configuration
-  - Nameserver and search path counts
-- **User Management**: User metrics including:
-  - User information with roles and status
-  - User activity timestamps
-  - Aggregated counts by role and status
-- **Tailnet Settings**: Configuration monitoring including:
-  - Device and user approval settings
-  - Network flow logging status
-  - Regional routing configuration
-  - Exit node role permissions
+- **Comprehensive Device Metrics**: Detailed per-device metrics
+- **API Key Management**: Metrics for all API keys
+- **DNS Configuration**: DNS settings
+- **User Management**: User metrics
+- **Tailnet Settings**: Tailnet Configuration
 - **API Health**: Monitoring of Tailscale API accessibility
 
 ## Authentication Setup
@@ -46,7 +31,7 @@ This repository also contains the `tailscale-mixin` that provides Prometheus ale
 
 ### Docker Image
 
-There's a Docker image available on Docker Hub: [tailscale-exporter](https://hub.docker.com/r/adinhodovic/tailscale-exporter)
+There's a Docker image available on Docker Hub: [tailscale-exporter](https://hub.docker.com/r/adinhodovic/tailscale-exporter).
 
 ### Helm
 
@@ -110,3 +95,17 @@ scrape_configs:
 ## Metrics
 
 You can find the full list of metrics in the [METRICS.md](./docs/METRICS.md) file.
+
+### Client Side Machine Metrics
+
+This project also makes use of the [Tailscale's client side metrics](https://tailscale.com/kb/1211/client-metrics/) that are exposed by Tailscale clients. These metrics provide insights into individual devices connected to your tailnet.
+
+The dashboards and alerts depend on the `tailscale_machine` label to exist, it makes filtering and grouping the metrics easier. Adding the label is fairly straightforward using Prometheus' `relabel_configs`. Here's an example configuration using the `ServiceMonitor` spec:
+
+```yaml
+spec:
+  relabelings:
+  - action: replace
+    replacement: adin
+    targetLabel: tailscale_machine
+```
