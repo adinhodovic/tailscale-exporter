@@ -8,3 +8,6 @@ GO := GO111MODULE=on CGO_ENABLED=0 go
 .PHONY: build
 build:
 	$(GO) build -ldflags '$(LDFLAGS)' -o tailscale-exporter ./cmd/tailscale-exporter
+
+build-linux-amd64:
+	$(GO) build -ldflags '$(LDFLAGS)' -o tailscale-exporter-linux-amd64 ./cmd/tailscale-exporter

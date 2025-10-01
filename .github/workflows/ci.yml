@@ -85,3 +85,13 @@ jobs:
         with:
           push: true
           tags: adinhodovic/tailscale-exporter:latest,adinhodovic/tailscale-exporter:${{ github.event.release.tag_name }}
+
+      - name: Build Binary
+        run: |
+          make build-linux-amd64
+
+      - name: Upload Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          path: |
+            ./tailscale-exporter-linux-amd64
