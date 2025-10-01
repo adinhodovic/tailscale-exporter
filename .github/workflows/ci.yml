@@ -91,7 +91,8 @@ jobs:
           make build-linux-amd64
 
       - name: Upload Artifacts
-        uses: actions/upload-artifact@v4
+        uses: softprops/action-gh-release@v2
         with:
-          path: |
-            ./tailscale-exporter-linux-amd64
+          tag_name: ${{ github.event.release.tag_name }}
+          files: |
+            tailscale-exporter-linux-amd64
