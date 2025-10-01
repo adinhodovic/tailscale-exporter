@@ -29,6 +29,29 @@ The `tailscale-mixin` also has dashboards and alerts for client side `machine` m
 
 ## Installation
 
+### Binary
+
+Download the latest binary for Linux (amd64):
+
+```bash
+curl -L https://github.com/adinhodovic/tailscale-exporter/releases/latest/download/tailscale-exporter-linux-amd64 -o tailscale-exporter
+chmod +x tailscale-exporter
+```
+
+Set up your Tailscale OAuth credentials and tailnet name (replace the placeholders with your actual values):
+
+```bash
+export TAILSCALE_OAUTH_CLIENT_ID="your-client-id"
+export TAILSCALE_OAUTH_CLIENT_SECRET="your-client-secret"
+export TAILSCALE_TAILNET="example.com"   # e.g. "mycompany.com" or "mytailnet.ts.net"
+```
+
+Run the exporter:
+
+```bash
+./tailscale-exporter
+```
+
 ### Docker Image
 
 There's a Docker image available on Docker Hub: [tailscale-exporter](https://hub.docker.com/r/adinhodovic/tailscale-exporter).
