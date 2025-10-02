@@ -755,6 +755,30 @@
                         "value": "string"
                      }
                   ]
+               },
+               {
+                  "matcher": {
+                     "id": "byName",
+                     "options": "Routes Enabled"
+                  },
+                  "properties": [
+                     {
+                        "id": "unit",
+                        "value": "short"
+                     }
+                  ]
+               },
+               {
+                  "matcher": {
+                     "id": "byName",
+                     "options": "Routes Advertised"
+                  },
+                  "properties": [
+                     {
+                        "id": "unit",
+                        "value": "short"
+                     }
+                  ]
                }
             ]
          },

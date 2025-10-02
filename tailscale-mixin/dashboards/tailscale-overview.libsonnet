@@ -661,6 +661,14 @@ local tbOverride = tbStandardOptions.override;
               tbOverride.byName.withPropertiesFromOptions(
                 tbStandardOptions.withUnit('string')
               ),
+              tbOverride.byName.new('Routes Enabled') +
+              tbOverride.byName.withPropertiesFromOptions(
+                tbStandardOptions.withUnit('short')
+              ),
+              tbOverride.byName.new('Routes Advertised') +
+              tbOverride.byName.withPropertiesFromOptions(
+                tbStandardOptions.withUnit('short')
+              ),
             ]
           ),
 
