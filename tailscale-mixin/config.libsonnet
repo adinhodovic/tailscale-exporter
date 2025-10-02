@@ -26,12 +26,12 @@
     tailscaleUserRecentlyCreatedSeverity: 'info',
     tailscaleUserRecentlyCreatedThreshold: '300',  // Seconds
 
-    // Tailscaled
-    tailscaledMachineUnapprovedRoutesEnabled: true,
-    tailscaledMachineUnapprovedRoutesFor: '15m',
-    tailscaledMachineUnapprovedRoutesSeverity: 'warning',
-    tailscaledMachineUnapprovedRoutesThreshold: '10',
+    tailscaleDeviceUnapprovedRoutesEnabled: true,
+    tailscaleDeviceUnapprovedRoutesFor: '15m',
+    tailscaleDeviceUnapprovedRoutesSeverity: 'warning',
+    tailscaleDeviceUnapprovedRoutesThreshold: '10',
 
+    // Tailscaled
     tailscaledMachineHighOutboundDroppedPacketsEnabled: true,
     tailscaledMachineHighOutboundDroppedPacketsFor: '15m',
     tailscaledMachineHighOutboundDroppedPacketsSeverity: 'warning',

@@ -66,40 +66,40 @@
               mixin: 'tailscale',
             },
           },
-        ]),
-      },
-      {
-        name: 'tailscaled-machine-alerts',
-        rules: std.prune([
-          if $._config.tailscaledMachineUnapprovedRoutesEnabled then {
-            alert: 'TailscaledMachineUnapprovedRoutes',
+          if $._config.tailscaleDeviceUnapprovedRoutesEnabled then {
+            alert: 'TailscaleDeviceUnapprovedRoutes',
             expr: |||
               100 -
               (
                 (
                   sum(
-                    tailscaled_approved_routes
-                  ) by (tailscale_machine)
+                    tailscale_devices_routes_enabled
+                  ) by (tailnet, name, id)
                   /
                   sum(
-                    tailscaled_advertised_routes
-                  ) by (tailscale_machine)
+                    tailscale_devices_routes_advertised
+                  ) by (tailnet, name, id)
                 )
                 * 100
               )
-              > %(tailscaledMachineUnapprovedRoutesThreshold)s
+              > %(tailscaleDeviceUnapprovedRoutesThreshold)s
             ||| % $._config,
-            'for': $._config.tailscaledMachineUnapprovedRoutesFor,
+            'for': $._config.tailscaleDeviceUnapprovedRoutesFor,
             annotations: {
-              summary: 'Tailscaled Machine has Unapproved Routes',
-              description: 'Tailscaled Machine {{ $labels.tailscale_machine }} has unapproved routes for longer than %(tailscaledMachineUnapprovedRoutesFor)s.' % $._config,
-              dashboard_url: $._config.dashboardUrls['tailscale-machine'] + '?var-tailscale_machine={{ $labels.tailscale_machine }}' + clusterVariableQueryString,
+              summary: 'Tailscale Device has Unapproved Routes',
+              description: 'Tailscale Device {{ $labels.name }} (ID: {{ $labels.id }}) in Tailnet {{ $labels.tailnet }} has more than %(tailscaleDeviceUnapprovedRoutesThreshold)s%% unapproved routes for longer than %(tailscaleDeviceUnapprovedRoutesFor)s.' % $._config,
+              dashboard_url: $._config.dashboardUrls['tailscale-overview'] + clusterVariableQueryString,
             },
             labels: {
-              severity: $._config.tailscaledMachineUnapprovedRoutesSeverity,
+              severity: $._config.tailscaleDeviceUnapprovedRoutesSeverity,
               mixin: 'tailscale',
             },
           },
+        ]),
+      },
+      {
+        name: 'tailscaled-machine-alerts',
+        rules: std.prune([
           if $._config.tailscaledMachineHighOutboundDroppedPacketsEnabled then {
             alert: 'TailscaledMachineHighOutboundDroppedPackets',
             expr: |||

@@ -47,24 +47,22 @@
     "labels":
       "mixin": "tailscale"
       "severity": "info"
-- "name": "tailscaled-machine-alerts"
-  "rules":
-  - "alert": "TailscaledMachineUnapprovedRoutes"
+  - "alert": "TailscaleDeviceUnapprovedRoutes"
     "annotations":
-      "dashboard_url": "https://grafana.com/d/tailscaled-mixin-over-k12e/tailscale-machine?var-tailscale_machine={{ $labels.tailscale_machine }}"
-      "description": "Tailscaled Machine {{ $labels.tailscale_machine }} has unapproved routes for longer than 15m."
-      "summary": "Tailscaled Machine has Unapproved Routes"
+      "dashboard_url": "https://grafana.com/d/tailscale-mixin-over-k12e/tailscale-overview"
+      "description": "Tailscale Device {{ $labels.name }} (ID: {{ $labels.id }}) in Tailnet {{ $labels.tailnet }} has more than 10% unapproved routes for longer than 15m."
+      "summary": "Tailscale Device has Unapproved Routes"
     "expr": |
       100 -
       (
         (
           sum(
-            tailscaled_approved_routes
-          ) by (tailscale_machine)
+            tailscale_devices_routes_enabled
+          ) by (tailnet, name, id)
           /
           sum(
-            tailscaled_advertised_routes
-          ) by (tailscale_machine)
+            tailscale_devices_routes_advertised
+          ) by (tailnet, name, id)
         )
         * 100
       )
@@ -73,6 +71,8 @@
     "labels":
       "mixin": "tailscale"
       "severity": "warning"
+- "name": "tailscaled-machine-alerts"
+  "rules":
   - "alert": "TailscaledMachineHighOutboundDroppedPackets"
     "annotations":
       "dashboard_url": "https://grafana.com/d/tailscaled-mixin-over-k12e/tailscale-machine?var-tailscale_machine={{ $labels.tailscale_machine }}"

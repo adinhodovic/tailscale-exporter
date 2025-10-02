@@ -69,29 +69,31 @@ tests:
               description: "Tailscale User newuser@example.com (ID: user-new) in Tailnet test-tailnet was created within the last 300 seconds."
               dashboard_url: "https://grafana.com/d/tailscale-mixin-over-k12e/tailscale-overview"
 
-  # TailscaledMachineUnapprovedRoutes Alert Test
+  # TailscaleUnapprovedRoutes Alert Test
   - interval: 1m
     input_series:
-      - series: 'tailscaled_advertised_routes{tailscale_machine="machine-1"}'
+      - series: 'tailscale_devices_routes_advertised{tailnet="test-tailnet", name="test-device-3", id="device-789"}'
         values: "10+0x16" # 10 advertised routes
-      - series: 'tailscaled_approved_routes{tailscale_machine="machine-1"}'
+      - series: 'tailscale_devices_routes_enabled{tailnet="test-tailnet", name="test-device-3", id="device-789"}'
         values: "7+0x16" # 7 approved routes (30% unapproved, > 10% threshold)
-      - series: 'tailscaled_advertised_routes{tailscale_machine="machine-2"}'
+      - series: 'tailscale_devices_routes_advertised{tailnet="test-tailnet", name="test-device-4", id="device-101"}'
         values: "20+0x16" # 20 advertised routes
-      - series: 'tailscaled_approved_routes{tailscale_machine="machine-2"}'
+      - series: 'tailscale_devices_routes_enabled{tailnet="test-tailnet", name="test-device-4", id="device-101"}'
         values: "19+0x16" # 19 approved routes (5% unapproved, < 10% threshold, should not alert)
     alert_rule_test:
       - eval_time: 16m
-        alertname: TailscaledMachineUnapprovedRoutes
+        alertname: TailscaleDeviceUnapprovedRoutes
         exp_alerts:
           - exp_labels:
-              tailscale_machine: machine-1
+              tailnet: test-tailnet
+              name: test-device-3
+              id: device-789
               severity: warning
               mixin: tailscale
             exp_annotations:
-              summary: "Tailscaled Machine has Unapproved Routes"
-              description: "Tailscaled Machine machine-1 has unapproved routes for longer than 15m."
-              dashboard_url: "https://grafana.com/d/tailscaled-mixin-over-k12e/tailscale-machine?var-tailscale_machine=machine-1"
+              summary: "Tailscale Device has Unapproved Routes"
+              description: "Tailscale Device test-device-3 (ID: device-789) in Tailnet test-tailnet has more than 10% unapproved routes for longer than 15m."
+              dashboard_url: "https://grafana.com/d/tailscale-mixin-over-k12e/tailscale-overview"
 
   # TailscaledMachineHighOutboundDroppedPackets Alert Test
   - interval: 1m
