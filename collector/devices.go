@@ -159,9 +159,12 @@ func (c TailscaleDevicesCollector) Update(
 			tailscaleIP = device.Addresses[0]
 		}
 
+		// Normalize client version to semver format
+		normalizedVersion := normalizeVersion(device.ClientVersion)
+
 		// Device info
 		ch <- prometheus.MustNewConstMetric(deviceesInfoDesc, prometheus.GaugeValue, 1,
-			device.ID, device.Name, device.Hostname, device.OS, device.ClientVersion,
+			device.ID, device.Name, device.Hostname, device.OS, normalizedVersion,
 			device.User, tailscaleIP, device.MachineKey, device.NodeKey)
 
 		// Device status metrics
@@ -191,7 +194,7 @@ func (c TailscaleDevicesCollector) Update(
 			updateAvailable = 1.0
 		}
 		ch <- prometheus.MustNewConstMetric(devicesUpdateAvailableDesc, prometheus.GaugeValue, updateAvailable,
-			device.ID, device.Name, device.Hostname, device.OS, device.User, device.ClientVersion)
+			device.ID, device.Name, device.Hostname, device.OS, device.User, normalizedVersion)
 
 		keyExpiryDisabled := 0.0
 		if device.KeyExpiryDisabled {
