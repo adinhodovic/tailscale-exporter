@@ -9,7 +9,11 @@ RUN go mod download
 
 COPY . .
 
-RUN CGO_ENABLED=0 GOOS=linux go build -ldflags="-s -w" -o tailscale-exporter ./cmd/tailscale-exporter
+# Build for target platform (amd64 or arm64 passed automatically by Buildx)
+ARG TARGETOS
+ARG TARGETARCH
+RUN CGO_ENABLED=0 GOOS=$TARGETOS GOARCH=$TARGETARCH go build -ldflags="-s -w" \
+  -o tailscale-exporter ./cmd/tailscale-exporter
 
 # Final stage
 FROM alpine:3.20
