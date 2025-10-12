@@ -90,6 +90,7 @@ jobs:
         uses: docker/build-push-action@v6
         with:
           push: true
+          platforms: linux/amd64,linux/arm64
           tags: adinhodovic/tailscale-exporter:latest,adinhodovic/tailscale-exporter:${{ github.event.release.tag_name }}
 
       - name: Setup Go
@@ -100,7 +101,7 @@ jobs:
 
       - name: Build Binary
         run: |
-          make build-linux-amd64
+          make build-all
 
       - name: Upload Artifacts
         uses: softprops/action-gh-release@v2
@@ -108,3 +109,4 @@ jobs:
           tag_name: ${{ github.event.release.tag_name }}
           files: |
             tailscale-exporter-linux-amd64
+            tailscale-exporter-linux-arm64
