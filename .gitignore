@@ -1,5 +1,6 @@
 /tailscale-exporter
 /tailscale-exporter-linux-amd64
+/tailscale-exporter-linux-arm64
 .envrc
 .env
 bin
