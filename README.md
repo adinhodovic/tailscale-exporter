@@ -27,6 +27,19 @@ The `tailscale-mixin` also has dashboards and alerts for client side `machine` m
 4. Add read access for DNS, Devices, Users, and Keys
 5. Copy the generated token (it's only shown once)
 
+The following exact scopes are required:
+
+```sh
+devices:core:read  
+devices:posture_attributes:read  
+devices:routes:read  
+users:read  
+dns:read  
+auth_keys:read  
+feature_settings:read  
+policy_file:read
+```
+
 ## Installation
 
 ### Binary
