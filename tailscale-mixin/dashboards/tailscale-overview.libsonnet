@@ -17,7 +17,6 @@ local tbOverride = tbStandardOptions.override;
   grafanaDashboards+:: {
     ['%s.json' % dashboardName]:
 
-
       local defaultVariables = dashboardUtil.variables($._config);
 
       local variables = [
