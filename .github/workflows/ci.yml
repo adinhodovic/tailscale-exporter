@@ -92,6 +92,8 @@ jobs:
           push: true
           platforms: linux/amd64,linux/arm64
           tags: adinhodovic/tailscale-exporter:latest,adinhodovic/tailscale-exporter:${{ github.event.release.tag_name }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
 
       - name: Setup Go
         id: go
