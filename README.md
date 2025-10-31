@@ -134,7 +134,7 @@ You can find the full list of metrics in the [METRICS.md](./docs/METRICS.md) fil
 
 ### Client Side Machine Metrics
 
-This project also makes use of the [Tailscale's client side metrics](https://tailscale.com/kb/1211/client-metrics/) that are exposed by Tailscale clients. These metrics provide insights into individual devices connected to your tailnet.
+This project also makes use of the [Tailscale's client side metrics](https://tailscale.com/kb/1482/client-metrics/) that are exposed by Tailscale clients. These metrics provide insights into individual devices connected to your tailnet.
 
 The dashboards and alerts depend on the `tailscale_machine` label to exist, it makes filtering and grouping the metrics easier. Adding the label is fairly straightforward using Prometheus' `relabel_configs`. Here's an example configuration using the `ServiceMonitor` spec:
 
