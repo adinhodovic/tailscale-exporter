@@ -36,6 +36,7 @@ local tbOverride = tbStandardOptions.override;
       };
 
       local queries = {
+        // Summary
         nodesTotal: |||
           count(
             headscale_nodes_info{
@@ -52,22 +53,39 @@ local tbOverride = tbStandardOptions.override;
           )
         ||| % headscaleFilters,
 
-        nodesOffline: |||
+        usersTotal: |||
           count(
-            headscale_nodes_online{
+            headscale_users_info{
               %(headscale)s
-            } == 0
+            }
           )
         ||| % headscaleFilters,
 
-        nodesByUser: |||
+        apiKeysTotal: |||
           count(
-            headscale_nodes_info{
+            headscale_apikeys_info{
               %(headscale)s
             }
-          ) by (user)
+          )
         ||| % headscaleFilters,
 
+        preAuthKeysTotal: |||
+          count(
+            headscale_preauthkeys_info{
+              %(headscale)s
+            }
+          )
+        ||| % headscaleFilters,
+
+        databaseConnectivity: |||
+          max(
+            headscale_health_database_connectivity{
+              %(headscale)s
+            }
+          )
+        ||| % headscaleFilters,
+
+        // Nodes
         nodesByRegisterMethod: |||
           count(
             headscale_nodes_info{
@@ -82,14 +100,6 @@ local tbOverride = tbStandardOptions.override;
               %(headscale)s
             }
           ) by (category)
-        ||| % headscaleFilters,
-
-        nodesOnlineTimeSeries: |||
-          sum(
-            headscale_nodes_online{
-              %(headscale)s
-            }
-          )
         ||| % headscaleFilters,
 
         nodesApprovedRoutes: |||
@@ -146,23 +156,7 @@ local tbOverride = tbStandardOptions.override;
           ) by (id, name, user)
         ||| % headscaleFilters,
 
-        nodesLastSeenAge: |||
-          time() -
-          max(
-            headscale_nodes_last_seen_timestamp{
-              %(headscale)s
-            }
-          ) by (id, name, user)
-        ||| % headscaleFilters,
-
-        usersTotal: |||
-          count(
-            headscale_users_info{
-              %(headscale)s
-            }
-          )
-        ||| % headscaleFilters,
-
+        // Users
         usersByProvider: |||
           count(
             headscale_users_info{
@@ -177,22 +171,7 @@ local tbOverride = tbStandardOptions.override;
           }
         ||| % headscaleFilters,
 
-        apiKeysTotal: |||
-          count(
-            headscale_apikeys_info{
-              %(headscale)s
-            }
-          )
-        ||| % headscaleFilters,
-
-        apiKeysExpiringSoon: |||
-          count(
-            headscale_apikeys_expiration_timestamp{
-              %(headscale)s
-            } < time() + 30 * 24 * 60 * 60
-          )
-        ||| % headscaleFilters,
-
+        // Access Management
         apiKeysCreated: |||
           min(
             headscale_apikeys_created_timestamp{
@@ -215,14 +194,6 @@ local tbOverride = tbStandardOptions.override;
               %(headscale)s
             } * 1000
           ) by (id, prefix)
-        ||| % headscaleFilters,
-
-        preAuthKeysTotal: |||
-          count(
-            headscale_preauthkeys_info{
-              %(headscale)s
-            }
-          )
         ||| % headscaleFilters,
 
         preAuthKeysExpiringSoon: |||
@@ -308,18 +279,18 @@ local tbOverride = tbStandardOptions.override;
             }
           )
         ||| % headscaleFilters,
-
-        databaseConnectivity: |||
-          max(
-            headscale_health_database_connectivity{
-              %(headscale)s
-            }
-          )
-        ||| % headscaleFilters,
       };
 
       local panels = {
         // Summary
+        usersTotalStat:
+          dashboardUtil.statPanel(
+            'Users',
+            'short',
+            queries.usersTotal,
+            description='Total number of users known to Headscale.',
+          ),
+
         nodesTotalStat:
           dashboardUtil.statPanel(
             'Nodes',
@@ -336,22 +307,6 @@ local tbOverride = tbStandardOptions.override;
             description='Nodes currently online according to Headscale.',
           ),
 
-        nodesOfflineStat:
-          dashboardUtil.statPanel(
-            'Offline Nodes',
-            'short',
-            queries.nodesOffline,
-            description='Nodes that Headscale considers offline.',
-          ),
-
-        usersTotalStat:
-          dashboardUtil.statPanel(
-            'Users',
-            'short',
-            queries.usersTotal,
-            description='Total number of users known to Headscale.',
-          ),
-
         apiKeysTotalStat:
           dashboardUtil.statPanel(
             'API Keys',
@@ -360,28 +315,12 @@ local tbOverride = tbStandardOptions.override;
             description='Count of Headscale API keys.',
           ),
 
-        apiKeysExpiringStat:
-          dashboardUtil.statPanel(
-            'API Keys <30d',
-            'short',
-            queries.apiKeysExpiringSoon,
-            description='API keys that expire within the next 30 days.',
-          ),
-
         preAuthKeysTotalStat:
           dashboardUtil.statPanel(
             'Pre-auth Keys',
             'short',
             queries.preAuthKeysTotal,
             description='Count of Headscale pre-authentication keys.',
-          ),
-
-        preAuthKeysExpiringStat:
-          dashboardUtil.statPanel(
-            'Pre-auth Keys <7d',
-            'short',
-            queries.preAuthKeysExpiringSoon,
-            description='Pre-authentication keys that expire within the next 7 days.',
           ),
 
         databaseConnectivityStat:
@@ -393,15 +332,6 @@ local tbOverride = tbStandardOptions.override;
           ),
 
         // Nodes
-        nodesByUserPieChart:
-          dashboardUtil.pieChartPanel(
-            'Nodes by User',
-            'short',
-            queries.nodesByUser,
-            '{{ user }}',
-            description='Distribution of nodes grouped by user.',
-          ),
-
         nodesByRegisterMethodPieChart:
           dashboardUtil.pieChartPanel(
             'Nodes by Register Method',
@@ -420,40 +350,22 @@ local tbOverride = tbStandardOptions.override;
             description='Breakdown of tags reported per node grouped by category.',
           ),
 
-        nodesOnlineTimeSeries:
-          dashboardUtil.timeSeriesPanel(
-            'Nodes Online',
-            'short',
-            queries.nodesOnlineTimeSeries,
-            'Online',
-            description='Total number of nodes that Headscale reports as online.',
-          ),
-
-        nodesRoutesTimeSeries:
-          dashboardUtil.timeSeriesPanel(
+        nodesRoutesPieChart:
+          dashboardUtil.pieChartPanel(
             'Advertised Routes',
             'short',
             [
-              {
-                expr: queries.nodesApprovedRoutes,
-                legend: 'Approved',
-              },
-              {
-                expr: queries.nodesAvailableRoutes,
-                legend: 'Available',
-              },
-              {
-                expr: queries.nodesSubnetRoutes,
-                legend: 'Subnet',
-              },
+              { expr: queries.nodesApprovedRoutes, legend: 'Approved' },
+              { expr: queries.nodesAvailableRoutes, legend: 'Available' },
+              { expr: queries.nodesSubnetRoutes, legend: 'Subnet' },
             ],
-            description='Counts of routes advertised by nodes grouped by state.',
+            description='Distribution of routes advertised by nodes grouped by state.',
           ),
 
         nodesInfoTable:
           dashboardUtil.tablePanel(
-            'Nodes Inventory',
-            'string',
+            'Nodes',
+            'short',
             queries.nodesInfo,
             description='Node metadata reported by Headscale.',
             sortBy={ name: 'Name', desc: false },
@@ -498,6 +410,7 @@ local tbOverride = tbStandardOptions.override;
                     __name__: true,
                     environment: true,
                     cluster: true,
+                    region: true,
                     prometheus: true,
                   },
                 }
@@ -557,6 +470,7 @@ local tbOverride = tbStandardOptions.override;
                     __name__: true,
                     environment: true,
                     cluster: true,
+                    region: true,
                     prometheus: true,
                   },
                 }
@@ -574,50 +488,6 @@ local tbOverride = tbStandardOptions.override;
               tbOverride.byName.new('Expiry') +
               tbOverride.byName.withPropertiesFromOptions(
                 tbStandardOptions.withUnit('dateTimeAsIso')
-              ),
-            ],
-          ),
-
-        nodesLastSeenTable:
-          dashboardUtil.tablePanel(
-            'Seconds Since Last Seen',
-            's',
-            queries.nodesLastSeenAge,
-            description='How long each node has been offline according to Headscale.',
-            sortBy={ name: 'Value', desc: true },
-            transformations=[
-              tbQueryOptions.transformation.withId(
-                'organize'
-              ) +
-              tbQueryOptions.transformation.withOptions(
-                {
-                  renameByName: {
-                    id: 'ID',
-                    name: 'Name',
-                    user: 'User',
-                    Value: 'Seconds Since Last Seen',
-                  },
-                  indexByName: {
-                    name: 0,
-                    user: 1,
-                    id: 2,
-                    Value: 3,
-                  },
-                  excludeByName: {
-                    Time: true,
-                    job: true,
-                    container: true,
-                    instance: true,
-                    service: true,
-                    pod: true,
-                    endpoint: true,
-                    namespace: true,
-                    __name__: true,
-                    environment: true,
-                    cluster: true,
-                    prometheus: true,
-                  },
-                }
               ),
             ],
           ),
@@ -674,6 +544,7 @@ local tbOverride = tbStandardOptions.override;
                     __name__: true,
                     environment: true,
                     cluster: true,
+                    region: true,
                     prometheus: true,
                   },
                 }
@@ -759,6 +630,7 @@ local tbOverride = tbStandardOptions.override;
                     __name__: true,
                     environment: true,
                     cluster: true,
+                    region: true,
                     prometheus: true,
                   },
                 }
@@ -805,6 +677,7 @@ local tbOverride = tbStandardOptions.override;
                     ephemeral: 'Ephemeral',
                     used: 'Used',
                     acl_tags: 'ACL Tags',
+                    'Value #A': 'ID',
                     'Value #B': 'Created',
                     'Value #C': 'Expiration',
                   },
@@ -815,6 +688,7 @@ local tbOverride = tbStandardOptions.override;
                     ephemeral: 3,
                     used: 4,
                     acl_tags: 5,
+                    'Value #A': 6,
                     'Value #B': 6,
                     'Value #C': 7,
                   },
@@ -832,6 +706,7 @@ local tbOverride = tbStandardOptions.override;
                     __name__: true,
                     environment: true,
                     cluster: true,
+                    region: true,
                     prometheus: true,
                   },
                 }
@@ -860,14 +735,11 @@ local tbOverride = tbStandardOptions.override;
         ] +
         grid.wrapPanels(
           [
+            panels.usersTotalStat,
             panels.nodesTotalStat,
             panels.nodesOnlineStat,
-            panels.nodesOfflineStat,
-            panels.usersTotalStat,
             panels.apiKeysTotalStat,
-            panels.apiKeysExpiringStat,
             panels.preAuthKeysTotalStat,
-            panels.preAuthKeysExpiringStat,
             panels.databaseConnectivityStat,
           ],
           panelWidth=4,
@@ -883,7 +755,7 @@ local tbOverride = tbStandardOptions.override;
         ] +
         grid.wrapPanels(
           [
-            panels.nodesByUserPieChart,
+            panels.nodesRoutesPieChart,
             panels.nodesByRegisterMethodPieChart,
             panels.nodesTagsPieChart,
           ],
@@ -893,34 +765,17 @@ local tbOverride = tbStandardOptions.override;
         ) +
         grid.wrapPanels(
           [
-            panels.nodesOnlineTimeSeries,
-            panels.nodesRoutesTimeSeries,
-          ],
-          panelWidth=12,
-          panelHeight=8,
-          startY=12,
-        ) +
-        grid.wrapPanels(
-          [
             panels.nodesInfoTable,
+            panels.nodesLifecycleTable,
           ],
           panelWidth=24,
           panelHeight=10,
-          startY=20,
-        ) +
-        grid.wrapPanels(
-          [
-            panels.nodesLifecycleTable,
-            panels.nodesLastSeenTable,
-          ],
-          panelWidth=12,
-          panelHeight=8,
-          startY=30,
+          startY=14,
         ) +
         [
           row.new('Users') +
           row.gridPos.withX(0) +
-          row.gridPos.withY(38) +
+          row.gridPos.withY(34) +
           row.gridPos.withW(24) +
           row.gridPos.withH(1),
         ] +
@@ -928,22 +783,21 @@ local tbOverride = tbStandardOptions.override;
           [
             panels.usersByProviderPieChart,
           ],
-          panelWidth=8,
-          panelHeight=6,
-          startY=39,
+          panelWidth=4,
+          panelHeight=8,
+          startY=35,
         ) +
-        grid.wrapPanels(
-          [
-            panels.usersInfoTable,
-          ],
-          panelWidth=24,
-          panelHeight=10,
-          startY=45,
-        ) +
+        [
+          panels.usersInfoTable +
+          table.gridPos.withX(4) +
+          table.gridPos.withY(35) +
+          table.gridPos.withW(20) +
+          table.gridPos.withH(8),
+        ] +
         [
           row.new('Access Management') +
           row.gridPos.withX(0) +
-          row.gridPos.withY(55) +
+          row.gridPos.withY(43) +
           row.gridPos.withW(24) +
           row.gridPos.withH(1),
         ] +
@@ -955,30 +809,23 @@ local tbOverride = tbStandardOptions.override;
           ],
           panelWidth=8,
           panelHeight=6,
-          startY=56,
+          startY=44,
         ) +
         grid.wrapPanels(
           [
             panels.apiKeysInfoTable,
-          ],
-          panelWidth=24,
-          panelHeight=10,
-          startY=62,
-        ) +
-        grid.wrapPanels(
-          [
             panels.preAuthKeysInfoTable,
           ],
           panelWidth=24,
           panelHeight=10,
-          startY=72,
+          startY=50,
         );
 
       dashboardUtil.bypassDashboardValidation +
       dashboard.new(
         'Headscale / Overview',
       ) +
-      dashboard.withDescription('An overview of Headscale metrics collected by tailscale-exporter. %s' % dashboardUtil.dashboardDescriptionLink) +
+      dashboard.withDescription('An overview of Headscale metrics collected by tailscale-exporter using the Headscale API. %s' % dashboardUtil.dashboardDescriptionLink) +
       dashboard.withUid($._config.dashboardIds[dashboardName]) +
       dashboard.withTags($._config.tags) +
       dashboard.withTimezone('utc') +

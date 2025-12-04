@@ -33,9 +33,9 @@ var (
 	metricsPath   string
 
 	// Tailscale
-	tailnet           string
-	oauthClientID     string
-	oauthClientSecret string
+	tailscaleTailnet           string
+	tailscaleOauthClientID     string
+	tailscaleOauthClientSecret string
 
 	// Headscale
 	headscaleAddress  string
@@ -70,7 +70,7 @@ func init() {
 	rootCmd.PersistentFlags().
 		StringVarP(&metricsPath, "metrics-path", "m", "/metrics", "Path under which to expose metrics")
 	rootCmd.PersistentFlags().
-		StringVarP(&tailnet, "tailnet", "t", "", "Tailscale tailnet (can also be set via TAILSCALE_TAILNET environment variable)")
+		StringVarP(&tailscaleTailnet, "tailscale-tailnet", "t", "", "Tailscale tailnet (can also be set via TAILSCALE_TAILNET environment variable)")
 	rootCmd.PersistentFlags().
 		StringVar(&headscaleAddress, "headscale-address", "", "Headscale gRPC address (can also be set via HEADSCALE_ADDRESS environment variable)")
 	rootCmd.PersistentFlags().
@@ -80,25 +80,32 @@ func init() {
 
 	// Authentication flags - API Key or OAuth
 	rootCmd.PersistentFlags().
-		StringVar(&oauthClientID, "oauth-client-id", "", "OAuth client ID (can also be set via TAILSCALE_OAUTH_CLIENT_ID environment variable)")
+		StringVar(&tailscaleOauthClientID, "tailscale-oauth-client-id", "", "OAuth client ID (can also be set via TAILSCALE_OAUTH_CLIENT_ID environment variable)")
 	rootCmd.PersistentFlags().
-		StringVar(&oauthClientSecret, "oauth-client-secret", "", "OAuth client secret (can also be set via TAILSCALE_OAUTH_CLIENT_SECRET environment variable)")
+		StringVar(&tailscaleOauthClientSecret, "tailscale-oauth-client-secret", "", "OAuth client secret (can also be set via TAILSCALE_OAUTH_CLIENT_SECRET environment variable)")
 
 	viper.SetEnvKeyReplacer(strings.NewReplacer("-", "_"))
 	viper.AutomaticEnv()
 
 	mustBindFlag("listen-address")
 	mustBindFlag("metrics-path")
-	mustBindFlag("tailnet")
+
+	// Tailscale flags
+	mustBindFlag("tailscale-tailnet")
+	mustBindFlag("tailscale-oauth-client-id")
+	mustBindFlag("tailscale-oauth-client-secret")
+
+	// Headscale flags
 	mustBindFlag("headscale-address")
 	mustBindFlag("headscale-api-key")
 	mustBindFlag("headscale-insecure")
-	mustBindFlag("oauth-client-id")
-	mustBindFlag("oauth-client-secret")
 
-	mustBindEnv("tailnet", "TAILSCALE_TAILNET")
-	mustBindEnv("oauth-client-id", "TAILSCALE_OAUTH_CLIENT_ID")
-	mustBindEnv("oauth-client-secret", "TAILSCALE_OAUTH_CLIENT_SECRET")
+	// Tailscale flags
+	mustBindEnv("tailscale-tailnet", "TAILSCALE_TAILNET")
+	mustBindEnv("tailscale-oauth-client-id", "TAILSCALE_OAUTH_CLIENT_ID")
+	mustBindEnv("tailscale-oauth-client-secret", "TAILSCALE_OAUTH_CLIENT_SECRET")
+
+	// Headscale flags
 	mustBindEnv("headscale-address", "HEADSCALE_ADDRESS")
 	mustBindEnv("headscale-api-key", "HEADSCALE_API_KEY")
 	mustBindEnv("headscale-insecure", "HEADSCALE_INSECURE")
@@ -120,23 +127,27 @@ func runExporter(cmd *cobra.Command, args []string) error {
 
 	listenAddress = strings.TrimSpace(viper.GetString("listen-address"))
 	metricsPath = strings.TrimSpace(viper.GetString("metrics-path"))
-	tailnet = strings.TrimSpace(viper.GetString("tailnet"))
-	oauthClientID = strings.TrimSpace(viper.GetString("oauth-client-id"))
-	oauthClientSecret = strings.TrimSpace(viper.GetString("oauth-client-secret"))
+
+	// Tailscale
+	tailscaleTailnet = strings.TrimSpace(viper.GetString("tailscale-tailnet"))
+	tailscaleOauthClientID = strings.TrimSpace(viper.GetString("tailscale-oauth-client-id"))
+	tailscaleOauthClientSecret = strings.TrimSpace(viper.GetString("tailscale-oauth-client-secret"))
+
+	// Headscale
 	headscaleAddress = strings.TrimSpace(viper.GetString("headscale-address"))
 	headscaleAPIKey = strings.TrimSpace(viper.GetString("headscale-api-key"))
 	headscaleInsecure = viper.GetBool("headscale-insecure")
 
 	registered := false
 
-	if tailnet != "" {
-		if oauthClientID == "" || oauthClientSecret == "" {
+	if tailscaleTailnet != "" {
+		if tailscaleOauthClientID == "" || tailscaleOauthClientSecret == "" {
 			return errors.New("oauth credentials are required when tailnet is set")
 		}
 
 		oauthConfig := &clientcredentials.Config{
-			ClientID:     oauthClientID,
-			ClientSecret: oauthClientSecret,
+			ClientID:     tailscaleOauthClientID,
+			ClientSecret: tailscaleOauthClientSecret,
 			TokenURL:     "https://api.tailscale.com/api/v2/oauth/token",
 			Scopes: []string{
 				"devices:core:read",
@@ -161,19 +172,19 @@ func runExporter(cmd *cobra.Command, args []string) error {
 		tsCollector, err := tailscale.NewTailscaleCollector(
 			logger,
 			httpClient,
-			tailnet,
+			tailscaleTailnet,
 		)
 		if err != nil {
 			return fmt.Errorf("failed to create Tailscale collector: %w", err)
 		}
 
 		tsReg := prometheus.WrapRegistererWith(
-			prometheus.Labels{"tailnet": tailnet},
+			prometheus.Labels{"tailnet": tailscaleTailnet},
 			prometheus.DefaultRegisterer,
 		)
 		tsReg.MustRegister(tsCollector)
 		registered = true
-		logger.Info("Tailscale metrics enabled", "tailnet", tailnet)
+		logger.Info("Tailscale metrics enabled", "tailnet", tailscaleTailnet)
 	} else {
 		logger.Info("Tailscale metrics disabled", "reason", "tailnet not set")
 	}
@@ -194,7 +205,7 @@ func runExporter(cmd *cobra.Command, args []string) error {
 			})
 		}
 
-		conn, err := grpc.Dial(
+		conn, err := grpc.NewClient(
 			headscaleAddress,
 			grpc.WithTransportCredentials(transportCreds),
 		)
@@ -226,7 +237,7 @@ func runExporter(cmd *cobra.Command, args []string) error {
 	}
 
 	if !registered {
-		logger.Error("No collectors enabled", "action", "set --tailnet or --headscale-address")
+		logger.Error("No collectors enabled", "action", "set --tailscale-tailnet or --headscale-address")
 		return errors.New("at least one metrics source (tailnet or headscale) must be configured")
 	}
 

@@ -4,7 +4,7 @@
    "annotations": {
       "list": [ ]
    },
-   "description": "An overview of Headscale metrics collected by tailscale-exporter. The dashboards were generated using [tailscale-mixin](https://github.com/adinhodovic/tailscale-exporter/tree/main/tailscale-mixin). Open issues and create feature requests in the repository.",
+   "description": "An overview of Headscale metrics collected by tailscale-exporter using the Headscale API. The dashboards were generated using [tailscale-mixin](https://github.com/adinhodovic/tailscale-exporter/tree/main/tailscale-mixin). Open issues and create feature requests in the repository.",
    "editable": false,
    "links": [
       {
@@ -38,7 +38,7 @@
             "type": "prometheus",
             "uid": "$datasource"
          },
-         "description": "Number of Headscale nodes discovered by the exporter.",
+         "description": "Total number of users known to Headscale.",
          "fieldConfig": {
             "defaults": {
                "mappings": [ ],
@@ -60,6 +60,46 @@
             "y": 1
          },
          "id": 2,
+         "pluginVersion": "v11.4.0",
+         "targets": [
+            {
+               "datasource": {
+                  "type": "prometheus",
+                  "uid": "${datasource}"
+               },
+               "expr": "count(\n  headscale_users_info{\n    cluster=\"$cluster\"\n,\nnamespace=\"$namespace\",\njob=\"$job\"\n\n  }\n)\n"
+            }
+         ],
+         "title": "Users",
+         "type": "stat"
+      },
+      {
+         "datasource": {
+            "type": "prometheus",
+            "uid": "$datasource"
+         },
+         "description": "Number of Headscale nodes discovered by the exporter.",
+         "fieldConfig": {
+            "defaults": {
+               "mappings": [ ],
+               "thresholds": {
+                  "steps": [
+                     {
+                        "color": "green",
+                        "value": 0
+                     }
+                  ]
+               },
+               "unit": "short"
+            }
+         },
+         "gridPos": {
+            "h": 4,
+            "w": 4,
+            "x": 4,
+            "y": 1
+         },
+         "id": 3,
          "pluginVersion": "v11.4.0",
          "targets": [
             {
@@ -96,10 +136,10 @@
          "gridPos": {
             "h": 4,
             "w": 4,
-            "x": 4,
+            "x": 8,
             "y": 1
          },
-         "id": 3,
+         "id": 4,
          "pluginVersion": "v11.4.0",
          "targets": [
             {
@@ -118,47 +158,7 @@
             "type": "prometheus",
             "uid": "$datasource"
          },
-         "description": "Nodes that Headscale considers offline.",
-         "fieldConfig": {
-            "defaults": {
-               "mappings": [ ],
-               "thresholds": {
-                  "steps": [
-                     {
-                        "color": "green",
-                        "value": 0
-                     }
-                  ]
-               },
-               "unit": "short"
-            }
-         },
-         "gridPos": {
-            "h": 4,
-            "w": 4,
-            "x": 8,
-            "y": 1
-         },
-         "id": 4,
-         "pluginVersion": "v11.4.0",
-         "targets": [
-            {
-               "datasource": {
-                  "type": "prometheus",
-                  "uid": "${datasource}"
-               },
-               "expr": "count(\n  headscale_nodes_online{\n    cluster=\"$cluster\"\n,\nnamespace=\"$namespace\",\njob=\"$job\"\n\n  } == 0\n)\n"
-            }
-         ],
-         "title": "Offline Nodes",
-         "type": "stat"
-      },
-      {
-         "datasource": {
-            "type": "prometheus",
-            "uid": "$datasource"
-         },
-         "description": "Total number of users known to Headscale.",
+         "description": "Count of Headscale API keys.",
          "fieldConfig": {
             "defaults": {
                "mappings": [ ],
@@ -187,10 +187,10 @@
                   "type": "prometheus",
                   "uid": "${datasource}"
                },
-               "expr": "count(\n  headscale_users_info{\n    cluster=\"$cluster\"\n,\nnamespace=\"$namespace\",\njob=\"$job\"\n\n  }\n)\n"
+               "expr": "count(\n  headscale_apikeys_info{\n    cluster=\"$cluster\"\n,\nnamespace=\"$namespace\",\njob=\"$job\"\n\n  }\n)\n"
             }
          ],
-         "title": "Users",
+         "title": "API Keys",
          "type": "stat"
       },
       {
@@ -198,7 +198,7 @@
             "type": "prometheus",
             "uid": "$datasource"
          },
-         "description": "Count of Headscale API keys.",
+         "description": "Count of Headscale pre-authentication keys.",
          "fieldConfig": {
             "defaults": {
                "mappings": [ ],
@@ -227,130 +227,10 @@
                   "type": "prometheus",
                   "uid": "${datasource}"
                },
-               "expr": "count(\n  headscale_apikeys_info{\n    cluster=\"$cluster\"\n,\nnamespace=\"$namespace\",\njob=\"$job\"\n\n  }\n)\n"
-            }
-         ],
-         "title": "API Keys",
-         "type": "stat"
-      },
-      {
-         "datasource": {
-            "type": "prometheus",
-            "uid": "$datasource"
-         },
-         "description": "API keys that expire within the next 30 days.",
-         "fieldConfig": {
-            "defaults": {
-               "mappings": [ ],
-               "thresholds": {
-                  "steps": [
-                     {
-                        "color": "green",
-                        "value": 0
-                     }
-                  ]
-               },
-               "unit": "short"
-            }
-         },
-         "gridPos": {
-            "h": 4,
-            "w": 4,
-            "x": 20,
-            "y": 1
-         },
-         "id": 7,
-         "pluginVersion": "v11.4.0",
-         "targets": [
-            {
-               "datasource": {
-                  "type": "prometheus",
-                  "uid": "${datasource}"
-               },
-               "expr": "count(\n  headscale_apikeys_expiration_timestamp{\n    cluster=\"$cluster\"\n,\nnamespace=\"$namespace\",\njob=\"$job\"\n\n  } < time() + 30 * 24 * 60 * 60\n)\n"
-            }
-         ],
-         "title": "API Keys <30d",
-         "type": "stat"
-      },
-      {
-         "datasource": {
-            "type": "prometheus",
-            "uid": "$datasource"
-         },
-         "description": "Count of Headscale pre-authentication keys.",
-         "fieldConfig": {
-            "defaults": {
-               "mappings": [ ],
-               "thresholds": {
-                  "steps": [
-                     {
-                        "color": "green",
-                        "value": 0
-                     }
-                  ]
-               },
-               "unit": "short"
-            }
-         },
-         "gridPos": {
-            "h": 4,
-            "w": 4,
-            "x": 0,
-            "y": 5
-         },
-         "id": 8,
-         "pluginVersion": "v11.4.0",
-         "targets": [
-            {
-               "datasource": {
-                  "type": "prometheus",
-                  "uid": "${datasource}"
-               },
                "expr": "count(\n  headscale_preauthkeys_info{\n    cluster=\"$cluster\"\n,\nnamespace=\"$namespace\",\njob=\"$job\"\n\n  }\n)\n"
             }
          ],
          "title": "Pre-auth Keys",
-         "type": "stat"
-      },
-      {
-         "datasource": {
-            "type": "prometheus",
-            "uid": "$datasource"
-         },
-         "description": "Pre-authentication keys that expire within the next 7 days.",
-         "fieldConfig": {
-            "defaults": {
-               "mappings": [ ],
-               "thresholds": {
-                  "steps": [
-                     {
-                        "color": "green",
-                        "value": 0
-                     }
-                  ]
-               },
-               "unit": "short"
-            }
-         },
-         "gridPos": {
-            "h": 4,
-            "w": 4,
-            "x": 4,
-            "y": 5
-         },
-         "id": 9,
-         "pluginVersion": "v11.4.0",
-         "targets": [
-            {
-               "datasource": {
-                  "type": "prometheus",
-                  "uid": "${datasource}"
-               },
-               "expr": "count(\n  headscale_preauthkeys_expiration_timestamp{\n    cluster=\"$cluster\"\n,\nnamespace=\"$namespace\",\njob=\"$job\"\n\n  } < time() + 7 * 24 * 60 * 60\n)\n"
-            }
-         ],
-         "title": "Pre-auth Keys <7d",
          "type": "stat"
       },
       {
@@ -376,10 +256,10 @@
          "gridPos": {
             "h": 4,
             "w": 4,
-            "x": 8,
-            "y": 5
+            "x": 20,
+            "y": 1
          },
-         "id": 10,
+         "id": 7,
          "pluginVersion": "v11.4.0",
          "targets": [
             {
@@ -401,7 +281,7 @@
             "x": 0,
             "y": 5
          },
-         "id": 11,
+         "id": 8,
          "title": "Nodes",
          "type": "row"
       },
@@ -410,7 +290,7 @@
             "type": "prometheus",
             "uid": "$datasource"
          },
-         "description": "Distribution of nodes grouped by user.",
+         "description": "Distribution of routes advertised by nodes grouped by state.",
          "fieldConfig": {
             "defaults": {
                "unit": "short"
@@ -422,7 +302,7 @@
             "x": 0,
             "y": 6
          },
-         "id": 12,
+         "id": 9,
          "options": {
             "displayLabels": [
                "percent"
@@ -447,12 +327,30 @@
                   "type": "prometheus",
                   "uid": "$datasource"
                },
-               "expr": "count(\n  headscale_nodes_info{\n    cluster=\"$cluster\"\n,\nnamespace=\"$namespace\",\njob=\"$job\"\n\n  }\n) by (user)\n",
+               "expr": "sum(\n  headscale_nodes_approved_routes{\n    cluster=\"$cluster\"\n,\nnamespace=\"$namespace\",\njob=\"$job\"\n\n  }\n)\n",
                "instant": true,
-               "legendFormat": "{{ user }}"
+               "legendFormat": "Approved"
+            },
+            {
+               "datasource": {
+                  "type": "prometheus",
+                  "uid": "$datasource"
+               },
+               "expr": "sum(\n  headscale_nodes_available_routes{\n    cluster=\"$cluster\"\n,\nnamespace=\"$namespace\",\njob=\"$job\"\n\n  }\n)\n",
+               "instant": true,
+               "legendFormat": "Available"
+            },
+            {
+               "datasource": {
+                  "type": "prometheus",
+                  "uid": "$datasource"
+               },
+               "expr": "sum(\n  headscale_nodes_subnet_routes{\n    cluster=\"$cluster\"\n,\nnamespace=\"$namespace\",\njob=\"$job\"\n\n  }\n)\n",
+               "instant": true,
+               "legendFormat": "Subnet"
             }
          ],
-         "title": "Nodes by User",
+         "title": "Advertised Routes",
          "type": "piechart"
       },
       {
@@ -472,7 +370,7 @@
             "x": 8,
             "y": 6
          },
-         "id": 13,
+         "id": 10,
          "options": {
             "displayLabels": [
                "percent"
@@ -522,7 +420,7 @@
             "x": 16,
             "y": 6
          },
-         "id": 14,
+         "id": 11,
          "options": {
             "displayLabels": [
                "percent"
@@ -560,134 +458,10 @@
             "type": "prometheus",
             "uid": "$datasource"
          },
-         "description": "Total number of nodes that Headscale reports as online.",
-         "fieldConfig": {
-            "defaults": {
-               "custom": {
-                  "fillOpacity": 10
-               },
-               "unit": "short"
-            }
-         },
-         "gridPos": {
-            "h": 8,
-            "w": 12,
-            "x": 0,
-            "y": 12
-         },
-         "id": 15,
-         "options": {
-            "legend": {
-               "calcs": [
-                  "mean",
-                  "max"
-               ],
-               "displayMode": "table",
-               "placement": "right",
-               "showLegend": true,
-               "sortBy": "Mean",
-               "sortDesc": true
-            },
-            "tooltip": {
-               "mode": "multi",
-               "sort": "desc"
-            }
-         },
-         "pluginVersion": "v11.4.0",
-         "targets": [
-            {
-               "datasource": {
-                  "type": "prometheus",
-                  "uid": "$datasource"
-               },
-               "exemplar": false,
-               "expr": "sum(\n  headscale_nodes_online{\n    cluster=\"$cluster\"\n,\nnamespace=\"$namespace\",\njob=\"$job\"\n\n  }\n)\n",
-               "legendFormat": "Online"
-            }
-         ],
-         "title": "Nodes Online",
-         "type": "timeseries"
-      },
-      {
-         "datasource": {
-            "type": "prometheus",
-            "uid": "$datasource"
-         },
-         "description": "Counts of routes advertised by nodes grouped by state.",
-         "fieldConfig": {
-            "defaults": {
-               "custom": {
-                  "fillOpacity": 10
-               },
-               "unit": "short"
-            }
-         },
-         "gridPos": {
-            "h": 8,
-            "w": 12,
-            "x": 12,
-            "y": 12
-         },
-         "id": 16,
-         "options": {
-            "legend": {
-               "calcs": [
-                  "mean",
-                  "max"
-               ],
-               "displayMode": "table",
-               "placement": "right",
-               "showLegend": true,
-               "sortBy": "Mean",
-               "sortDesc": true
-            },
-            "tooltip": {
-               "mode": "multi",
-               "sort": "desc"
-            }
-         },
-         "pluginVersion": "v11.4.0",
-         "targets": [
-            {
-               "datasource": {
-                  "type": "prometheus",
-                  "uid": "$datasource"
-               },
-               "exemplar": false,
-               "expr": "sum(\n  headscale_nodes_approved_routes{\n    cluster=\"$cluster\"\n,\nnamespace=\"$namespace\",\njob=\"$job\"\n\n  }\n)\n",
-               "legendFormat": "Approved"
-            },
-            {
-               "datasource": {
-                  "type": "prometheus",
-                  "uid": "$datasource"
-               },
-               "exemplar": false,
-               "expr": "sum(\n  headscale_nodes_available_routes{\n    cluster=\"$cluster\"\n,\nnamespace=\"$namespace\",\njob=\"$job\"\n\n  }\n)\n",
-               "legendFormat": "Available"
-            },
-            {
-               "datasource": {
-                  "type": "prometheus",
-                  "uid": "$datasource"
-               },
-               "exemplar": false,
-               "expr": "sum(\n  headscale_nodes_subnet_routes{\n    cluster=\"$cluster\"\n,\nnamespace=\"$namespace\",\njob=\"$job\"\n\n  }\n)\n",
-               "legendFormat": "Subnet"
-            }
-         ],
-         "title": "Advertised Routes",
-         "type": "timeseries"
-      },
-      {
-         "datasource": {
-            "type": "prometheus",
-            "uid": "$datasource"
-         },
          "description": "Node metadata reported by Headscale.",
          "fieldConfig": {
             "defaults": {
-               "unit": "string"
+               "unit": "short"
             },
             "overrides": [ ]
          },
@@ -695,9 +469,9 @@
             "h": 10,
             "w": 24,
             "x": 0,
-            "y": 20
+            "y": 14
          },
-         "id": 17,
+         "id": 12,
          "options": {
             "footer": {
                "enablePagination": true
@@ -721,7 +495,7 @@
                "instant": true
             }
          ],
-         "title": "Nodes Inventory",
+         "title": "Nodes",
          "transformations": [
             {
                "id": "organize",
@@ -739,6 +513,7 @@
                      "namespace": true,
                      "pod": true,
                      "prometheus": true,
+                     "region": true,
                      "service": true
                   },
                   "indexByName": {
@@ -818,12 +593,12 @@
             ]
          },
          "gridPos": {
-            "h": 8,
-            "w": 12,
+            "h": 10,
+            "w": 24,
             "x": 0,
-            "y": 30
+            "y": 24
          },
-         "id": 18,
+         "id": 13,
          "options": {
             "footer": {
                "enablePagination": true
@@ -885,6 +660,7 @@
                      "namespace": true,
                      "pod": true,
                      "prometheus": true,
+                     "region": true,
                      "service": true
                   },
                   "indexByName": {
@@ -909,92 +685,14 @@
          "type": "table"
       },
       {
-         "datasource": {
-            "type": "prometheus",
-            "uid": "$datasource"
-         },
-         "description": "How long each node has been offline according to Headscale.",
-         "fieldConfig": {
-            "defaults": {
-               "unit": "s"
-            },
-            "overrides": [ ]
-         },
-         "gridPos": {
-            "h": 8,
-            "w": 12,
-            "x": 12,
-            "y": 30
-         },
-         "id": 19,
-         "options": {
-            "footer": {
-               "enablePagination": true
-            },
-            "sortBy": [
-               {
-                  "desc": true,
-                  "displayName": "Value"
-               }
-            ]
-         },
-         "pluginVersion": "v11.4.0",
-         "targets": [
-            {
-               "datasource": {
-                  "type": "prometheus",
-                  "uid": "$datasource"
-               },
-               "expr": "time() -\nmax(\n  headscale_nodes_last_seen_timestamp{\n    cluster=\"$cluster\"\n,\nnamespace=\"$namespace\",\njob=\"$job\"\n\n  }\n) by (id, name, user)\n",
-               "format": "table",
-               "instant": true
-            }
-         ],
-         "title": "Seconds Since Last Seen",
-         "transformations": [
-            {
-               "id": "organize",
-               "options": {
-                  "excludeByName": {
-                     "Time": true,
-                     "__name__": true,
-                     "cluster": true,
-                     "container": true,
-                     "endpoint": true,
-                     "environment": true,
-                     "instance": true,
-                     "job": true,
-                     "namespace": true,
-                     "pod": true,
-                     "prometheus": true,
-                     "service": true
-                  },
-                  "indexByName": {
-                     "Value": 3,
-                     "id": 2,
-                     "name": 0,
-                     "user": 1
-                  },
-                  "renameByName": {
-                     "Value": "Seconds Since Last Seen",
-                     "id": "ID",
-                     "name": "Name",
-                     "user": "User"
-                  }
-               }
-            }
-         ],
-         "type": "table"
-      },
-      {
          "collapsed": false,
          "gridPos": {
             "h": 1,
             "w": 24,
             "x": 0,
-            "y": 38
+            "y": 34
          },
-         "id": 20,
+         "id": 14,
          "title": "Users",
          "type": "row"
       },
@@ -1010,12 +708,12 @@
             }
          },
          "gridPos": {
-            "h": 6,
-            "w": 8,
+            "h": 8,
+            "w": 4,
             "x": 0,
-            "y": 39
+            "y": 35
          },
-         "id": 21,
+         "id": 15,
          "options": {
             "displayLabels": [
                "percent"
@@ -1061,12 +759,12 @@
             "overrides": [ ]
          },
          "gridPos": {
-            "h": 10,
-            "w": 24,
-            "x": 0,
-            "y": 45
+            "h": 8,
+            "w": 20,
+            "x": 4,
+            "y": 35
          },
-         "id": 22,
+         "id": 16,
          "options": {
             "footer": {
                "enablePagination": true
@@ -1108,6 +806,7 @@
                      "namespace": true,
                      "pod": true,
                      "prometheus": true,
+                     "region": true,
                      "service": true
                   },
                   "indexByName": {
@@ -1137,9 +836,9 @@
             "h": 1,
             "w": 24,
             "x": 0,
-            "y": 55
+            "y": 43
          },
-         "id": 23,
+         "id": 17,
          "title": "Access Management",
          "type": "row"
       },
@@ -1158,9 +857,9 @@
             "h": 6,
             "w": 8,
             "x": 0,
-            "y": 56
+            "y": 44
          },
-         "id": 24,
+         "id": 18,
          "options": {
             "displayLabels": [
                "percent"
@@ -1217,9 +916,9 @@
             "h": 6,
             "w": 8,
             "x": 8,
-            "y": 56
+            "y": 44
          },
-         "id": 25,
+         "id": 19,
          "options": {
             "displayLabels": [
                "percent"
@@ -1276,9 +975,9 @@
             "h": 6,
             "w": 8,
             "x": 16,
-            "y": 56
+            "y": 44
          },
-         "id": 26,
+         "id": 20,
          "options": {
             "displayLabels": [
                "percent"
@@ -1373,9 +1072,9 @@
             "h": 10,
             "w": 24,
             "x": 0,
-            "y": 62
+            "y": 50
          },
-         "id": 27,
+         "id": 21,
          "options": {
             "footer": {
                "enablePagination": true
@@ -1437,6 +1136,7 @@
                      "namespace": true,
                      "pod": true,
                      "prometheus": true,
+                     "region": true,
                      "service": true
                   },
                   "indexByName": {
@@ -1499,9 +1199,9 @@
             "h": 10,
             "w": 24,
             "x": 0,
-            "y": 72
+            "y": 60
          },
-         "id": 28,
+         "id": 22,
          "options": {
             "footer": {
                "enablePagination": true
@@ -1565,9 +1265,11 @@
                      "namespace": true,
                      "pod": true,
                      "prometheus": true,
+                     "region": true,
                      "service": true
                   },
                   "indexByName": {
+                     "Value #A": 6,
                      "Value #B": 6,
                      "Value #C": 7,
                      "acl_tags": 5,
@@ -1578,6 +1280,7 @@
                      "user": 0
                   },
                   "renameByName": {
+                     "Value #A": "ID",
                      "Value #B": "Created",
                      "Value #C": "Expiration",
                      "acl_tags": "ACL Tags",
