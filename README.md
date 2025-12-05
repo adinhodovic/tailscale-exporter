@@ -1,6 +1,6 @@
 # Tailscale Exporter
 
-A Prometheus exporter for Tailscale that provides tailnet-level metrics using the Tailscale API.
+A Prometheus exporter for Tailscale and Headscale that provides tailnet-level metrics using the Tailscale/Headscale API.
 
 This repository also contains the `tailscale-mixin` that provides Prometheus alerts and rules and Grafana dashboard for tailnet-level metrics. You can find the dashboards in `./tailscale-mixin/dashboards_out/`.
 
@@ -11,15 +11,12 @@ The `tailscale-mixin` also has dashboards and alerts for client side `machine` m
 ## Overview
 
 The exporter supports metrics from:
-- Tailscale (official cloud) via the Tailscale API
-- Headscale (self-hosted) via the Headscale gRPC API
+- Tailscale via the Tailscale API
+- Headscale via the Headscale gRPC API
 
 Dashboards and alerts for both are provided in the `tailscale-mixin`.
 
-![Tailscale Dashboard](./docs/images/grafana-overview-1.png)
-![Headscale Dashboard](./docs/images/grafana-machine-1.png)
-
-## Tailscale Exporting Features
+## Tailscale Features
 
 - Comprehensive device metrics
 - API key management (auth keys)
@@ -28,40 +25,20 @@ Dashboards and alerts for both are provided in the `tailscale-mixin`.
 - Tailnet settings
 - API health (Tailscale API accessibility)
 
-## Headscale Exporting Features
+## Headscale Features
 
 - Node metrics (devices managed by Headscale)
 - User and API key metrics
 - Preauth keys metrics
 - Headscale health status
-- TLS or plaintext gRPC connectivity options
-
-## Authentication Setup
-
-### 1. Generate API Access Token
-
-1. Go to the [Tailscale admin console](https://login.tailscale.com/admin/settings/keys)
-2. Navigate to **Settings** → **Oauth Client**
-3. Click on **Create new OAuth client**
-4. Add read access for DNS, Devices, Users, and Keys
-5. Copy the generated token (it's only shown once)
-
-The following exact scopes are required:
-
-```sh
-devices:core:read  
-devices:posture_attributes:read  
-devices:routes:read  
-users:read  
-dns:read  
-auth_keys:read  
-feature_settings:read  
-policy_file:read
-```
 
 ## Installation
 
-### Binary
+You can run the exporter to collect metrics from Tailscale (official cloud) and/or Headscale (self-hosted). Choose the path that matches your environment.
+
+### Tailscale Installation
+
+#### Tailscale Binary
 
 Download the latest binary for Linux (amd64):
 
@@ -84,11 +61,21 @@ Run the exporter:
 ./tailscale-exporter
 ```
 
-### Docker Image
+#### Docker Image
 
 There's a Docker image available on Docker Hub: [tailscale-exporter](https://hub.docker.com/r/adinhodovic/tailscale-exporter).
 
-### Helm
+Example with environment variables:
+
+```bash
+docker run -d --name tailscale-exporter -p 9250:9250 \
+  -e TAILSCALE_OAUTH_CLIENT_ID="your-client-id" \
+  -e TAILSCALE_OAUTH_CLIENT_SECRET="your-client-secret" \
+  -e TAILSCALE_TAILNET="your-tailnet-name" \
+  adinhodovic/tailscale-exporter:latest
+```
+
+#### Helm
 
 A Helm chart is available in the `charts/tailscale-exporter` directory. You can install it using Helm:
 
@@ -99,17 +86,53 @@ helm install tailscale-exporter ./charts/tailscale-exporter \
   --set env.TAILSCALE_TAILNET="your-tailnet-name"
 ```
 
-## Usage
+### Headscale Installation
 
-### Environment Variables
+#### Binary
 
 Set the required environment variables:
 
 ```bash
-export TAILSCALE_OAUTH_CLIENT_ID="your-client-id"
-export TAILSCALE_OAUTH_CLIENT_SECRET="your-client-secret"
-export TAILSCALE_TAILNET="your-tailnet-name"
+export HEADSCALE_ADDRESS="host:port"          # e.g. "headscale.example.com:50443" or "localhost:50443"
+export HEADSCALE_API_KEY="your-api-key"       # required when HEADSCALE_ADDRESS is set
+export HEADSCALE_INSECURE="false"             # set to "true" to allow plaintext gRPC (no TLS)
 ```
+
+Run the exporter with Headscale enabled:
+
+```bash
+./tailscale-exporter \
+  --headscale-address "$HEADSCALE_ADDRESS" \
+  --headscale-api-key "$HEADSCALE_API_KEY" \
+  -- headscale-inseucre "false"
+```
+
+#### Docker Image
+
+Example with environment variables:
+
+```bash
+docker run -d --name tailscale-exporter -p 9250:9250 \
+  -e HEADSCALE_ADDRESS="headscale.example.com:50443" \
+  -e HEADSCALE_API_KEY="your-api-key" \
+  -e HEADSCALE_INSECURE="false" \
+  adinhodovic/tailscale-exporter:latest
+```
+
+You can combine Tailscale and Headscale in the same container by setting both sets of environment variables.
+
+#### Helm
+
+Install with Headscale settings:
+
+```bash
+helm install tailscale-exporter ./charts/tailscale-exporter \
+  --set env.HEADSCALE_ADDRESS="headscale.example.com:50443" \
+  --set env.HEADSCALE_API_KEY="your-api-key" \
+  --set env.HEADSCALE_INSECURE="false"
+```
+
+## Usage
 
 ### Basic Usage
 
@@ -125,12 +148,15 @@ The exporter will start on port 9250 by default and expose metrics at `/metrics`
 ./tailscale-exporter -h
 
 Flags:
-  -h, --help                         help for tailscale-exporter
-  -l, --listen-address string        Address to listen on for web interface and telemetry (default ":9250")
-  -m, --metrics-path string          Path under which to expose metrics (default "/metrics")
-      --oauth-client-id string       OAuth client ID (can also be set via TAILSCALE_OAUTH_CLIENT_ID environment variable)
-      --oauth-client-secret string   OAuth client secret (can also be set via TAILSCALE_OAUTH_CLIENT_SECRET environment variable)
-  -t, --tailnet string               Tailscale tailnet (can also be set via TAILSCALE_TAILNET environment variable)
+      --headscale-address string               Headscale gRPC address (can also be set via HEADSCALE_ADDRESS environment variable)
+      --headscale-api-key string               Headscale API key (can also be set via HEADSCALE_API_KEY environment variable)
+      --headscale-insecure                     Allow insecure (plaintext) gRPC connection to Headscale (can also be set via HEADSCALE_INSECURE environment variable)
+  -h, --help                                   help for tailscale-exporter
+  -l, --listen-address string                  Address to listen on for web interface and telemetry (default ":9250")
+  -m, --metrics-path string                    Path under which to expose metrics (default "/metrics")
+      --tailscale-oauth-client-id string       OAuth client ID (can also be set via TAILSCALE_OAUTH_CLIENT_ID environment variable)
+      --tailscale-oauth-client-secret string   OAuth client secret (can also be set via TAILSCALE_OAUTH_CLIENT_SECRET environment variable)
+  -t, --tailscale-tailnet string               Tailscale tailnet (can also be set via TAILSCALE_TAILNET environment variable)
 ```
 
 
@@ -146,6 +172,7 @@ scrape_configs:
     scrape_interval: 30s
     metrics_path: /metrics
 ```
+
 
 ## Metrics
 
@@ -163,47 +190,4 @@ spec:
   - action: replace
     replacement: adin
     targetLabel: tailscale_machine
-
-### Headscale Metrics
-
-You can run the exporter with Tailscale metrics, Headscale metrics, or both at the same time. Enable Headscale metrics via the Headscale gRPC API.
-
-You can enable collection of Headscale metrics via the Headscale gRPC API.
-
-Headscale configuration can be provided via environment variables or flags:
-
-Environment variables:
-
-```bash
-export HEADSCALE_ADDRESS="host:port"          # e.g. "headscale.example.com:50443" or "localhost:50443"
-export HEADSCALE_API_KEY="your-api-key"       # required when HEADSCALE_ADDRESS is set
-export HEADSCALE_INSECURE="false"             # set to "true" to allow plaintext gRPC (no TLS)
-```
-
-Command line flags:
-
-```bash
-./tailscale-exporter \
-  --headscale-address "host:port" \
-  --headscale-api-key "your-api-key" \
-  --headscale-insecure                 # optional, allow plaintext gRPC
-```
-
-Notes:
-- When --headscale-address is set, --headscale-api-key (or HEADSCALE_API_KEY) is required.
-- By default, the exporter uses TLS with minimum version TLS 1.2 for Headscale connections.
-- Use --headscale-insecure (or HEADSCALE_INSECURE=true) only for trusted networks and testing.
-
-Example combined usage (Tailscale + Headscale):
-
-```bash
-export TAILSCALE_OAUTH_CLIENT_ID="your-client-id"
-export TAILSCALE_OAUTH_CLIENT_SECRET="your-client-secret"
-export TAILSCALE_TAILNET="your-tailnet-name"
-export HEADSCALE_ADDRESS="headscale.example.com:50443"
-export HEADSCALE_API_KEY="your-api-key"
-
-./tailscale-exporter --listen-address ":9250" --metrics-path "/metrics"
-```
-
 ```
