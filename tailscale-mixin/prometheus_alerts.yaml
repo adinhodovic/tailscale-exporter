@@ -3,13 +3,13 @@
   "rules":
   - "alert": "TailscaleDeviceUnauthorized"
     "annotations":
-      "dashboard_url": "https://grafana.com/d/tailscale-mixin-over-k12e/tailscale-overview"
+      "dashboard_url": "https://grafana.com/d/tailscale-mixin-over-k12e/tailscale-overview?var-namespace={{ $labels.namespace }}&var-tailnet={{ $labels.tailnet }}"
       "description": "Tailscale Device {{ $labels.name }} (ID: {{ $labels.id }}) in Tailnet {{ $labels.tailnet }} is unauthorized. Please authorize it in the Tailscale admin console."
       "summary": "Tailscale Device is Unauthorized"
     "expr": |
       sum(
         tailscale_devices_authorized
-      ) by (tailnet, name, id)
+      ) by (cluster, namespace, job, tailnet, name, id)
       == 0
     "for": "15m"
     "labels":
@@ -17,7 +17,7 @@
       "severity": "warning"
   - "alert": "TailscaleUserUnapproved"
     "annotations":
-      "dashboard_url": "https://grafana.com/d/tailscale-mixin-over-k12e/tailscale-overview"
+      "dashboard_url": "https://grafana.com/d/tailscale-mixin-over-k12e/tailscale-overview?var-namespace={{ $labels.namespace }}&var-tailnet={{ $labels.tailnet }}"
       "description": "Tailscale User {{ $labels.login_name }} (ID: {{ $labels.id }}) in Tailnet {{ $labels.tailnet }} is unapproved. Please approve it in the Tailscale admin console."
       "summary": "Tailscale User is Unapproved"
     "expr": |
@@ -25,7 +25,7 @@
         tailscale_users_info{
           status="needs-approval"
         }
-      ) by (tailnet, login_name, id)
+      ) by (cluster, namespace, job, tailnet, login_name, id)
       == 1
     "for": "15m"
     "labels":
@@ -33,7 +33,7 @@
       "severity": "warning"
   - "alert": "TailscaleUserRecentlyCreated"
     "annotations":
-      "dashboard_url": "https://grafana.com/d/tailscale-mixin-over-k12e/tailscale-overview"
+      "dashboard_url": "https://grafana.com/d/tailscale-mixin-over-k12e/tailscale-overview?var-namespace={{ $labels.namespace }}&var-tailnet={{ $labels.tailnet }}"
       "description": "Tailscale User {{ $labels.login_name }} (ID: {{ $labels.id }}) in Tailnet {{ $labels.tailnet }} was created within the last 300 seconds."
       "summary": "Tailscale User Recently Created"
     "expr": |
@@ -41,7 +41,7 @@
       (
         max(
           tailscale_users_created_timestamp{}
-        ) by (tailnet, id, login_name)
+        ) by (cluster, namespace, job, tailnet, id, login_name)
       )
       < 300
     "labels":
@@ -49,7 +49,7 @@
       "severity": "info"
   - "alert": "TailscaleDeviceUnapprovedRoutes"
     "annotations":
-      "dashboard_url": "https://grafana.com/d/tailscale-mixin-over-k12e/tailscale-overview"
+      "dashboard_url": "https://grafana.com/d/tailscale-mixin-over-k12e/tailscale-overview?var-namespace={{ $labels.namespace }}&var-tailnet={{ $labels.tailnet }}"
       "description": "Tailscale Device {{ $labels.name }} (ID: {{ $labels.id }}) in Tailnet {{ $labels.tailnet }} has more than 10% unapproved routes for longer than 15m."
       "summary": "Tailscale Device has Unapproved Routes"
     "expr": |
@@ -58,11 +58,11 @@
         (
           sum(
             tailscale_devices_routes_enabled
-          ) by (tailnet, name, id)
+          ) by (cluster, namespace, job, tailnet, name, id)
           /
           sum(
             tailscale_devices_routes_advertised
-          ) by (tailnet, name, id)
+          ) by (cluster, namespace, job, tailnet, name, id)
         )
         * 100
       )
@@ -70,6 +70,46 @@
     "for": "15m"
     "labels":
       "mixin": "tailscale"
+      "severity": "warning"
+- "name": "headscale-alerts"
+  "rules":
+  - "alert": "HeadscaleDatabaseDown"
+    "annotations":
+      "dashboard_url": "https://grafana.com/d/headscale-mixin-over-k12e/headscale-overview?var-namespace={{ $labels.namespace }}"
+      "description": "Headscale instance in namespace {{ $labels.namespace }} has lost database connectivity for longer than 5m."
+      "summary": "Headscale Database Connectivity Lost"
+    "expr": |
+      max(
+        headscale_health_database_connectivity{}
+      ) by (cluster, namespace, job)
+      == 0
+    "for": "5m"
+    "labels":
+      "mixin": "headscale"
+      "severity": "critical"
+  - "alert": "HeadscaleNodeUnapprovedRoutes"
+    "annotations":
+      "dashboard_url": "https://grafana.com/d/headscale-mixin-over-k12e/headscale-overview?var-namespace={{ $labels.namespace }}"
+      "description": "Headscale node {{ $labels.name }} (user: {{ $labels.user }}) in namespace {{ $labels.namespace }} has more than 10% unapproved routes for longer than 15m."
+      "summary": "Headscale Node has Unapproved Routes"
+    "expr": |
+      100 -
+      (
+        (
+          sum(
+            headscale_nodes_approved_routes{}
+          ) by (cluster, namespace, job, name, user)
+          /
+          sum(
+            headscale_nodes_available_routes{}
+          ) by (cluster, namespace, job, name, user)
+        )
+        * 100
+      )
+      > 10
+    "for": "15m"
+    "labels":
+      "mixin": "headscale"
       "severity": "warning"
 - "name": "tailscaled-machine-alerts"
   "rules":
@@ -84,14 +124,14 @@
           tailscaled_outbound_dropped_packets_total{}
           [5m]
         )
-      ) by (tailscale_machine)
+      ) by (cluster, job, tailscale_machine)
       /
       sum (
         increase(
           tailscaled_outbound_packets_total{}
           [5m]
         )
-      ) by (tailscale_machine)
+      ) by (cluster, job, tailscale_machine)
       * 100
       > 50
     "for": "15m"

@@ -1,3 +1,4 @@
+local mixinUtils = import 'github.com/adinhodovic/mixin-utils/utils.libsonnet';
 local g = import 'github.com/grafana/grafonnet/gen/grafonnet-latest/main.libsonnet';
 local dashboardUtil = import 'util.libsonnet';
 
@@ -309,7 +310,7 @@ local tbOverride = tbStandardOptions.override;
 
       local panels = {
         tailnetSettingsInfoTable:
-          dashboardUtil.tablePanel(
+          mixinUtils.dashboards.tablePanel(
             'Tailnet Settings',
             'bool',
             queries.tailnetSettingsInfo,
@@ -367,7 +368,7 @@ local tbOverride = tbStandardOptions.override;
           ),
 
         usersTotalStat:
-          dashboardUtil.statPanel(
+          mixinUtils.dashboards.statPanel(
             'Total Users',
             'short',
             queries.usersTotal,
@@ -375,7 +376,7 @@ local tbOverride = tbStandardOptions.override;
           ),
 
         devicesTotalStat:
-          dashboardUtil.statPanel(
+          mixinUtils.dashboards.statPanel(
             'Total Devices',
             'short',
             queries.devicesTotal,
@@ -383,7 +384,7 @@ local tbOverride = tbStandardOptions.override;
           ),
 
         devicesOnlineTotalStat:
-          dashboardUtil.statPanel(
+          mixinUtils.dashboards.statPanel(
             'Devices Logged In',
             'short',
             queries.devicesOnlineTotal,
@@ -391,7 +392,7 @@ local tbOverride = tbStandardOptions.override;
           ),
 
         keysTotalStat:
-          dashboardUtil.statPanel(
+          mixinUtils.dashboards.statPanel(
             'Total Keys',
             'short',
             queries.keysTotal,
@@ -399,7 +400,7 @@ local tbOverride = tbStandardOptions.override;
           ),
 
         nameserversTotalTable:
-          dashboardUtil.tablePanel(
+          mixinUtils.dashboards.tablePanel(
             'Nameservers',
             'string',
             queries.nameserversTotal,
@@ -428,7 +429,7 @@ local tbOverride = tbStandardOptions.override;
           ),
 
         magicDnsEnabledStat:
-          dashboardUtil.statPanel(
+          mixinUtils.dashboards.statPanel(
             'Magic DNS Enabled',
             'bool',
             queries.magicDnsEnabled,
@@ -437,7 +438,7 @@ local tbOverride = tbStandardOptions.override;
 
         // Devices
         devicesByOsPieChart:
-          dashboardUtil.pieChartPanel(
+          mixinUtils.dashboards.pieChartPanel(
             'Devices by OS',
             'short',
             queries.devicesByOs,
@@ -446,7 +447,7 @@ local tbOverride = tbStandardOptions.override;
           ),
 
         devicesByVersionPieChart:
-          dashboardUtil.pieChartPanel(
+          mixinUtils.dashboards.pieChartPanel(
             'Devices by Version',
             'short',
             queries.devicesByVersion,
@@ -455,7 +456,7 @@ local tbOverride = tbStandardOptions.override;
           ),
 
         devicesUpdateAvailablePieChart:
-          dashboardUtil.pieChartPanel(
+          mixinUtils.dashboards.pieChartPanel(
             'Devices with Update Available',
             'short',
             [
@@ -472,7 +473,7 @@ local tbOverride = tbStandardOptions.override;
           ),
 
         devicesAuthorizedPieChart:
-          dashboardUtil.pieChartPanel(
+          mixinUtils.dashboards.pieChartPanel(
             'Authorized Devices',
             'short',
             [
@@ -489,7 +490,7 @@ local tbOverride = tbStandardOptions.override;
           ),
 
         devicesInfoTable:
-          dashboardUtil.tablePanel(
+          mixinUtils.dashboards.tablePanel(
             'Devices',
             'string',
             queries.devicesInfo,
@@ -546,7 +547,7 @@ local tbOverride = tbStandardOptions.override;
           ),
 
         devicesUpdateAvailableTimeSeries:
-          dashboardUtil.timeSeriesPanel(
+          mixinUtils.dashboards.timeSeriesPanel(
             'Update Available',
             'bool',
             queries.devicesUpdateAvailableByNameId,
@@ -555,7 +556,7 @@ local tbOverride = tbStandardOptions.override;
           ),
 
         devicesLastSeenTimeSeries:
-          dashboardUtil.timeSeriesPanel(
+          mixinUtils.dashboards.timeSeriesPanel(
             'Time Since Last Seen',
             's',
             queries.devicesLastSeen,
@@ -564,7 +565,7 @@ local tbOverride = tbStandardOptions.override;
           ),
 
         devicesSettingsInfoTable:
-          dashboardUtil.tablePanel(
+          mixinUtils.dashboards.tablePanel(
             'Devices Settings',
             'bool',
             [
@@ -673,7 +674,7 @@ local tbOverride = tbStandardOptions.override;
 
         // Users
         usersByRolePieChart:
-          dashboardUtil.pieChartPanel(
+          mixinUtils.dashboards.pieChartPanel(
             'Users by Role',
             'short',
             queries.usersByRole,
@@ -682,7 +683,7 @@ local tbOverride = tbStandardOptions.override;
           ),
 
         usersByStatusPieChart:
-          dashboardUtil.pieChartPanel(
+          mixinUtils.dashboards.pieChartPanel(
             'Users by Status',
             'short',
             queries.usersByStatus,
@@ -691,7 +692,7 @@ local tbOverride = tbStandardOptions.override;
           ),
 
         usersByTypePieChart:
-          dashboardUtil.pieChartPanel(
+          mixinUtils.dashboards.pieChartPanel(
             'Users by Type',
             'short',
             queries.usersByType,
@@ -700,7 +701,7 @@ local tbOverride = tbStandardOptions.override;
           ),
 
         usersLoggedInPieChart:
-          dashboardUtil.pieChartPanel(
+          mixinUtils.dashboards.pieChartPanel(
             'Users Logged In',
             'short',
             [
@@ -717,7 +718,7 @@ local tbOverride = tbStandardOptions.override;
           ),
 
         usersInfoTable:
-          dashboardUtil.tablePanel(
+          mixinUtils.dashboards.tablePanel(
             'Users',
             'short',
             [
@@ -796,7 +797,7 @@ local tbOverride = tbStandardOptions.override;
 
         // Keys
         keysInfoTable:
-          dashboardUtil.tablePanel(
+          mixinUtils.dashboards.tablePanel(
             'Keys',
             'string',
             [
@@ -984,11 +985,11 @@ local tbOverride = tbStandardOptions.override;
           startY=61,
         );
 
-      dashboardUtil.bypassDashboardValidation +
+      mixinUtils.dashboards.bypassDashboardValidation +
       dashboard.new(
         'Tailscale / Overview',
       ) +
-      dashboard.withDescription('A dashboard that gives an overview of Tailscale API metrics. %s' % dashboardUtil.dashboardDescriptionLink) +
+      dashboard.withDescription('A dashboard that gives an overview of Tailscale API metrics. %s' % mixinUtils.dashboards.dashboardDescriptionLink('tailscale-mixin', 'https://github.com/adinhodovic/tailscale-exporter/tree/main/tailscale-mixin')) +
       dashboard.withUid($._config.dashboardIds[dashboardName]) +
       dashboard.withTags($._config.tags) +
       dashboard.withTimezone('utc') +
@@ -997,13 +998,13 @@ local tbOverride = tbStandardOptions.override;
       dashboard.time.withTo('now') +
       dashboard.withVariables(variables) +
       dashboard.withLinks(
-        dashboardUtil.dashboardLinks($._config)
+        mixinUtils.dashboards.dashboardLinks('Tailscale', $._config, dropdown=true)
       ) +
       dashboard.withPanels(
         rows
       ) +
       dashboard.withAnnotations(
-        dashboardUtil.annotations($._config, defaultFilters)
+        mixinUtils.dashboards.annotations($._config, defaultFilters)
       ),
   },
 }

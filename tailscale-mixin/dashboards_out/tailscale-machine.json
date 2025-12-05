@@ -8,11 +8,13 @@
    "editable": false,
    "links": [
       {
-         "asDropdown": false,
+         "asDropdown": true,
          "includeVars": false,
          "keepTime": true,
          "tags": [
             "tailscale",
+            "headscale",
+            "tailscaled",
             "tailscale-mixin"
          ],
          "targetBlank": true,
@@ -60,6 +62,11 @@
             "y": 1
          },
          "id": 2,
+         "options": {
+            "graphMode": "area",
+            "percentChangeColorMode": "standard",
+            "showPercentChange": false
+         },
          "pluginVersion": "v11.4.0",
          "targets": [
             {
@@ -82,7 +89,8 @@
          "fieldConfig": {
             "defaults": {
                "unit": "short"
-            }
+            },
+            "overrides": [ ]
          },
          "gridPos": {
             "h": 5,
@@ -141,7 +149,8 @@
          "fieldConfig": {
             "defaults": {
                "unit": "bps"
-            }
+            },
+            "overrides": [ ]
          },
          "gridPos": {
             "h": 5,
@@ -191,7 +200,8 @@
          "fieldConfig": {
             "defaults": {
                "unit": "bps"
-            }
+            },
+            "overrides": [ ]
          },
          "gridPos": {
             "h": 5,
@@ -241,7 +251,8 @@
          "fieldConfig": {
             "defaults": {
                "unit": "bps"
-            }
+            },
+            "overrides": [ ]
          },
          "gridPos": {
             "h": 5,
@@ -300,7 +311,8 @@
          "fieldConfig": {
             "defaults": {
                "unit": "pps"
-            }
+            },
+            "overrides": [ ]
          },
          "gridPos": {
             "h": 5,
@@ -349,6 +361,9 @@
          "description": "A table panel showing the top 20 Tailscale machines by inbound traffic over the last hour.",
          "fieldConfig": {
             "defaults": {
+               "thresholds": {
+                  "steps": [ ]
+               },
                "unit": "Bps"
             },
             "overrides": [ ]
@@ -413,6 +428,9 @@
          "description": "A table panel showing the Tailscale machines with unadvertised routes.",
          "fieldConfig": {
             "defaults": {
+               "thresholds": {
+                  "steps": [ ]
+               },
                "unit": "short"
             },
             "overrides": [ ]
@@ -477,6 +495,9 @@
          "description": "A table panel showing the Tailscale machines with dropped packets in the last hour.",
          "fieldConfig": {
             "defaults": {
+               "thresholds": {
+                  "steps": [ ]
+               },
                "unit": "percent"
             },
             "overrides": [ ]
@@ -915,7 +936,8 @@
          "fieldConfig": {
             "defaults": {
                "unit": "short"
-            }
+            },
+            "overrides": [ ]
          },
          "gridPos": {
             "h": 4,
@@ -974,7 +996,8 @@
          "fieldConfig": {
             "defaults": {
                "unit": "bps"
-            }
+            },
+            "overrides": [ ]
          },
          "gridPos": {
             "h": 4,
@@ -1033,7 +1056,8 @@
          "fieldConfig": {
             "defaults": {
                "unit": "pps"
-            }
+            },
+            "overrides": [ ]
          },
          "gridPos": {
             "h": 4,
@@ -1426,6 +1450,8 @@
    "schemaVersion": 39,
    "tags": [
       "tailscale",
+      "headscale",
+      "tailscaled",
       "tailscale-mixin"
    ],
    "templating": {
