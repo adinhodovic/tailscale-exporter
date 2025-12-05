@@ -141,7 +141,7 @@ Run the exporter with Headscale enabled:
 ./tailscale-exporter \
   --headscale-address "$HEADSCALE_ADDRESS" \
   --headscale-api-key "$HEADSCALE_API_KEY" \
-  -- headscale-inseucre "false"
+  --headscale-insecure "false"
 ```
 
 #### Docker Image
