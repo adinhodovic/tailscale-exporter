@@ -9,13 +9,11 @@ import (
 
 const healthSubsystem = "health"
 
-var (
-	healthDatabaseConnectivityDesc = newDesc(
-		healthSubsystem,
-		"database_connectivity",
-		"Whether Headscale reports healthy database connectivity",
-		nil,
-	)
+var healthDatabaseConnectivityDesc = newDesc(
+	healthSubsystem,
+	"database_connectivity",
+	"Whether Headscale reports healthy database connectivity",
+	nil,
 )
 
 type HeadscaleHealthCollector struct {

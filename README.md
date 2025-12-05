@@ -6,7 +6,14 @@ This repository also contains the `tailscale-mixin` that provides Prometheus ale
 
 The `tailscale-mixin` also has dashboards and alerts for client side `machine` metrics. You can find the dashboards in `./tailscale-mixin/dashboards_out/`. Jump to the [Client Side Machine Metrics](#client-side-machine-metrics) section for more information.
 
-![Grafana Dashboard](./docs/images/grafana-overview-1.png)
+Tailscale:
+
+![Grafana Dashboard](./docs/images/grafana-tailscale-overview-1.png)
+
+
+Headscale:
+
+![Grafana Dashboard](./docs/images/grafana-headscale-overview-1.png)
 
 ## Overview
 
@@ -37,6 +44,27 @@ Dashboards and alerts for both are provided in the `tailscale-mixin`.
 You can run the exporter to collect metrics from Tailscale (official cloud) and/or Headscale (self-hosted). Choose the path that matches your environment.
 
 ### Tailscale Installation
+
+#### Authentication Setup
+
+1. Go to the [Tailscale admin console](https://login.tailscale.com/admin/settings/keys)
+2. Navigate to **Settings** → **Oauth Client**
+3. Click on **Create new OAuth client**
+4. Add read access for DNS, Devices, Users, and Keys
+5. Copy the generated token (it's only shown once)
+
+The following exact scopes are required:
+
+```sh
+devices:core:read
+devices:posture_attributes:read
+devices:routes:read
+users:read
+dns:read
+auth_keys:read
+feature_settings:read
+policy_file:read
+```
 
 #### Tailscale Binary
 
@@ -87,6 +115,15 @@ helm install tailscale-exporter ./charts/tailscale-exporter \
 ```
 
 ### Headscale Installation
+
+
+#### Authentication Setup
+
+Create an API key in Headscale:
+
+```bash
+headscale apikey create "tailscale-exporter"
+```
 
 #### Binary
 

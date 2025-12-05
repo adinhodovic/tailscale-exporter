@@ -46,7 +46,9 @@ func (m *mockHeadscaleClient) ListAPIKeys(ctx context.Context) ([]*headscalev1.A
 	return m.apiKeys, nil
 }
 
-func (m *mockHeadscaleClient) ListPreAuthKeys(ctx context.Context) ([]*headscalev1.PreAuthKey, error) {
+func (m *mockHeadscaleClient) ListPreAuthKeys(
+	ctx context.Context,
+) ([]*headscalev1.PreAuthKey, error) {
 	if m.preAuthErr != nil {
 		return nil, m.preAuthErr
 	}
@@ -69,7 +71,11 @@ func gatherMetrics(t *testing.T, metrics []prometheus.Metric, expected string) {
 	}
 }
 
-func collectFromCollector(t *testing.T, collector Collector, client HeadscaleClient) []prometheus.Metric {
+func collectFromCollector(
+	t *testing.T,
+	collector Collector,
+	client HeadscaleClient,
+) []prometheus.Metric {
 	t.Helper()
 	ch := make(chan prometheus.Metric, 64)
 	if err := collector.Update(context.Background(), client, ch); err != nil {

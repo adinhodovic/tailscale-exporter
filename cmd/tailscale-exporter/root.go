@@ -192,7 +192,9 @@ func runExporter(cmd *cobra.Command, args []string) error {
 	// Optional Headscale metrics.
 	if headscaleAddress != "" {
 		if headscaleAPIKey == "" {
-			return errors.New("HEADSCALE_API_KEY (or --headscale-api-key) is required when HEADSCALE_ADDRESS is set")
+			return errors.New(
+				"HEADSCALE_API_KEY (or --headscale-api-key) is required when HEADSCALE_ADDRESS is set",
+			)
 		}
 
 		var transportCreds credentials.TransportCredentials
@@ -237,7 +239,11 @@ func runExporter(cmd *cobra.Command, args []string) error {
 	}
 
 	if !registered {
-		logger.Error("No collectors enabled", "action", "set --tailscale-tailnet or --headscale-address")
+		logger.Error(
+			"No collectors enabled",
+			"action",
+			"set --tailscale-tailnet or --headscale-address",
+		)
 		return errors.New("at least one metrics source (tailnet or headscale) must be configured")
 	}
 

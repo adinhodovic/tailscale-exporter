@@ -71,7 +71,10 @@ type grpcHeadscaleClient struct {
 	apiKey string
 }
 
-func NewGRPCHeadscaleClient(client headscalev1.HeadscaleServiceClient, apiKey string) HeadscaleClient {
+func NewGRPCHeadscaleClient(
+	client headscalev1.HeadscaleServiceClient,
+	apiKey string,
+) HeadscaleClient {
 	return &grpcHeadscaleClient{
 		client: client,
 		apiKey: apiKey,
@@ -112,7 +115,9 @@ func (c *grpcHeadscaleClient) ListAPIKeys(ctx context.Context) ([]*headscalev1.A
 	return resp.GetApiKeys(), nil
 }
 
-func (c *grpcHeadscaleClient) ListPreAuthKeys(ctx context.Context) ([]*headscalev1.PreAuthKey, error) {
+func (c *grpcHeadscaleClient) ListPreAuthKeys(
+	ctx context.Context,
+) ([]*headscalev1.PreAuthKey, error) {
 	ctx = c.ctxWithAuth(ctx)
 
 	usersResp, err := c.client.ListUsers(ctx, &headscalev1.ListUsersRequest{})
@@ -151,7 +156,10 @@ func registerCollector(name string, createFunc func(collectorConfig) (Collector,
 	factories[name] = createFunc
 }
 
-func NewHeadscaleCollector(logger *slog.Logger, client HeadscaleClient) (*HeadscaleCollector, error) {
+func NewHeadscaleCollector(
+	logger *slog.Logger,
+	client HeadscaleClient,
+) (*HeadscaleCollector, error) {
 	h := &HeadscaleCollector{
 		logger: logger,
 		client: client,
