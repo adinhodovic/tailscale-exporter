@@ -1,17 +1,18 @@
-package collector
+package tailscale
 
 import (
 	"context"
 	"log/slog"
 	"strings"
 	"testing"
+	"time"
 
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/testutil"
 	"tailscale.com/client/tailscale/v2"
 )
 
-func TestTailnetSettingsCollector_Update(t *testing.T) {
+func TestTailscaleUsersCollector_Update(t *testing.T) {
 	logger := slog.Default()
 
 	tests := []struct {
@@ -21,30 +22,40 @@ func TestTailnetSettingsCollector_Update(t *testing.T) {
 		expectError     bool
 	}{
 		{
-			name: "successful collection with tailnet settings",
+			name: "successful collection with users",
 			mockClient: &MockTailscaleClient{
-				tailnetSettingsClient: &MockTailnetSettingsClient{
-					settings: &tailscale.TailnetSettings{
-						ACLsExternallyManagedOn:                true,
-						ACLsExternalLink:                       "https://example.com/acls",
-						DevicesApprovalOn:                      true,
-						DevicesAutoUpdatesOn:                   true,
-						DevicesKeyDurationDays:                 90,
-						UsersApprovalOn:                        true,
-						UsersRoleAllowedToJoinExternalTailnets: "admin",
-						NetworkFlowLoggingOn:                   true,
-						RegionalRoutingOn:                      false,
-						PostureIdentityCollectionOn:            true,
+				usersClient: &MockUsersClient{
+					users: []tailscale.User{
+						{
+							ID:                 "user-456",
+							DisplayName:        "User One",
+							LoginName:          "user",
+							ProfilePicURL:      "https://example.com/pic.jpg",
+							TailnetID:          "tailnet-789",
+							Created:            time.Unix(1610000000, 0),
+							Type:               "member",
+							Role:               "admin",
+							Status:             "active",
+							DeviceCount:        2,
+							LastSeen:           time.Unix(1620000000, 0),
+							CurrentlyConnected: true,
+						},
 					},
 				},
 			},
 			expectedMetrics: `
-# HELP tailscale_tailnet_settings_devices_key_duration_days Number of days before device key expiry.
-# TYPE tailscale_tailnet_settings_devices_key_duration_days gauge
-tailscale_tailnet_settings_devices_key_duration_days 90
-# HELP tailscale_tailnet_settings_info Information about the Tailscale Tailnet settings.
-# TYPE tailscale_tailnet_settings_info gauge
-tailscale_tailnet_settings_info{acls_external_link="https://example.com/acls",acls_externally_managed_on="true",devices_approval_on="true",devices_auto_updates_on="true",network_flow_logging_on="true",posture_identity_collection_on="true",regional_routing_on="false",users_approval_on="true",users_role_allowed_to_join_external_tailnets="admin"} 1
+# HELP tailscale_users_created_timestamp Unix timestamp when user was created
+# TYPE tailscale_users_created_timestamp gauge
+tailscale_users_created_timestamp{display_name="User One",id="user-456",login_name="user"} 1.61e+09
+# HELP tailscale_users_currently_logged_in Whether user is currently logged in
+# TYPE tailscale_users_currently_logged_in gauge
+tailscale_users_currently_logged_in{display_name="User One",id="user-456",login_name="user"} 1
+# HELP tailscale_users_info Users information and status
+# TYPE tailscale_users_info gauge
+tailscale_users_info{display_name="User One",id="user-456",login_name="user",role="member",status="admin",type="active"} 1
+# HELP tailscale_users_last_seen_timestamp Unix timestamp when user was last seen
+# TYPE tailscale_users_last_seen_timestamp gauge
+tailscale_users_last_seen_timestamp{display_name="User One",id="user-456",login_name="user"} 1.62e+09
 `,
 			expectError: false,
 		},
@@ -52,7 +63,7 @@ tailscale_tailnet_settings_info{acls_external_link="https://example.com/acls",ac
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			collector := &TailscaleTailnetSettingsCollector{
+			collector := &TailscaleUsersCollector{
 				log: logger,
 			}
 

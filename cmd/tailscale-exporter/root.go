@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"crypto/tls"
 	"errors"
 	"fmt"
 	"log/slog"
@@ -12,23 +13,34 @@ import (
 	"syscall"
 	"time"
 
+	headscaleCollector "github.com/adinhodovic/tailscale-exporter/collector/headscale"
+	tailscale "github.com/adinhodovic/tailscale-exporter/collector/tailscale"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
 	"golang.org/x/oauth2/clientcredentials"
 
-	"github.com/adinhodovic/tailscale-exporter/collector"
+	headscalev1 "github.com/juanfont/headscale/gen/go/headscale/v1"
+	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials"
+	"google.golang.org/grpc/credentials/insecure"
 )
 
 var (
 	// Global flags.
 	listenAddress string
 	metricsPath   string
-	tailnet       string
 
-	// OAuth flags.
-	oauthClientID     string
-	oauthClientSecret string
+	// Tailscale
+	tailscaleTailnet           string
+	tailscaleOauthClientID     string
+	tailscaleOauthClientSecret string
+
+	// Headscale
+	headscaleAddress  string
+	headscaleAPIKey   string
+	headscaleInsecure bool
 )
 
 // rootCmd represents the base command when called without any subcommands.
@@ -58,28 +70,45 @@ func init() {
 	rootCmd.PersistentFlags().
 		StringVarP(&metricsPath, "metrics-path", "m", "/metrics", "Path under which to expose metrics")
 	rootCmd.PersistentFlags().
-		StringVarP(&tailnet, "tailnet", "t", "", "Tailscale tailnet (can also be set via TAILSCALE_TAILNET environment variable)")
+		StringVarP(&tailscaleTailnet, "tailscale-tailnet", "t", "", "Tailscale tailnet (can also be set via TAILSCALE_TAILNET environment variable)")
+	rootCmd.PersistentFlags().
+		StringVar(&headscaleAddress, "headscale-address", "", "Headscale gRPC address (can also be set via HEADSCALE_ADDRESS environment variable)")
+	rootCmd.PersistentFlags().
+		StringVar(&headscaleAPIKey, "headscale-api-key", "", "Headscale API key (can also be set via HEADSCALE_API_KEY environment variable)")
+	rootCmd.PersistentFlags().
+		BoolVar(&headscaleInsecure, "headscale-insecure", false, "Allow insecure (plaintext) gRPC connection to Headscale (can also be set via HEADSCALE_INSECURE environment variable)")
 
 	// Authentication flags - API Key or OAuth
 	rootCmd.PersistentFlags().
-		StringVar(&oauthClientID, "oauth-client-id", "", "OAuth client ID (can also be set via TAILSCALE_OAUTH_CLIENT_ID environment variable)")
+		StringVar(&tailscaleOauthClientID, "tailscale-oauth-client-id", "", "OAuth client ID (can also be set via TAILSCALE_OAUTH_CLIENT_ID environment variable)")
 	rootCmd.PersistentFlags().
-		StringVar(&oauthClientSecret, "oauth-client-secret", "", "OAuth client secret (can also be set via TAILSCALE_OAUTH_CLIENT_SECRET environment variable)")
+		StringVar(&tailscaleOauthClientSecret, "tailscale-oauth-client-secret", "", "OAuth client secret (can also be set via TAILSCALE_OAUTH_CLIENT_SECRET environment variable)")
 
-	// Bind environment variables
-	if rootCmd.PersistentFlags().Lookup("tailnet").Value.String() == "" {
-		tailnet = getTailnetFromEnv()
-	}
-	if rootCmd.PersistentFlags().
-		Lookup("oauth-client-id").
-		Value.String() == "" {
-		oauthClientID = getOAuthClientIDFromEnv()
-	}
-	if rootCmd.PersistentFlags().
-		Lookup("oauth-client-secret").
-		Value.String() == "" {
-		oauthClientSecret = getOAuthClientSecretFromEnv()
-	}
+	viper.SetEnvKeyReplacer(strings.NewReplacer("-", "_"))
+	viper.AutomaticEnv()
+
+	mustBindFlag("listen-address")
+	mustBindFlag("metrics-path")
+
+	// Tailscale flags
+	mustBindFlag("tailscale-tailnet")
+	mustBindFlag("tailscale-oauth-client-id")
+	mustBindFlag("tailscale-oauth-client-secret")
+
+	// Headscale flags
+	mustBindFlag("headscale-address")
+	mustBindFlag("headscale-api-key")
+	mustBindFlag("headscale-insecure")
+
+	// Tailscale flags
+	mustBindEnv("tailscale-tailnet", "TAILSCALE_TAILNET")
+	mustBindEnv("tailscale-oauth-client-id", "TAILSCALE_OAUTH_CLIENT_ID")
+	mustBindEnv("tailscale-oauth-client-secret", "TAILSCALE_OAUTH_CLIENT_SECRET")
+
+	// Headscale flags
+	mustBindEnv("headscale-address", "HEADSCALE_ADDRESS")
+	mustBindEnv("headscale-api-key", "HEADSCALE_API_KEY")
+	mustBindEnv("headscale-insecure", "HEADSCALE_INSECURE")
 }
 
 func runExporter(cmd *cobra.Command, args []string) error {
@@ -96,73 +125,127 @@ func runExporter(cmd *cobra.Command, args []string) error {
 		"build_time", buildTime,
 	)
 
-	// Get tailnet from flag or environment
-	if tailnet == "" {
-		tailnet = getTailnetFromEnv()
-	}
-	if tailnet == "" {
-		return errors.New(
-			"tailnet is required. Set via --tailnet flag or TAILSCALE_TAILNET environment variable",
+	listenAddress = strings.TrimSpace(viper.GetString("listen-address"))
+	metricsPath = strings.TrimSpace(viper.GetString("metrics-path"))
+
+	// Tailscale
+	tailscaleTailnet = strings.TrimSpace(viper.GetString("tailscale-tailnet"))
+	tailscaleOauthClientID = strings.TrimSpace(viper.GetString("tailscale-oauth-client-id"))
+	tailscaleOauthClientSecret = strings.TrimSpace(viper.GetString("tailscale-oauth-client-secret"))
+
+	// Headscale
+	headscaleAddress = strings.TrimSpace(viper.GetString("headscale-address"))
+	headscaleAPIKey = strings.TrimSpace(viper.GetString("headscale-api-key"))
+	headscaleInsecure = viper.GetBool("headscale-insecure")
+
+	registered := false
+
+	if tailscaleTailnet != "" {
+		if tailscaleOauthClientID == "" || tailscaleOauthClientSecret == "" {
+			return errors.New("oauth credentials are required when tailnet is set")
+		}
+
+		oauthConfig := &clientcredentials.Config{
+			ClientID:     tailscaleOauthClientID,
+			ClientSecret: tailscaleOauthClientSecret,
+			TokenURL:     "https://api.tailscale.com/api/v2/oauth/token",
+			Scopes: []string{
+				"devices:core:read",
+				"devices:posture_attributes:read",
+				"devices:routes:read",
+				"users:read",
+				"dns:read",
+				"auth_keys:read",
+				"feature_settings:read",
+				"policy_file:read",
+			},
+		}
+
+		httpClient := oauthConfig.Client(context.Background())
+		token, err := oauthConfig.Token(context.Background())
+		if err != nil {
+			return fmt.Errorf("failed to obtain OAuth token: %w", err)
+		}
+		logger.Info("OAuth token obtained", "token_type", token.TokenType)
+		logger.Info("Successfully obtained OAuth token", "expires", token.Expiry)
+
+		tsCollector, err := tailscale.NewTailscaleCollector(
+			logger,
+			httpClient,
+			tailscaleTailnet,
 		)
-	}
+		if err != nil {
+			return fmt.Errorf("failed to create Tailscale collector: %w", err)
+		}
 
-	logger.Info("Using tailnet", "tailnet", tailnet)
-
-	// Check if OAuth is requested or if OAuth credentials are provided
-	if oauthClientID == "" && oauthClientSecret == "" {
-		return errors.New(
-			"authentication is required. Use OAuth with --oauth-client-id and --oauth-client-secret flags",
+		tsReg := prometheus.WrapRegistererWith(
+			prometheus.Labels{"tailnet": tailscaleTailnet},
+			prometheus.DefaultRegisterer,
 		)
-	}
-	oauthClientID = getOAuthClientIDFromEnv()
-	oauthClientSecret = getOAuthClientSecretFromEnv()
-
-	// Create OAuth client using client credentials flow
-	oauthConfig := &clientcredentials.Config{
-		ClientID:     oauthClientID,
-		ClientSecret: oauthClientSecret,
-		TokenURL:     "https://api.tailscale.com/api/v2/oauth/token",
-		Scopes: []string{
-			"devices:core:read",
-			"devices:posture_attributes:read",
-			"devices:routes:read",
-			"users:read",
-			"dns:read",
-			"auth_keys:read",
-			"feature_settings:read",
-			"policy_file:read",
-		}, // Request needed scopes
+		tsReg.MustRegister(tsCollector)
+		registered = true
+		logger.Info("Tailscale metrics enabled", "tailnet", tailscaleTailnet)
+	} else {
+		logger.Info("Tailscale metrics disabled", "reason", "tailnet not set")
 	}
 
-	// Create HTTP client that automatically handles token refresh
-	httpClient := oauthConfig.Client(context.Background())
+	// Optional Headscale metrics.
+	if headscaleAddress != "" {
+		if headscaleAPIKey == "" {
+			return errors.New(
+				"HEADSCALE_API_KEY (or --headscale-api-key) is required when HEADSCALE_ADDRESS is set",
+			)
+		}
 
-	// Test OAuth token generation
-	token, err := oauthConfig.Token(context.Background())
-	if err != nil {
-		return fmt.Errorf("failed to obtain OAuth token: %w", err)
+		var transportCreds credentials.TransportCredentials
+		if headscaleInsecure {
+			logger.Warn("Using insecure gRPC connection to Headscale", "address", headscaleAddress)
+			transportCreds = insecure.NewCredentials()
+		} else {
+			transportCreds = credentials.NewTLS(&tls.Config{
+				MinVersion: tls.VersionTLS12,
+			})
+		}
+
+		conn, err := grpc.NewClient(
+			headscaleAddress,
+			grpc.WithTransportCredentials(transportCreds),
+		)
+		if err != nil {
+			return fmt.Errorf("failed to connect to headscale: %w", err)
+		}
+		defer func() {
+			if err := conn.Close(); err != nil {
+				logger.Error("Failed to close headscale connection", "error", err)
+			}
+		}()
+
+		hsClient := headscaleCollector.NewGRPCHeadscaleClient(
+			headscalev1.NewHeadscaleServiceClient(conn),
+			headscaleAPIKey,
+		)
+		hsCollector, err := headscaleCollector.NewHeadscaleCollector(
+			logger.With("system", "headscale"),
+			hsClient,
+		)
+		if err != nil {
+			return fmt.Errorf("failed to create Headscale collector: %w", err)
+		}
+		prometheus.DefaultRegisterer.MustRegister(hsCollector)
+		registered = true
+		logger.Info("Headscale metrics enabled", "address", headscaleAddress)
+	} else {
+		logger.Info("Headscale metrics disabled", "reason", "HEADSCALE_ADDRESS not set")
 	}
-	logger.Info("OAuth token obtained", "token_type", token.TokenType)
-	logger.Info("Successfully obtained OAuth token", "expires", token.Expiry)
 
-	// Default labels for all metrics
-	defaultLabels := prometheus.Labels{"tailnet": tailnet}
-	reg := prometheus.WrapRegistererWith(
-		defaultLabels,
-		prometheus.DefaultRegisterer,
-	)
-
-	// Create collector with OAuth HTTP client
-	tsCollector, err := collector.NewTailscaleCollector(
-		logger,
-		httpClient,
-		tailnet,
-	)
-	if err != nil {
-		return fmt.Errorf("failed to create Tailscale collector: %w", err)
+	if !registered {
+		logger.Error(
+			"No collectors enabled",
+			"action",
+			"set --tailscale-tailnet or --headscale-address",
+		)
+		return errors.New("at least one metrics source (tailnet or headscale) must be configured")
 	}
-
-	reg.MustRegister(tsCollector)
 
 	// Create HTTP server
 	http.Handle(metricsPath, promhttp.Handler())
@@ -220,33 +303,14 @@ func SetVersionInfo(v, c, bt string) {
 	buildTime = bt
 }
 
-// getTailnetFromEnv gets the tailnet from environment variables.
-func getTailnetFromEnv() string {
-	// Try different environment variable names
-	tailnet := os.Getenv("TAILSCALE_TAILNET")
-	if tailnet == "" {
-		tailnet = os.Getenv("TS_TAILNET")
+func mustBindFlag(name string) {
+	if err := viper.BindPFlag(name, rootCmd.PersistentFlags().Lookup(name)); err != nil {
+		panic(fmt.Errorf("failed to bind flag %s: %w", name, err))
 	}
-	if tailnet == "" {
-		tailnet = os.Getenv("TAILNET")
-	}
-	return tailnet
 }
 
-// getOAuthClientIDFromEnv gets the OAuth client ID from environment variables.
-func getOAuthClientIDFromEnv() string {
-	clientID := os.Getenv("TAILSCALE_OAUTH_CLIENT_ID")
-	if clientID == "" {
-		clientID = os.Getenv("TS_OAUTH_CLIENT_ID")
+func mustBindEnv(key, env string) {
+	if err := viper.BindEnv(key, env); err != nil {
+		panic(fmt.Errorf("failed to bind env for %s: %w", key, err))
 	}
-	return strings.TrimSpace(clientID)
-}
-
-// getOAuthClientSecretFromEnv gets the OAuth client secret from environment variables.
-func getOAuthClientSecretFromEnv() string {
-	clientSecret := os.Getenv("TAILSCALE_OAUTH_CLIENT_SECRET")
-	if clientSecret == "" {
-		clientSecret = os.Getenv("TS_OAUTH_CLIENT_SECRET")
-	}
-	return strings.TrimSpace(clientSecret)
 }

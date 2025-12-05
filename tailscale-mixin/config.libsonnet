@@ -40,10 +40,12 @@
     grafanaUrl: 'https://grafana.com',
 
     dashboardIds: {
+      'headscale-overview': 'headscale-mixin-over-k12e',
       'tailscale-overview': 'tailscale-mixin-over-k12e',
       'tailscale-machine': 'tailscaled-mixin-over-k12e',
     },
     dashboardUrls: {
+      'headscale-overview': '%s/d/%s/headscale-overview' % [this.grafanaUrl, this.dashboardIds['headscale-overview']],
       'tailscale-overview': '%s/d/%s/tailscale-overview' % [this.grafanaUrl, this.dashboardIds['tailscale-overview']],
       'tailscale-machine': '%s/d/%s/tailscale-machine' % [this.grafanaUrl, this.dashboardIds['tailscale-machine']],
     },
