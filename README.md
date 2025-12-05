@@ -8,14 +8,33 @@ The `tailscale-mixin` also has dashboards and alerts for client side `machine` m
 
 ![Grafana Dashboard](./docs/images/grafana-overview-1.png)
 
-## Features
+## Overview
 
-- **Comprehensive Device Metrics**: Detailed per-device metrics
-- **API Key Management**: Metrics for all API keys
-- **DNS Configuration**: DNS settings
-- **User Management**: User metrics
-- **Tailnet Settings**: Tailnet Configuration
-- **API Health**: Monitoring of Tailscale API accessibility
+The exporter supports metrics from:
+- Tailscale (official cloud) via the Tailscale API
+- Headscale (self-hosted) via the Headscale gRPC API
+
+Dashboards and alerts for both are provided in the `tailscale-mixin`.
+
+![Tailscale Dashboard](./docs/images/grafana-overview-1.png)
+![Headscale Dashboard](./docs/images/grafana-machine-1.png)
+
+## Tailscale Exporting Features
+
+- Comprehensive device metrics
+- API key management (auth keys)
+- DNS configuration
+- User management
+- Tailnet settings
+- API health (Tailscale API accessibility)
+
+## Headscale Exporting Features
+
+- Node metrics (devices managed by Headscale)
+- User and API key metrics
+- Preauth keys metrics
+- Headscale health status
+- TLS or plaintext gRPC connectivity options
 
 ## Authentication Setup
 
@@ -144,4 +163,47 @@ spec:
   - action: replace
     replacement: adin
     targetLabel: tailscale_machine
+
+### Headscale Metrics
+
+You can run the exporter with Tailscale metrics, Headscale metrics, or both at the same time. Enable Headscale metrics via the Headscale gRPC API.
+
+You can enable collection of Headscale metrics via the Headscale gRPC API.
+
+Headscale configuration can be provided via environment variables or flags:
+
+Environment variables:
+
+```bash
+export HEADSCALE_ADDRESS="host:port"          # e.g. "headscale.example.com:50443" or "localhost:50443"
+export HEADSCALE_API_KEY="your-api-key"       # required when HEADSCALE_ADDRESS is set
+export HEADSCALE_INSECURE="false"             # set to "true" to allow plaintext gRPC (no TLS)
+```
+
+Command line flags:
+
+```bash
+./tailscale-exporter \
+  --headscale-address "host:port" \
+  --headscale-api-key "your-api-key" \
+  --headscale-insecure                 # optional, allow plaintext gRPC
+```
+
+Notes:
+- When --headscale-address is set, --headscale-api-key (or HEADSCALE_API_KEY) is required.
+- By default, the exporter uses TLS with minimum version TLS 1.2 for Headscale connections.
+- Use --headscale-insecure (or HEADSCALE_INSECURE=true) only for trusted networks and testing.
+
+Example combined usage (Tailscale + Headscale):
+
+```bash
+export TAILSCALE_OAUTH_CLIENT_ID="your-client-id"
+export TAILSCALE_OAUTH_CLIENT_SECRET="your-client-secret"
+export TAILSCALE_TAILNET="your-tailnet-name"
+export HEADSCALE_ADDRESS="headscale.example.com:50443"
+export HEADSCALE_API_KEY="your-api-key"
+
+./tailscale-exporter --listen-address ":9250" --metrics-path "/metrics"
+```
+
 ```
