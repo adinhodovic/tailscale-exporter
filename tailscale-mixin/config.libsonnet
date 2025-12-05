@@ -2,40 +2,16 @@
   _config+:: {
     local this = self,
 
+    tailscaleSelector: 'job="tailscale-exporter"',
+    // This selector is anything for now as scraping machines can vary in label names.
+    tailscaledSelector: 'job=~".*"',
+
     // Default datasource name
     datasourceName: 'default',
 
     // Opt-in to multiCluster dashboards by overriding this and the clusterLabel.
     showMultiCluster: false,
     clusterLabel: 'cluster',
-
-    tailscaleSelector: 'job="tailscale-exporter"',
-    // This selector is anything for now as scraping machines can vary in label names.
-    tailscaledSelector: 'job=~".*"',
-
-    // Tailnet
-    tailscaleDeviceUnauthorizedEnabled: true,
-    tailscaleDeviceUnauthorizedFor: '15m',
-    tailscaleDeviceUnauthorizedSeverity: 'warning',
-
-    tailscaleUserUnapprovedEnabled: true,
-    tailscaleUserUnapprovedFor: '15m',
-    tailscaleUserUnapprovedSeverity: 'warning',
-
-    tailscaleUserRecentlyCreatedEnabled: true,
-    tailscaleUserRecentlyCreatedSeverity: 'info',
-    tailscaleUserRecentlyCreatedThreshold: '300',  // Seconds
-
-    tailscaleDeviceUnapprovedRoutesEnabled: true,
-    tailscaleDeviceUnapprovedRoutesFor: '15m',
-    tailscaleDeviceUnapprovedRoutesSeverity: 'warning',
-    tailscaleDeviceUnapprovedRoutesThreshold: '10',
-
-    // Tailscaled
-    tailscaledMachineHighOutboundDroppedPacketsEnabled: true,
-    tailscaledMachineHighOutboundDroppedPacketsFor: '15m',
-    tailscaledMachineHighOutboundDroppedPacketsSeverity: 'warning',
-    tailscaledMachineHighOutboundDroppedPacketsThreshold: '50',
 
     grafanaUrl: 'https://grafana.com',
 
@@ -50,7 +26,60 @@
       'tailscale-machine': '%s/d/%s/tailscale-machine' % [this.grafanaUrl, this.dashboardIds['tailscale-machine']],
     },
 
-    tags: ['tailscale', 'tailscale-mixin'],
+    // Alert configuration
+    alerts: {
+      enabled: true,
+
+      // Tailnet alerts
+      tailscaleDeviceUnauthorized: {
+        enabled: true,
+        severity: 'warning',
+        interval: '15m',
+      },
+
+      tailscaleUserUnapproved: {
+        enabled: true,
+        severity: 'warning',
+        interval: '15m',
+      },
+
+      tailscaleUserRecentlyCreated: {
+        enabled: true,
+        severity: 'info',
+        threshold: '300',  // seconds
+      },
+
+      tailscaleDeviceUnapprovedRoutes: {
+        enabled: true,
+        severity: 'warning',
+        interval: '15m',
+        threshold: '10',
+      },
+
+      // Headscale alerts
+      headscaleDatabaseDown: {
+        enabled: true,
+        severity: 'critical',
+        interval: '5m',
+      },
+
+      headscaleNodeUnapprovedRoutes: {
+        enabled: true,
+        severity: 'warning',
+        interval: '15m',
+        threshold: '10',  // percent of unapproved routes
+      },
+
+      // Tailscaled alerts
+      tailscaledMachineHighOutboundDroppedPackets: {
+        enabled: true,
+        severity: 'warning',
+        interval: '15m',
+        threshold: '50',  // percent
+      },
+    },
+
+    tags: ['tailscale', 'headscale', 'tailscaled', 'tailscale-mixin'],
 
     // Custom annotations to display in graphs
     annotation: {

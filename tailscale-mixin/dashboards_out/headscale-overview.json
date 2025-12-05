@@ -8,11 +8,13 @@
    "editable": false,
    "links": [
       {
-         "asDropdown": false,
+         "asDropdown": true,
          "includeVars": false,
          "keepTime": true,
          "tags": [
             "tailscale",
+            "headscale",
+            "tailscaled",
             "tailscale-mixin"
          ],
          "targetBlank": true,
@@ -60,6 +62,11 @@
             "y": 1
          },
          "id": 2,
+         "options": {
+            "graphMode": "area",
+            "percentChangeColorMode": "standard",
+            "showPercentChange": false
+         },
          "pluginVersion": "v11.4.0",
          "targets": [
             {
@@ -100,6 +107,11 @@
             "y": 1
          },
          "id": 3,
+         "options": {
+            "graphMode": "area",
+            "percentChangeColorMode": "standard",
+            "showPercentChange": false
+         },
          "pluginVersion": "v11.4.0",
          "targets": [
             {
@@ -140,6 +152,11 @@
             "y": 1
          },
          "id": 4,
+         "options": {
+            "graphMode": "area",
+            "percentChangeColorMode": "standard",
+            "showPercentChange": false
+         },
          "pluginVersion": "v11.4.0",
          "targets": [
             {
@@ -180,6 +197,11 @@
             "y": 1
          },
          "id": 5,
+         "options": {
+            "graphMode": "area",
+            "percentChangeColorMode": "standard",
+            "showPercentChange": false
+         },
          "pluginVersion": "v11.4.0",
          "targets": [
             {
@@ -220,6 +242,11 @@
             "y": 1
          },
          "id": 6,
+         "options": {
+            "graphMode": "area",
+            "percentChangeColorMode": "standard",
+            "showPercentChange": false
+         },
          "pluginVersion": "v11.4.0",
          "targets": [
             {
@@ -260,6 +287,11 @@
             "y": 1
          },
          "id": 7,
+         "options": {
+            "graphMode": "area",
+            "percentChangeColorMode": "standard",
+            "showPercentChange": false
+         },
          "pluginVersion": "v11.4.0",
          "targets": [
             {
@@ -294,7 +326,8 @@
          "fieldConfig": {
             "defaults": {
                "unit": "short"
-            }
+            },
+            "overrides": [ ]
          },
          "gridPos": {
             "h": 6,
@@ -362,7 +395,8 @@
          "fieldConfig": {
             "defaults": {
                "unit": "short"
-            }
+            },
+            "overrides": [ ]
          },
          "gridPos": {
             "h": 6,
@@ -412,7 +446,8 @@
          "fieldConfig": {
             "defaults": {
                "unit": "short"
-            }
+            },
+            "overrides": [ ]
          },
          "gridPos": {
             "h": 6,
@@ -461,6 +496,9 @@
          "description": "Node metadata reported by Headscale.",
          "fieldConfig": {
             "defaults": {
+               "thresholds": {
+                  "steps": [ ]
+               },
                "unit": "short"
             },
             "overrides": [ ]
@@ -551,6 +589,9 @@
          "description": "Creation, last seen, and expiry timestamps per node.",
          "fieldConfig": {
             "defaults": {
+               "thresholds": {
+                  "steps": [ ]
+               },
                "unit": "string"
             },
             "overrides": [
@@ -705,7 +746,8 @@
          "fieldConfig": {
             "defaults": {
                "unit": "short"
-            }
+            },
+            "overrides": [ ]
          },
          "gridPos": {
             "h": 8,
@@ -754,6 +796,9 @@
          "description": "User metadata reported by Headscale.",
          "fieldConfig": {
             "defaults": {
+               "thresholds": {
+                  "steps": [ ]
+               },
                "unit": "string"
             },
             "overrides": [ ]
@@ -851,7 +896,8 @@
          "fieldConfig": {
             "defaults": {
                "unit": "short"
-            }
+            },
+            "overrides": [ ]
          },
          "gridPos": {
             "h": 6,
@@ -910,7 +956,8 @@
          "fieldConfig": {
             "defaults": {
                "unit": "short"
-            }
+            },
+            "overrides": [ ]
          },
          "gridPos": {
             "h": 6,
@@ -969,7 +1016,8 @@
          "fieldConfig": {
             "defaults": {
                "unit": "short"
-            }
+            },
+            "overrides": [ ]
          },
          "gridPos": {
             "h": 6,
@@ -1027,6 +1075,9 @@
          "description": "Lifecycle information (created, expiration, last seen) for API keys.",
          "fieldConfig": {
             "defaults": {
+               "thresholds": {
+                  "steps": [ ]
+               },
                "unit": "string"
             },
             "overrides": [
@@ -1166,6 +1217,9 @@
          "description": "Metadata and lifecycle information for Headscale pre-authentication keys.",
          "fieldConfig": {
             "defaults": {
+               "thresholds": {
+                  "steps": [ ]
+               },
                "unit": "string"
             },
             "overrides": [
@@ -1299,6 +1353,8 @@
    "schemaVersion": 39,
    "tags": [
       "tailscale",
+      "headscale",
+      "tailscaled",
       "tailscale-mixin"
    ],
    "templating": {

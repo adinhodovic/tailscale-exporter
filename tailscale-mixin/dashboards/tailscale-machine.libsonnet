@@ -1,3 +1,4 @@
+local mixinUtils = import 'github.com/adinhodovic/mixin-utils/utils.libsonnet';
 local g = import 'github.com/grafana/grafonnet/gen/grafonnet-latest/main.libsonnet';
 local dashboardUtil = import 'util.libsonnet';
 
@@ -214,7 +215,7 @@ local tbQueryOptions = table.queryOptions;
       local panels = {
 
         tailscaledMachineCountStat:
-          dashboardUtil.statPanel(
+          mixinUtils.dashboards.statPanel(
             'Tailscale Machines',
             'short',
             queries.tailscaledMachineCount,
@@ -222,7 +223,7 @@ local tbQueryOptions = table.queryOptions;
           ),
 
         tailscaledRoutesPieChartPanel:
-          dashboardUtil.pieChartPanel(
+          mixinUtils.dashboards.pieChartPanel(
             'Advertised / Approved Routes',
             'short',
             [
@@ -239,7 +240,7 @@ local tbQueryOptions = table.queryOptions;
           ),
 
         tailscaledInboundPathPieChartPanel:
-          dashboardUtil.pieChartPanel(
+          mixinUtils.dashboards.pieChartPanel(
             'Paths Distribution Inbound [1h]',
             'bps',
             queries.tailscaledInboundBytesByPathRate1h,
@@ -248,7 +249,7 @@ local tbQueryOptions = table.queryOptions;
           ),
 
         tailscaledOutboundPathPieChartPanel:
-          dashboardUtil.pieChartPanel(
+          mixinUtils.dashboards.pieChartPanel(
             'Paths Distribution Outbound [1h]',
             'bps',
             queries.tailscaledOutboundBytesByPathRate1h,
@@ -257,7 +258,7 @@ local tbQueryOptions = table.queryOptions;
           ),
 
         tailscaledInboundOutboundPieChartPanel:
-          dashboardUtil.pieChartPanel(
+          mixinUtils.dashboards.pieChartPanel(
             'Inbound vs Outbound Traffic [1h]',
             'bps',
             [
@@ -275,7 +276,7 @@ local tbQueryOptions = table.queryOptions;
           ),
 
         tailscaledDroppedPacketsByReasonPieChartPanel:
-          dashboardUtil.pieChartPanel(
+          mixinUtils.dashboards.pieChartPanel(
             'Dropped Packets by Reason [1h]',
             'pps',
             queries.tailscaledOutboundDroppedPacketsByReasonRate1h,
@@ -284,7 +285,7 @@ local tbQueryOptions = table.queryOptions;
           ),
 
         tailscaledTop20MachinesByInboundTrafficTable:
-          dashboardUtil.tablePanel(
+          mixinUtils.dashboards.tablePanel(
             'Top 20 Machines by Inbound Traffic (1h)',
             'Bps',
             queries.tailscaledTop20MachinesByInboundTraffic1h,
@@ -314,7 +315,7 @@ local tbQueryOptions = table.queryOptions;
           ),
 
         tailscaledMachinesWithUnapprovedRoutesTable:
-          dashboardUtil.tablePanel(
+          mixinUtils.dashboards.tablePanel(
             'Machines with Unapproved Routes',
             'short',
             queries.tailscaledMachinesWithUnapprovedRoutes,
@@ -344,7 +345,7 @@ local tbQueryOptions = table.queryOptions;
           ),
 
         tailscaledMachinesWithDroppedPacketsTable:
-          dashboardUtil.tablePanel(
+          mixinUtils.dashboards.tablePanel(
             'Machines with Dropped Packets (1h)',
             'percent',
             queries.tailscaledMachinesWithDroppedPackets1h,
@@ -374,7 +375,7 @@ local tbQueryOptions = table.queryOptions;
           ),
 
         tailscaledHealthMessagesByTypeTimeSeries:
-          dashboardUtil.timeSeriesPanel(
+          mixinUtils.dashboards.timeSeriesPanel(
             'Health Messages by Type',
             'short',
             queries.tailscaledHealthMessagesByType,
@@ -384,7 +385,7 @@ local tbQueryOptions = table.queryOptions;
           ),
 
         tailscaledOutboundDroppedPacketsByReasonTimeSeries:
-          dashboardUtil.timeSeriesPanel(
+          mixinUtils.dashboards.timeSeriesPanel(
             'Outbound Dropped Packets by Reason',
             'pps',
             queries.tailscaledOutboundDroppedPacketsByReasonRate,
@@ -394,7 +395,7 @@ local tbQueryOptions = table.queryOptions;
           ),
 
         tailscaledInboundBytesByPathTimeSeries:
-          dashboardUtil.timeSeriesPanel(
+          mixinUtils.dashboards.timeSeriesPanel(
             'Inbound Bytes by Path',
             'bps',
             queries.tailscaledInboundBytesByPathRate,
@@ -404,7 +405,7 @@ local tbQueryOptions = table.queryOptions;
           ),
 
         tailscaledOutboundBytesByPathTimeSeries:
-          dashboardUtil.timeSeriesPanel(
+          mixinUtils.dashboards.timeSeriesPanel(
             'Outbound Bytes by Path',
             'bps',
             queries.tailscaledOutboundBytesByPathRate,
@@ -414,7 +415,7 @@ local tbQueryOptions = table.queryOptions;
           ),
 
         tailscaledInboundPacketByPathTimeSeries:
-          dashboardUtil.timeSeriesPanel(
+          mixinUtils.dashboards.timeSeriesPanel(
             'Inbound Packets by Path',
             'pps',
             queries.tailscaledInboundPacketByPathRate,
@@ -424,7 +425,7 @@ local tbQueryOptions = table.queryOptions;
           ),
 
         tailscaledOutboundPacketByPathTimeSeries:
-          dashboardUtil.timeSeriesPanel(
+          mixinUtils.dashboards.timeSeriesPanel(
             'Outbound Packets by Path',
             'pps',
             queries.tailscaledOutboundPacketByPathRate,
@@ -435,7 +436,7 @@ local tbQueryOptions = table.queryOptions;
 
         // Tailscale Machine
         tailscaledRoutesMachinePieChartPanel:
-          dashboardUtil.pieChartPanel(
+          mixinUtils.dashboards.pieChartPanel(
             'Advertised / Approved Routes',
             'short',
             [
@@ -452,7 +453,7 @@ local tbQueryOptions = table.queryOptions;
           ),
 
         tailscaledDerpNonDerpOutboundBytesMachinePieChartPanel:
-          dashboardUtil.pieChartPanel(
+          mixinUtils.dashboards.pieChartPanel(
             'DERP vs Non-DERP Outbound Traffic [1h]',
             'bps',
             [
@@ -469,7 +470,7 @@ local tbQueryOptions = table.queryOptions;
           ),
 
         tailscaledDroppedPacketsMachineByReasonPieChartPanel:
-          dashboardUtil.pieChartPanel(
+          mixinUtils.dashboards.pieChartPanel(
             'Dropped Packets by Reason [1h]',
             'pps',
             queries.tailscaledOutboundDroppedPacketsMachineByReasonRate1h,
@@ -478,7 +479,7 @@ local tbQueryOptions = table.queryOptions;
           ),
 
         tailscaledHealthMessagesMachineByTypeTimeSeries:
-          dashboardUtil.timeSeriesPanel(
+          mixinUtils.dashboards.timeSeriesPanel(
             'Health Messages by Type',
             'short',
             queries.tailscaledHealthMessagesMachineByType,
@@ -488,7 +489,7 @@ local tbQueryOptions = table.queryOptions;
           ),
 
         tailscaledOutboundDroppedPacketsMachineByReasonTimeSeries:
-          dashboardUtil.timeSeriesPanel(
+          mixinUtils.dashboards.timeSeriesPanel(
             'Outbound Dropped Packets by Reason',
             'short',
             queries.tailscaledOutboundDroppedPacketsMachineByReasonRate,
@@ -497,7 +498,7 @@ local tbQueryOptions = table.queryOptions;
             stack='normal',
           ),
         tailscaledInboundBytesMachineByPathTimeSeries:
-          dashboardUtil.timeSeriesPanel(
+          mixinUtils.dashboards.timeSeriesPanel(
             'Inbound Bytes by Path',
             'Bps',
             queries.tailscaledInboundBytesMachineByPathRate,
@@ -507,7 +508,7 @@ local tbQueryOptions = table.queryOptions;
           ),
 
         tailscaledOutboundBytesMachineByPathTimeSeries:
-          dashboardUtil.timeSeriesPanel(
+          mixinUtils.dashboards.timeSeriesPanel(
             'Outbound Bytes by Path',
             'Bps',
             queries.tailscaledOutboundBytesMachineByPathRate,
@@ -517,7 +518,7 @@ local tbQueryOptions = table.queryOptions;
           ),
 
         tailscaledInboundPacketMachineByPathTimeSeries:
-          dashboardUtil.timeSeriesPanel(
+          mixinUtils.dashboards.timeSeriesPanel(
             'Inbound Packets by Path',
             'pps',
             queries.tailscaledInboundPacketMachineByPathRate,
@@ -527,7 +528,7 @@ local tbQueryOptions = table.queryOptions;
           ),
 
         tailscaledOutboundPacketMachineByPathTimeSeries:
-          dashboardUtil.timeSeriesPanel(
+          mixinUtils.dashboards.timeSeriesPanel(
             'Outbound Packets by Path',
             'pps',
             queries.tailscaledOutboundPacketMachineByPathRate,
@@ -620,11 +621,11 @@ local tbQueryOptions = table.queryOptions;
           startY=36,
         );
 
-      dashboardUtil.bypassDashboardValidation +
+      mixinUtils.dashboards.bypassDashboardValidation +
       dashboard.new(
         'Tailscale / Machine',
       ) +
-      dashboard.withDescription('A dashboard that gives an overview of Tailscale Machine daemon metrics. %s' % dashboardUtil.dashboardDescriptionLink) +
+      dashboard.withDescription('A dashboard that gives an overview of Tailscale Machine daemon metrics. %s' % mixinUtils.dashboards.dashboardDescriptionLink('tailscale-mixin', 'https://github.com/adinhodovic/tailscale-exporter/tree/main/tailscale-mixin')) +
       dashboard.withUid($._config.dashboardIds[dashboardName]) +
       dashboard.withTags($._config.tags) +
       dashboard.withTimezone('utc') +
@@ -633,13 +634,13 @@ local tbQueryOptions = table.queryOptions;
       dashboard.time.withTo('now') +
       dashboard.withVariables(variables) +
       dashboard.withLinks(
-        dashboardUtil.dashboardLinks($._config)
+        mixinUtils.dashboards.dashboardLinks('Tailscale', $._config, dropdown=true)
       ) +
       dashboard.withPanels(
         rows
       ) +
       dashboard.withAnnotations(
-        dashboardUtil.annotations($._config, defaultFilters)
+        mixinUtils.dashboards.annotations($._config, defaultFilters)
       ),
   },
 }

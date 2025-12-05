@@ -1,3 +1,4 @@
+local mixinUtils = import 'github.com/adinhodovic/mixin-utils/utils.libsonnet';
 local g = import 'github.com/grafana/grafonnet/gen/grafonnet-latest/main.libsonnet';
 local dashboardUtil = import 'util.libsonnet';
 
@@ -284,7 +285,7 @@ local tbOverride = tbStandardOptions.override;
       local panels = {
         // Summary
         usersTotalStat:
-          dashboardUtil.statPanel(
+          mixinUtils.dashboards.statPanel(
             'Users',
             'short',
             queries.usersTotal,
@@ -292,7 +293,7 @@ local tbOverride = tbStandardOptions.override;
           ),
 
         nodesTotalStat:
-          dashboardUtil.statPanel(
+          mixinUtils.dashboards.statPanel(
             'Nodes',
             'short',
             queries.nodesTotal,
@@ -300,7 +301,7 @@ local tbOverride = tbStandardOptions.override;
           ),
 
         nodesOnlineStat:
-          dashboardUtil.statPanel(
+          mixinUtils.dashboards.statPanel(
             'Online Nodes',
             'short',
             queries.nodesOnline,
@@ -308,7 +309,7 @@ local tbOverride = tbStandardOptions.override;
           ),
 
         apiKeysTotalStat:
-          dashboardUtil.statPanel(
+          mixinUtils.dashboards.statPanel(
             'API Keys',
             'short',
             queries.apiKeysTotal,
@@ -316,7 +317,7 @@ local tbOverride = tbStandardOptions.override;
           ),
 
         preAuthKeysTotalStat:
-          dashboardUtil.statPanel(
+          mixinUtils.dashboards.statPanel(
             'Pre-auth Keys',
             'short',
             queries.preAuthKeysTotal,
@@ -324,7 +325,7 @@ local tbOverride = tbStandardOptions.override;
           ),
 
         databaseConnectivityStat:
-          dashboardUtil.statPanel(
+          mixinUtils.dashboards.statPanel(
             'Database Connectivity',
             'bool',
             queries.databaseConnectivity,
@@ -333,7 +334,7 @@ local tbOverride = tbStandardOptions.override;
 
         // Nodes
         nodesByRegisterMethodPieChart:
-          dashboardUtil.pieChartPanel(
+          mixinUtils.dashboards.pieChartPanel(
             'Nodes by Register Method',
             'short',
             queries.nodesByRegisterMethod,
@@ -342,7 +343,7 @@ local tbOverride = tbStandardOptions.override;
           ),
 
         nodesTagsPieChart:
-          dashboardUtil.pieChartPanel(
+          mixinUtils.dashboards.pieChartPanel(
             'Node Tags',
             'short',
             queries.nodesTagsByCategory,
@@ -351,7 +352,7 @@ local tbOverride = tbStandardOptions.override;
           ),
 
         nodesRoutesPieChart:
-          dashboardUtil.pieChartPanel(
+          mixinUtils.dashboards.pieChartPanel(
             'Advertised Routes',
             'short',
             [
@@ -363,7 +364,7 @@ local tbOverride = tbStandardOptions.override;
           ),
 
         nodesInfoTable:
-          dashboardUtil.tablePanel(
+          mixinUtils.dashboards.tablePanel(
             'Nodes',
             'short',
             queries.nodesInfo,
@@ -419,7 +420,7 @@ local tbOverride = tbStandardOptions.override;
           ),
 
         nodesLifecycleTable:
-          dashboardUtil.tablePanel(
+          mixinUtils.dashboards.tablePanel(
             'Node Lifecycle',
             'string',
             [
@@ -494,7 +495,7 @@ local tbOverride = tbStandardOptions.override;
 
         // Users
         usersByProviderPieChart:
-          dashboardUtil.pieChartPanel(
+          mixinUtils.dashboards.pieChartPanel(
             'Users by Provider',
             'short',
             queries.usersByProvider,
@@ -503,7 +504,7 @@ local tbOverride = tbStandardOptions.override;
           ),
 
         usersInfoTable:
-          dashboardUtil.tablePanel(
+          mixinUtils.dashboards.tablePanel(
             'Users',
             'string',
             queries.usersInfo,
@@ -554,7 +555,7 @@ local tbOverride = tbStandardOptions.override;
 
         // Access
         preAuthKeysUsagePieChart:
-          dashboardUtil.pieChartPanel(
+          mixinUtils.dashboards.pieChartPanel(
             'Pre-auth Keys Usage',
             'short',
             [
@@ -565,7 +566,7 @@ local tbOverride = tbStandardOptions.override;
           ),
 
         preAuthKeysReusablePieChart:
-          dashboardUtil.pieChartPanel(
+          mixinUtils.dashboards.pieChartPanel(
             'Pre-auth Keys Reusable',
             'short',
             [
@@ -576,7 +577,7 @@ local tbOverride = tbStandardOptions.override;
           ),
 
         preAuthKeysEphemeralPieChart:
-          dashboardUtil.pieChartPanel(
+          mixinUtils.dashboards.pieChartPanel(
             'Pre-auth Keys Ephemeral',
             'short',
             [
@@ -587,7 +588,7 @@ local tbOverride = tbStandardOptions.override;
           ),
 
         apiKeysInfoTable:
-          dashboardUtil.tablePanel(
+          mixinUtils.dashboards.tablePanel(
             'API Keys',
             'string',
             [
@@ -653,7 +654,7 @@ local tbOverride = tbStandardOptions.override;
           ),
 
         preAuthKeysInfoTable:
-          dashboardUtil.tablePanel(
+          mixinUtils.dashboards.tablePanel(
             'Pre-auth Keys',
             'string',
             [
@@ -821,11 +822,11 @@ local tbOverride = tbStandardOptions.override;
           startY=50,
         );
 
-      dashboardUtil.bypassDashboardValidation +
+      mixinUtils.dashboards.bypassDashboardValidation +
       dashboard.new(
         'Headscale / Overview',
       ) +
-      dashboard.withDescription('An overview of Headscale metrics collected by tailscale-exporter using the Headscale API. %s' % dashboardUtil.dashboardDescriptionLink) +
+      dashboard.withDescription('An overview of Headscale metrics collected by tailscale-exporter using the Headscale API. %s' % mixinUtils.dashboards.dashboardDescriptionLink('tailscale-mixin', 'https://github.com/adinhodovic/tailscale-exporter/tree/main/tailscale-mixin')) +
       dashboard.withUid($._config.dashboardIds[dashboardName]) +
       dashboard.withTags($._config.tags) +
       dashboard.withTimezone('utc') +
@@ -834,13 +835,13 @@ local tbOverride = tbStandardOptions.override;
       dashboard.time.withTo('now') +
       dashboard.withVariables(variables) +
       dashboard.withLinks(
-        dashboardUtil.dashboardLinks($._config)
+        mixinUtils.dashboards.dashboardLinks('Tailscale', $._config, dropdown=true)
       ) +
       dashboard.withPanels(
         rows
       ) +
       dashboard.withAnnotations(
-        dashboardUtil.annotations($._config, defaultFilters)
+        mixinUtils.dashboards.annotations($._config, defaultFilters)
       ),
   },
 }

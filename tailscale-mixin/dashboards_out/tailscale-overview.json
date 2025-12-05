@@ -8,11 +8,13 @@
    "editable": false,
    "links": [
       {
-         "asDropdown": false,
+         "asDropdown": true,
          "includeVars": false,
          "keepTime": true,
          "tags": [
             "tailscale",
+            "headscale",
+            "tailscaled",
             "tailscale-mixin"
          ],
          "targetBlank": true,
@@ -60,6 +62,11 @@
             "y": 1
          },
          "id": 2,
+         "options": {
+            "graphMode": "area",
+            "percentChangeColorMode": "standard",
+            "showPercentChange": false
+         },
          "pluginVersion": "v11.4.0",
          "targets": [
             {
@@ -100,6 +107,11 @@
             "y": 1
          },
          "id": 3,
+         "options": {
+            "graphMode": "area",
+            "percentChangeColorMode": "standard",
+            "showPercentChange": false
+         },
          "pluginVersion": "v11.4.0",
          "targets": [
             {
@@ -140,6 +152,11 @@
             "y": 1
          },
          "id": 4,
+         "options": {
+            "graphMode": "area",
+            "percentChangeColorMode": "standard",
+            "showPercentChange": false
+         },
          "pluginVersion": "v11.4.0",
          "targets": [
             {
@@ -180,6 +197,11 @@
             "y": 1
          },
          "id": 5,
+         "options": {
+            "graphMode": "area",
+            "percentChangeColorMode": "standard",
+            "showPercentChange": false
+         },
          "pluginVersion": "v11.4.0",
          "targets": [
             {
@@ -201,6 +223,9 @@
          "description": "A table showing the nameservers configured for the selected tailnet.",
          "fieldConfig": {
             "defaults": {
+               "thresholds": {
+                  "steps": [ ]
+               },
                "unit": "string"
             },
             "overrides": [ ]
@@ -283,6 +308,11 @@
             "y": 1
          },
          "id": 7,
+         "options": {
+            "graphMode": "area",
+            "percentChangeColorMode": "standard",
+            "showPercentChange": false
+         },
          "pluginVersion": "v11.4.0",
          "targets": [
             {
@@ -304,6 +334,9 @@
          "description": "A table showing the current settings for the selected tailnet.",
          "fieldConfig": {
             "defaults": {
+               "thresholds": {
+                  "steps": [ ]
+               },
                "unit": "bool"
             },
             "overrides": [ ]
@@ -409,7 +442,8 @@
          "fieldConfig": {
             "defaults": {
                "unit": "short"
-            }
+            },
+            "overrides": [ ]
          },
          "gridPos": {
             "h": 5,
@@ -459,7 +493,8 @@
          "fieldConfig": {
             "defaults": {
                "unit": "short"
-            }
+            },
+            "overrides": [ ]
          },
          "gridPos": {
             "h": 5,
@@ -509,7 +544,8 @@
          "fieldConfig": {
             "defaults": {
                "unit": "short"
-            }
+            },
+            "overrides": [ ]
          },
          "gridPos": {
             "h": 5,
@@ -568,7 +604,8 @@
          "fieldConfig": {
             "defaults": {
                "unit": "short"
-            }
+            },
+            "overrides": [ ]
          },
          "gridPos": {
             "h": 5,
@@ -626,6 +663,9 @@
          "description": "A table showing all devices in the selected tailnet.",
          "fieldConfig": {
             "defaults": {
+               "thresholds": {
+                  "steps": [ ]
+               },
                "unit": "string"
             },
             "overrides": [ ]
@@ -717,6 +757,9 @@
          "description": "A table showing all devices in the selected tailnet.",
          "fieldConfig": {
             "defaults": {
+               "thresholds": {
+                  "steps": [ ]
+               },
                "unit": "bool"
             },
             "overrides": [
@@ -1055,7 +1098,8 @@
          "fieldConfig": {
             "defaults": {
                "unit": "short"
-            }
+            },
+            "overrides": [ ]
          },
          "gridPos": {
             "h": 5,
@@ -1105,7 +1149,8 @@
          "fieldConfig": {
             "defaults": {
                "unit": "short"
-            }
+            },
+            "overrides": [ ]
          },
          "gridPos": {
             "h": 5,
@@ -1155,7 +1200,8 @@
          "fieldConfig": {
             "defaults": {
                "unit": "short"
-            }
+            },
+            "overrides": [ ]
          },
          "gridPos": {
             "h": 5,
@@ -1205,7 +1251,8 @@
          "fieldConfig": {
             "defaults": {
                "unit": "short"
-            }
+            },
+            "overrides": [ ]
          },
          "gridPos": {
             "h": 5,
@@ -1263,6 +1310,9 @@
          "description": "A table showing all users in the selected tailnet.",
          "fieldConfig": {
             "defaults": {
+               "thresholds": {
+                  "steps": [ ]
+               },
                "unit": "short"
             },
             "overrides": [
@@ -1410,6 +1460,9 @@
          "description": "A table showing all keys in the selected tailnet.",
          "fieldConfig": {
             "defaults": {
+               "thresholds": {
+                  "steps": [ ]
+               },
                "unit": "string"
             },
             "overrides": [
@@ -1537,6 +1590,8 @@
    "schemaVersion": 39,
    "tags": [
       "tailscale",
+      "headscale",
+      "tailscaled",
       "tailscale-mixin"
    ],
    "templating": {
