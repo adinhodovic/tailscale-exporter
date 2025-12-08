@@ -116,7 +116,6 @@ helm install tailscale-exporter ./charts/tailscale-exporter \
 
 ### Headscale Installation
 
-
 #### Authentication Setup
 
 Create an API key in Headscale:
@@ -169,17 +168,7 @@ helm install tailscale-exporter ./charts/tailscale-exporter \
   --set env.HEADSCALE_INSECURE="false"
 ```
 
-## Usage
-
-### Basic Usage
-
-```bash
-./tailscale-exporter
-```
-
-The exporter will start on port 9250 by default and expose metrics at `/metrics`.
-
-### Command Line Options
+## Command Line Options
 
 ```bash
 ./tailscale-exporter -h
@@ -209,7 +198,6 @@ scrape_configs:
     scrape_interval: 30s
     metrics_path: /metrics
 ```
-
 
 ## Metrics
 
