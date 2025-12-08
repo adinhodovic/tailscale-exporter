@@ -77,7 +77,7 @@
                "expr": "sum(\n  tailscale_users_info{\n    cluster=\"$cluster\"\n,\nnamespace=\"$namespace\",\njob=\"$job\",\ntailnet=\"$tailnet\"\n\n  }\n)\n"
             }
          ],
-         "title": "Total Users",
+         "title": "Users",
          "type": "stat"
       },
       {
@@ -122,7 +122,7 @@
                "expr": "sum(\n  tailscale_devices_info{\n    cluster=\"$cluster\"\n,\nnamespace=\"$namespace\",\njob=\"$job\",\ntailnet=\"$tailnet\"\n\n  }\n)\n"
             }
          ],
-         "title": "Total Devices",
+         "title": "Devices",
          "type": "stat"
       },
       {
@@ -212,7 +212,7 @@
                "expr": "sum(\n  tailscale_keys_info{\n    cluster=\"$cluster\"\n,\nnamespace=\"$namespace\",\njob=\"$job\",\ntailnet=\"$tailnet\"\n\n  }\n)\n"
             }
          ],
-         "title": "Total Keys",
+         "title": "Keys",
          "type": "stat"
       },
       {

@@ -369,7 +369,7 @@ local tbOverride = tbStandardOptions.override;
 
         usersTotalStat:
           mixinUtils.dashboards.statPanel(
-            'Total Users',
+            'Users',
             'short',
             queries.usersTotal,
             description='The total number of users in the selected tailnet.',
@@ -377,7 +377,7 @@ local tbOverride = tbStandardOptions.override;
 
         devicesTotalStat:
           mixinUtils.dashboards.statPanel(
-            'Total Devices',
+            'Devices',
             'short',
             queries.devicesTotal,
             description='The total number of devices in the selected tailnet.',
@@ -393,7 +393,7 @@ local tbOverride = tbStandardOptions.override;
 
         keysTotalStat:
           mixinUtils.dashboards.statPanel(
-            'Total Keys',
+            'Keys',
             'short',
             queries.keysTotal,
             description='The total number of keys in the selected tailnet.',
