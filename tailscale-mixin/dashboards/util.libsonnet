@@ -61,7 +61,7 @@ local query = variable.query;
         },
       },
 
-    cluster:
+    clusterTailscale:
       query.new(
         config.clusterLabel,
         'label_values(tailscale_up{}, cluster)',
@@ -77,7 +77,23 @@ local query = variable.query;
         else query.generalOptions.showOnDashboard.withNothing()
       ),
 
-    namespace:
+    clusterHeadscale:
+      query.new(
+        config.clusterLabel,
+        'label_values(headscale_up, cluster)',
+      ) +
+      query.withDatasourceFromVariable(this.datasource) +
+      query.withSort() +
+      query.generalOptions.withLabel('Cluster') +
+      query.refresh.onLoad() +
+      query.refresh.onTime() +
+      (
+        if config.showMultiCluster
+        then query.generalOptions.showOnDashboard.withLabelAndValue()
+        else query.generalOptions.showOnDashboard.withNothing()
+      ),
+
+    namespaceTailscale:
       query.new(
         'namespace',
         'label_values(tailscale_up{%(cluster)s}, namespace)' % defaultFilters
@@ -88,10 +104,32 @@ local query = variable.query;
       query.refresh.onLoad() +
       query.refresh.onTime(),
 
-    job:
+    namespaceHeadscale:
+      query.new(
+        'namespace',
+        'label_values(headscale_up{%(cluster)s}, namespace)' % defaultFilters
+      ) +
+      query.withDatasourceFromVariable(this.datasource) +
+      query.withSort() +
+      query.generalOptions.withLabel('Namespace') +
+      query.refresh.onLoad() +
+      query.refresh.onTime(),
+
+    jobTailscale:
       query.new(
         'job',
         'label_values(tailscale_up{%(cluster)s, %(namespace)s}, job)' % defaultFilters
+      ) +
+      query.withDatasourceFromVariable(this.datasource) +
+      query.withSort() +
+      query.generalOptions.withLabel('Job') +
+      query.refresh.onLoad() +
+      query.refresh.onTime(),
+
+    jobHeadscale:
+      query.new(
+        'job',
+        'label_values(headscale_up{%(cluster)s, %(namespace)s}, job)' % defaultFilters
       ) +
       query.withDatasourceFromVariable(this.datasource) +
       query.withSort() +

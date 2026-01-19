@@ -22,9 +22,9 @@ local tbOverride = tbStandardOptions.override;
 
       local variables = [
         defaultVariables.datasource,
-        defaultVariables.cluster,
-        defaultVariables.namespace,
-        defaultVariables.job,
+        defaultVariables.clusterHeadscale,
+        defaultVariables.namespaceHeadscale,
+        defaultVariables.jobHeadscale,
       ];
 
       local defaultFilters = dashboardUtil.filters($._config);
