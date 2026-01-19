@@ -53,7 +53,8 @@
                   ]
                },
                "unit": "short"
-            }
+            },
+            "overrides": [ ]
          },
          "gridPos": {
             "h": 4,
@@ -72,9 +73,10 @@
             {
                "datasource": {
                   "type": "prometheus",
-                  "uid": "${datasource}"
+                  "uid": "$datasource"
                },
-               "expr": "count(\n  headscale_users_info{\n    cluster=\"$cluster\"\n,\nnamespace=\"$namespace\",\njob=\"$job\"\n\n  }\n)\n"
+               "expr": "count(\n  headscale_users_info{\n    cluster=\"$cluster\"\n,\nnamespace=\"$namespace\",\njob=\"$job\"\n\n  }\n)\n",
+               "instant": false
             }
          ],
          "title": "Users",
@@ -98,7 +100,8 @@
                   ]
                },
                "unit": "short"
-            }
+            },
+            "overrides": [ ]
          },
          "gridPos": {
             "h": 4,
@@ -117,9 +120,10 @@
             {
                "datasource": {
                   "type": "prometheus",
-                  "uid": "${datasource}"
+                  "uid": "$datasource"
                },
-               "expr": "count(\n  headscale_nodes_info{\n    cluster=\"$cluster\"\n,\nnamespace=\"$namespace\",\njob=\"$job\"\n\n  }\n)\n"
+               "expr": "count(\n  headscale_nodes_info{\n    cluster=\"$cluster\"\n,\nnamespace=\"$namespace\",\njob=\"$job\"\n\n  }\n)\n",
+               "instant": false
             }
          ],
          "title": "Nodes",
@@ -143,7 +147,8 @@
                   ]
                },
                "unit": "short"
-            }
+            },
+            "overrides": [ ]
          },
          "gridPos": {
             "h": 4,
@@ -162,9 +167,10 @@
             {
                "datasource": {
                   "type": "prometheus",
-                  "uid": "${datasource}"
+                  "uid": "$datasource"
                },
-               "expr": "sum(\n  headscale_nodes_online{\n    cluster=\"$cluster\"\n,\nnamespace=\"$namespace\",\njob=\"$job\"\n\n  }\n)\n"
+               "expr": "sum(\n  headscale_nodes_online{\n    cluster=\"$cluster\"\n,\nnamespace=\"$namespace\",\njob=\"$job\"\n\n  }\n)\n",
+               "instant": false
             }
          ],
          "title": "Online Nodes",
@@ -188,7 +194,8 @@
                   ]
                },
                "unit": "short"
-            }
+            },
+            "overrides": [ ]
          },
          "gridPos": {
             "h": 4,
@@ -207,9 +214,10 @@
             {
                "datasource": {
                   "type": "prometheus",
-                  "uid": "${datasource}"
+                  "uid": "$datasource"
                },
-               "expr": "count(\n  headscale_apikeys_info{\n    cluster=\"$cluster\"\n,\nnamespace=\"$namespace\",\njob=\"$job\"\n\n  }\n)\n"
+               "expr": "count(\n  headscale_apikeys_info{\n    cluster=\"$cluster\"\n,\nnamespace=\"$namespace\",\njob=\"$job\"\n\n  }\n)\n",
+               "instant": false
             }
          ],
          "title": "API Keys",
@@ -233,7 +241,8 @@
                   ]
                },
                "unit": "short"
-            }
+            },
+            "overrides": [ ]
          },
          "gridPos": {
             "h": 4,
@@ -252,9 +261,10 @@
             {
                "datasource": {
                   "type": "prometheus",
-                  "uid": "${datasource}"
+                  "uid": "$datasource"
                },
-               "expr": "count(\n  headscale_preauthkeys_info{\n    cluster=\"$cluster\"\n,\nnamespace=\"$namespace\",\njob=\"$job\"\n\n  }\n)\n"
+               "expr": "count(\n  headscale_preauthkeys_info{\n    cluster=\"$cluster\"\n,\nnamespace=\"$namespace\",\njob=\"$job\"\n\n  }\n)\n",
+               "instant": false
             }
          ],
          "title": "Pre-auth Keys",
@@ -278,7 +288,8 @@
                   ]
                },
                "unit": "bool"
-            }
+            },
+            "overrides": [ ]
          },
          "gridPos": {
             "h": 4,
@@ -297,9 +308,10 @@
             {
                "datasource": {
                   "type": "prometheus",
-                  "uid": "${datasource}"
+                  "uid": "$datasource"
                },
-               "expr": "max(\n  headscale_health_database_connectivity{\n    cluster=\"$cluster\"\n,\nnamespace=\"$namespace\",\njob=\"$job\"\n\n  }\n)\n"
+               "expr": "max(\n  headscale_health_database_connectivity{\n    cluster=\"$cluster\"\n,\nnamespace=\"$namespace\",\njob=\"$job\"\n\n  }\n)\n",
+               "instant": false
             }
          ],
          "title": "Database Connectivity",
@@ -496,6 +508,7 @@
          "description": "Node metadata reported by Headscale.",
          "fieldConfig": {
             "defaults": {
+               "links": [ ],
                "thresholds": {
                   "steps": [ ]
                },
@@ -589,6 +602,7 @@
          "description": "Creation, last seen, and expiry timestamps per node.",
          "fieldConfig": {
             "defaults": {
+               "links": [ ],
                "thresholds": {
                   "steps": [ ]
                },
@@ -796,6 +810,7 @@
          "description": "User metadata reported by Headscale.",
          "fieldConfig": {
             "defaults": {
+               "links": [ ],
                "thresholds": {
                   "steps": [ ]
                },
@@ -1075,6 +1090,7 @@
          "description": "Lifecycle information (created, expiration, last seen) for API keys.",
          "fieldConfig": {
             "defaults": {
+               "links": [ ],
                "thresholds": {
                   "steps": [ ]
                },
@@ -1217,6 +1233,7 @@
          "description": "Metadata and lifecycle information for Headscale pre-authentication keys.",
          "fieldConfig": {
             "defaults": {
+               "links": [ ],
                "thresholds": {
                   "steps": [ ]
                },
@@ -1378,7 +1395,7 @@
             "hide": 2,
             "label": "Cluster",
             "name": "cluster",
-            "query": "label_values(tailscale_up{}, cluster)",
+            "query": "label_values(headscale_up, cluster)",
             "refresh": 2,
             "sort": 1,
             "type": "query"
@@ -1390,7 +1407,7 @@
             },
             "label": "Namespace",
             "name": "namespace",
-            "query": "label_values(tailscale_up{cluster=\"$cluster\"}, namespace)",
+            "query": "label_values(headscale_up{cluster=\"$cluster\"}, namespace)",
             "refresh": 2,
             "sort": 1,
             "type": "query"
@@ -1402,7 +1419,7 @@
             },
             "label": "Job",
             "name": "job",
-            "query": "label_values(tailscale_up{cluster=\"$cluster\", namespace=\"$namespace\"}, job)",
+            "query": "label_values(headscale_up{cluster=\"$cluster\", namespace=\"$namespace\"}, job)",
             "refresh": 2,
             "sort": 1,
             "type": "query"

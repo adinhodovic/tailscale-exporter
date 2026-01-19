@@ -53,7 +53,8 @@
                   ]
                },
                "unit": "short"
-            }
+            },
+            "overrides": [ ]
          },
          "gridPos": {
             "h": 5,
@@ -72,9 +73,10 @@
             {
                "datasource": {
                   "type": "prometheus",
-                  "uid": "${datasource}"
+                  "uid": "$datasource"
                },
-               "expr": "count(\n  tailscaled_health_messages{\n    cluster=\"$cluster\"\n,\njob=~\"$job\"\n\n  }\n)\n"
+               "expr": "count(\n  tailscaled_health_messages{\n    cluster=\"$cluster\"\n,\njob=~\"$job\"\n\n  }\n)\n",
+               "instant": false
             }
          ],
          "title": "Tailscale Machines",
@@ -361,6 +363,7 @@
          "description": "A table panel showing the top 20 Tailscale machines by inbound traffic over the last hour.",
          "fieldConfig": {
             "defaults": {
+               "links": [ ],
                "thresholds": {
                   "steps": [ ]
                },
@@ -428,6 +431,7 @@
          "description": "A table panel showing the Tailscale machines with unadvertised routes.",
          "fieldConfig": {
             "defaults": {
+               "links": [ ],
                "thresholds": {
                   "steps": [ ]
                },
@@ -495,6 +499,7 @@
          "description": "A table panel showing the Tailscale machines with dropped packets in the last hour.",
          "fieldConfig": {
             "defaults": {
+               "links": [ ],
                "thresholds": {
                   "steps": [ ]
                },
@@ -583,7 +588,8 @@
                   }
                },
                "unit": "short"
-            }
+            },
+            "overrides": [ ]
          },
          "gridPos": {
             "h": 5,
@@ -641,7 +647,8 @@
                   }
                },
                "unit": "pps"
-            }
+            },
+            "overrides": [ ]
          },
          "gridPos": {
             "h": 5,
@@ -699,7 +706,8 @@
                   }
                },
                "unit": "bps"
-            }
+            },
+            "overrides": [ ]
          },
          "gridPos": {
             "h": 5,
@@ -757,7 +765,8 @@
                   }
                },
                "unit": "pps"
-            }
+            },
+            "overrides": [ ]
          },
          "gridPos": {
             "h": 5,
@@ -815,7 +824,8 @@
                   }
                },
                "unit": "bps"
-            }
+            },
+            "overrides": [ ]
          },
          "gridPos": {
             "h": 5,
@@ -873,7 +883,8 @@
                   }
                },
                "unit": "pps"
-            }
+            },
+            "overrides": [ ]
          },
          "gridPos": {
             "h": 5,
@@ -1115,7 +1126,8 @@
                   }
                },
                "unit": "short"
-            }
+            },
+            "overrides": [ ]
          },
          "gridPos": {
             "h": 5,
@@ -1173,7 +1185,8 @@
                   }
                },
                "unit": "short"
-            }
+            },
+            "overrides": [ ]
          },
          "gridPos": {
             "h": 5,
@@ -1231,7 +1244,8 @@
                   }
                },
                "unit": "Bps"
-            }
+            },
+            "overrides": [ ]
          },
          "gridPos": {
             "h": 5,
@@ -1289,7 +1303,8 @@
                   }
                },
                "unit": "pps"
-            }
+            },
+            "overrides": [ ]
          },
          "gridPos": {
             "h": 5,
@@ -1347,7 +1362,8 @@
                   }
                },
                "unit": "Bps"
-            }
+            },
+            "overrides": [ ]
          },
          "gridPos": {
             "h": 5,
@@ -1405,7 +1421,8 @@
                   }
                },
                "unit": "pps"
-            }
+            },
+            "overrides": [ ]
          },
          "gridPos": {
             "h": 5,
