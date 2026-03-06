@@ -64,12 +64,19 @@ func (c HeadscalePreAuthKeysCollector) Update(
 		return err
 	}
 
+	seen := make(map[string]struct{}, len(keys)) // remove duplicates
+
 	for _, key := range keys {
 		userName := ""
 		if key.GetUser() != nil {
 			userName = key.GetUser().GetName()
 		}
 		keyID := formatUint(key.GetId())
+		metricID := keyID + "\x00" + userName
+		if _, ok := seen[metricID]; ok {
+			continue
+		}
+		seen[metricID] = struct{}{}
 
 		ch <- prometheus.MustNewConstMetric(
 			preAuthKeysInfoDesc, prometheus.GaugeValue, 1,
