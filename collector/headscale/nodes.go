@@ -71,8 +71,8 @@ var (
 	nodesTagsDesc = newDesc(
 		nodesSubsystem,
 		"tags",
-		"Number of tags grouped by category (forced, valid, invalid)",
-		[]string{"id", "name", "user", "category"},
+		"Number of tags applied to the node",
+		[]string{"id", "name", "user"},
 	)
 )
 
@@ -156,17 +156,9 @@ func (c HeadscaleNodesCollector) Update(
 			nodeID, node.GetName(), userName,
 		)
 
-		tagCategories := map[string]int{
-			"forced":  len(node.GetForcedTags()),
-			"valid":   len(node.GetValidTags()),
-			"invalid": len(node.GetInvalidTags()),
-		}
-
-		for category, count := range tagCategories {
-			ch <- prometheus.MustNewConstMetric(nodesTagsDesc, prometheus.GaugeValue, float64(count),
-				nodeID, node.GetName(), userName, category,
-			)
-		}
+		ch <- prometheus.MustNewConstMetric(nodesTagsDesc, prometheus.GaugeValue, float64(len(node.GetTags())),
+			nodeID, node.GetName(), userName,
+		)
 	}
 
 	return nil

@@ -32,9 +32,7 @@ func TestHeadscaleNodesCollector_Update(t *testing.T) {
 			"10.0.0.0/24",
 		},
 		SubnetRoutes: []string{"0.0.0.0/0"},
-		ForcedTags:   []string{"tag:forced"},
-		ValidTags:    []string{"tag:valid"},
-		InvalidTags:  []string{"tag:invalid"},
+		Tags:         []string{"tag:one", "tag:two", "tag:three"},
 	}
 
 	client := &mockHeadscaleClient{
@@ -67,11 +65,9 @@ headscale_nodes_available_routes{id="1",name="node-one",user="alice"} 1
 # HELP headscale_nodes_subnet_routes Number of subnet routes advertised by the node
 # TYPE headscale_nodes_subnet_routes gauge
 headscale_nodes_subnet_routes{id="1",name="node-one",user="alice"} 1
-# HELP headscale_nodes_tags Number of tags grouped by category (forced, valid, invalid)
+# HELP headscale_nodes_tags Number of tags applied to the node
 # TYPE headscale_nodes_tags gauge
-headscale_nodes_tags{category="forced",id="1",name="node-one",user="alice"} 1
-headscale_nodes_tags{category="invalid",id="1",name="node-one",user="alice"} 1
-headscale_nodes_tags{category="valid",id="1",name="node-one",user="alice"} 1
+headscale_nodes_tags{id="1",name="node-one",user="alice"} 3
 `
 	gatherMetrics(t, metrics, expected)
 }

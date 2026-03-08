@@ -120,22 +120,11 @@ func (c *grpcHeadscaleClient) ListPreAuthKeys(
 ) ([]*headscalev1.PreAuthKey, error) {
 	ctx = c.ctxWithAuth(ctx)
 
-	usersResp, err := c.client.ListUsers(ctx, &headscalev1.ListUsersRequest{})
+	resp, err := c.client.ListPreAuthKeys(ctx, &headscalev1.ListPreAuthKeysRequest{})
 	if err != nil {
 		return nil, err
 	}
-
-	var keys []*headscalev1.PreAuthKey
-	for _, user := range usersResp.GetUsers() {
-		resp, err := c.client.ListPreAuthKeys(ctx, &headscalev1.ListPreAuthKeysRequest{
-			User: user.GetId(),
-		})
-		if err != nil {
-			return nil, err
-		}
-		keys = append(keys, resp.GetPreAuthKeys()...)
-	}
-	return keys, nil
+	return resp.GetPreAuthKeys(), nil
 }
 
 func (c *grpcHeadscaleClient) Health(ctx context.Context) (*headscalev1.HealthResponse, error) {
