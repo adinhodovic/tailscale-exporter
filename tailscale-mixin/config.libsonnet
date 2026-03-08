@@ -56,6 +56,12 @@
         threshold: '10',
       },
 
+      tailscaleCollectorFailed: {
+        enabled: true,
+        severity: 'critical',
+        interval: '5m',
+      },
+
       // Headscale alerts
       headscaleDatabaseDown: {
         enabled: true,
@@ -68,6 +74,12 @@
         severity: 'warning',
         interval: '15m',
         threshold: '10',  // percent of unapproved routes
+      },
+
+      headscaleCollectorFailed: {
+        enabled: true,
+        severity: 'critical',
+        interval: '5m',
       },
 
       // Tailscaled alerts

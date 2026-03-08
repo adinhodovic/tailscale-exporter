@@ -5,6 +5,25 @@
       {
         name: 'tailscale-tailnet-alerts',
         rules: if $._config.alerts.enabled then std.prune([
+          if $._config.alerts.tailscaleCollectorFailed.enabled then {
+            alert: 'TailscaleCollectorFailed',
+            expr: |||
+              min(
+                tailscale_scrape_collector_success{}
+              ) by (%(clusterLabel)s, namespace, job, collector, tailnet)
+              == 0
+            ||| % $._config,
+            'for': $._config.alerts.tailscaleCollectorFailed.interval,
+            annotations: {
+              summary: 'Tailscale Collector Failed',
+              description: 'Tailscale collector {{ $labels.collector }} for tailnet {{ $labels.tailnet }} in namespace {{ $labels.namespace }} has been failing for longer than %(interval)s.' % $._config.alerts.tailscaleCollectorFailed,
+              dashboard_url: $._config.dashboardUrls['tailscale-overview'] + '?var-namespace={{ $labels.namespace }}&var-tailnet={{ $labels.tailnet }}' + clusterVariableQueryString,
+            },
+            labels: {
+              severity: $._config.alerts.tailscaleCollectorFailed.severity,
+              mixin: 'tailscale',
+            },
+          },
           if $._config.alerts.tailscaleDeviceUnauthorized.enabled then {
             alert: 'TailscaleDeviceUnauthorized',
             expr: |||
@@ -116,6 +135,25 @@
             },
             labels: {
               severity: $._config.alerts.headscaleDatabaseDown.severity,
+              mixin: 'headscale',
+            },
+          },
+          if $._config.alerts.headscaleCollectorFailed.enabled then {
+            alert: 'HeadscaleCollectorFailed',
+            expr: |||
+              min(
+                headscale_scrape_collector_success{}
+              ) by (%(clusterLabel)s, namespace, job, collector)
+              == 0
+            ||| % $._config,
+            'for': $._config.alerts.headscaleCollectorFailed.interval,
+            annotations: {
+              summary: 'Headscale Collector Failed',
+              description: 'Headscale collector {{ $labels.collector }} in namespace {{ $labels.namespace }} has been failing for longer than %(interval)s.' % $._config.alerts.headscaleCollectorFailed,
+              dashboard_url: $._config.dashboardUrls['headscale-overview'] + '?var-namespace={{ $labels.namespace }}' + clusterVariableQueryString,
+            },
+            labels: {
+              severity: $._config.alerts.headscaleCollectorFailed.severity,
               mixin: 'headscale',
             },
           },
