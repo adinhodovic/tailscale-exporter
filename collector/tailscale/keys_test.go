@@ -89,7 +89,10 @@ tailscale_keys_expires_timestamp{id="key-123",key_type="auth",user_id="user-456"
 			reg.MustRegister(tempCollector)
 
 			// Compare the metrics
-			if err := testutil.GatherAndCompare(reg, strings.NewReader(tt.expectedMetrics)); err != nil {
+			if err := testutil.GatherAndCompare(
+				reg,
+				strings.NewReader(tt.expectedMetrics),
+			); err != nil {
 				t.Errorf("metrics mismatch: %v", err)
 			}
 		})

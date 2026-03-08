@@ -82,7 +82,10 @@ tailscale_dns_magic_dns 1
 			reg.MustRegister(tempCollector)
 
 			// Compare the metrics
-			if err := testutil.GatherAndCompare(reg, strings.NewReader(tt.expectedMetrics)); err != nil {
+			if err := testutil.GatherAndCompare(
+				reg,
+				strings.NewReader(tt.expectedMetrics),
+			); err != nil {
 				t.Errorf("metrics mismatch: %v", err)
 			}
 		})

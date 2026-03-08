@@ -90,7 +90,10 @@ tailscale_tailnet_settings_info{acls_external_link="https://example.com/acls",ac
 			reg.MustRegister(tempCollector)
 
 			// Compare the metrics
-			if err := testutil.GatherAndCompare(reg, strings.NewReader(tt.expectedMetrics)); err != nil {
+			if err := testutil.GatherAndCompare(
+				reg,
+				strings.NewReader(tt.expectedMetrics),
+			); err != nil {
 				t.Errorf("metrics mismatch: %v", err)
 			}
 		})

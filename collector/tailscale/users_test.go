@@ -101,7 +101,10 @@ tailscale_users_last_seen_timestamp{display_name="User One",id="user-456",login_
 			reg.MustRegister(tempCollector)
 
 			// Compare the metrics
-			if err := testutil.GatherAndCompare(reg, strings.NewReader(tt.expectedMetrics)); err != nil {
+			if err := testutil.GatherAndCompare(
+				reg,
+				strings.NewReader(tt.expectedMetrics),
+			); err != nil {
 				t.Errorf("metrics mismatch: %v", err)
 			}
 		})
