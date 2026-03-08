@@ -4,7 +4,7 @@
    "annotations": {
       "list": [ ]
    },
-   "description": "An overview of Headscale metrics collected by tailscale-exporter using the Headscale API. The dashboards were generated using [tailscale-mixin](https://github.com/adinhodovic/tailscale-exporter/tree/main/tailscale-mixin). Open issues and create feature requests in the repository.",
+   "description": "An overview of Headscale metrics including nodes (registration method, routes, lifecycle), users (by provider), and access management (API keys, pre-auth keys usage, reusability, and expiry). The dashboards were generated using [tailscale-mixin](https://github.com/adinhodovic/tailscale-exporter/tree/main/tailscale-mixin). Open issues and create feature requests in the repository.",
    "editable": false,
    "links": [
       {

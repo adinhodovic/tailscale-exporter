@@ -989,7 +989,7 @@ local tbOverride = tbStandardOptions.override;
       dashboard.new(
         'Tailscale / Overview',
       ) +
-      dashboard.withDescription('A dashboard that gives an overview of Tailscale API metrics. %s' % mixinUtils.dashboards.dashboardDescriptionLink('tailscale-mixin', 'https://github.com/adinhodovic/tailscale-exporter/tree/main/tailscale-mixin')) +
+      dashboard.withDescription('An overview of Tailscale API metrics including tailnet settings, devices (OS, version, authorization, routes), users (role, status, login state), and auth keys. %s' % mixinUtils.dashboards.dashboardDescriptionLink('tailscale-mixin', 'https://github.com/adinhodovic/tailscale-exporter/tree/main/tailscale-mixin')) +
       dashboard.withUid($._config.dashboardIds[dashboardName]) +
       dashboard.withTags($._config.tags) +
       dashboard.withTimezone('utc') +
