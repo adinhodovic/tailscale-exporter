@@ -1,6 +1,20 @@
 "groups":
 - "name": "tailscale-tailnet-alerts"
   "rules":
+  - "alert": "TailscaleCollectorFailed"
+    "annotations":
+      "dashboard_url": "https://grafana.com/d/tailscale-mixin-over-k12e/tailscale-overview?var-namespace={{ $labels.namespace }}&var-tailnet={{ $labels.tailnet }}"
+      "description": "Tailscale collector {{ $labels.collector }} for tailnet {{ $labels.tailnet }} in namespace {{ $labels.namespace }} has been failing for longer than 5m."
+      "summary": "Tailscale Collector Failed"
+    "expr": |
+      min(
+        tailscale_scrape_collector_success{}
+      ) by (cluster, namespace, job, collector, tailnet)
+      == 0
+    "for": "5m"
+    "labels":
+      "mixin": "tailscale"
+      "severity": "critical"
   - "alert": "TailscaleDeviceUnauthorized"
     "annotations":
       "dashboard_url": "https://grafana.com/d/tailscale-mixin-over-k12e/tailscale-overview?var-namespace={{ $labels.namespace }}&var-tailnet={{ $labels.tailnet }}"
@@ -82,6 +96,20 @@
       max(
         headscale_health_database_connectivity{}
       ) by (cluster, namespace, job)
+      == 0
+    "for": "5m"
+    "labels":
+      "mixin": "headscale"
+      "severity": "critical"
+  - "alert": "HeadscaleCollectorFailed"
+    "annotations":
+      "dashboard_url": "https://grafana.com/d/headscale-mixin-over-k12e/headscale-overview?var-namespace={{ $labels.namespace }}"
+      "description": "Headscale collector {{ $labels.collector }} in namespace {{ $labels.namespace }} has been failing for longer than 5m."
+      "summary": "Headscale Collector Failed"
+    "expr": |
+      min(
+        headscale_scrape_collector_success{}
+      ) by (cluster, namespace, job, collector)
       == 0
     "for": "5m"
     "labels":

@@ -4,6 +4,55 @@ rule_files:
   - ../prometheus_alerts.yaml
 
 tests:
+  # TailscaleCollectorFailed Alert Test
+  - interval: 1m
+    input_series:
+      # Failing collector (devices) for 6 minutes (> 5m)
+      - series: 'tailscale_scrape_collector_success{namespace="tailscale-ns", job="tailscale", collector="devices", tailnet="test-tailnet"}'
+        values: "0+0x6"
+      # Passing collectors - should not alert
+      - series: 'tailscale_scrape_collector_success{namespace="tailscale-ns", job="tailscale", collector="dns", tailnet="test-tailnet"}'
+        values: "1+0x6"
+      - series: 'tailscale_scrape_collector_success{namespace="tailscale-ns", job="tailscale", collector="keys", tailnet="test-tailnet"}'
+        values: "1+0x6"
+      - series: 'tailscale_scrape_collector_success{namespace="tailscale-ns", job="tailscale", collector="tailnet_settings", tailnet="test-tailnet"}'
+        values: "1+0x6"
+      - series: 'tailscale_scrape_collector_success{namespace="tailscale-ns", job="tailscale", collector="users", tailnet="test-tailnet"}'
+        values: "1+0x6"
+    alert_rule_test:
+      - eval_time: 6m
+        alertname: TailscaleCollectorFailed
+        exp_alerts:
+          - exp_labels:
+              namespace: tailscale-ns
+              job: tailscale
+              collector: devices
+              tailnet: test-tailnet
+              severity: critical
+              mixin: tailscale
+            exp_annotations:
+              summary: "Tailscale Collector Failed"
+              description: "Tailscale collector devices for tailnet test-tailnet in namespace tailscale-ns has been failing for longer than 5m."
+              dashboard_url: "https://grafana.com/d/tailscale-mixin-over-k12e/tailscale-overview?var-namespace=tailscale-ns&var-tailnet=test-tailnet"
+
+  # TailscaleCollectorFailed Alert Test - should not fire when all collectors succeed
+  - interval: 1m
+    input_series:
+      - series: 'tailscale_scrape_collector_success{namespace="tailscale-ns", job="tailscale", collector="devices", tailnet="test-tailnet"}'
+        values: "1+0x6"
+      - series: 'tailscale_scrape_collector_success{namespace="tailscale-ns", job="tailscale", collector="dns", tailnet="test-tailnet"}'
+        values: "1+0x6"
+      - series: 'tailscale_scrape_collector_success{namespace="tailscale-ns", job="tailscale", collector="keys", tailnet="test-tailnet"}'
+        values: "1+0x6"
+      - series: 'tailscale_scrape_collector_success{namespace="tailscale-ns", job="tailscale", collector="tailnet_settings", tailnet="test-tailnet"}'
+        values: "1+0x6"
+      - series: 'tailscale_scrape_collector_success{namespace="tailscale-ns", job="tailscale", collector="users", tailnet="test-tailnet"}'
+        values: "1+0x6"
+    alert_rule_test:
+      - eval_time: 6m
+        alertname: TailscaleCollectorFailed
+        exp_alerts: []
+
   # TailscaleDeviceUnauthorized Alert Test
   - interval: 1m
     input_series:
@@ -120,6 +169,54 @@ tests:
               summary: "Tailscaled Machine has High Outbound Dropped Packets"
               description: "Tailscaled Machine machine-3 has a high rate of outbound dropped packets (>50%) for longer than 15m."
               dashboard_url: "https://grafana.com/d/tailscaled-mixin-over-k12e/tailscale-machine?var-tailscale_machine=machine-3"
+
+  # HeadscaleCollectorFailed Alert Test
+  - interval: 1m
+    input_series:
+      # Failing collector (apikeys) for 6 minutes (> 5m)
+      - series: 'headscale_scrape_collector_success{namespace="headscale-ns", job="headscale", collector="apikeys"}'
+        values: "0+0x6"
+      # Passing collectors - should not alert
+      - series: 'headscale_scrape_collector_success{namespace="headscale-ns", job="headscale", collector="nodes"}'
+        values: "1+0x6"
+      - series: 'headscale_scrape_collector_success{namespace="headscale-ns", job="headscale", collector="users"}'
+        values: "1+0x6"
+      - series: 'headscale_scrape_collector_success{namespace="headscale-ns", job="headscale", collector="preauthkeys"}'
+        values: "1+0x6"
+      - series: 'headscale_scrape_collector_success{namespace="headscale-ns", job="headscale", collector="health"}'
+        values: "1+0x6"
+    alert_rule_test:
+      - eval_time: 6m
+        alertname: HeadscaleCollectorFailed
+        exp_alerts:
+          - exp_labels:
+              namespace: headscale-ns
+              job: headscale
+              collector: apikeys
+              severity: critical
+              mixin: headscale
+            exp_annotations:
+              summary: "Headscale Collector Failed"
+              description: "Headscale collector apikeys in namespace headscale-ns has been failing for longer than 5m."
+              dashboard_url: "https://grafana.com/d/headscale-mixin-over-k12e/headscale-overview?var-namespace=headscale-ns"
+
+  # HeadscaleCollectorFailed Alert Test - should not fire when all collectors succeed
+  - interval: 1m
+    input_series:
+      - series: 'headscale_scrape_collector_success{namespace="headscale-ns", job="headscale", collector="apikeys"}'
+        values: "1+0x6"
+      - series: 'headscale_scrape_collector_success{namespace="headscale-ns", job="headscale", collector="nodes"}'
+        values: "1+0x6"
+      - series: 'headscale_scrape_collector_success{namespace="headscale-ns", job="headscale", collector="users"}'
+        values: "1+0x6"
+      - series: 'headscale_scrape_collector_success{namespace="headscale-ns", job="headscale", collector="preauthkeys"}'
+        values: "1+0x6"
+      - series: 'headscale_scrape_collector_success{namespace="headscale-ns", job="headscale", collector="health"}'
+        values: "1+0x6"
+    alert_rule_test:
+      - eval_time: 6m
+        alertname: HeadscaleCollectorFailed
+        exp_alerts: []
 
   # HeadscaleDatabaseDown Alert Test
   - interval: 1m
