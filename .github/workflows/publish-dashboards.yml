@@ -1,0 +1,57 @@
+name: publish-dashboards
+permissions: {}
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - tailscale-mixin/**
+  workflow_dispatch:
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    name: Publish dashboards
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Get changed dashboard files
+        id: changed-files
+        uses: tj-actions/changed-files@7dee1b0c1557f278e5c7dc244927139d78c0e22a # v47.0.4
+        with:
+          files: tailscale-mixin/dashboards_out/*.json
+
+      - name: Publish changed dashboards to grafana.com
+        if: steps.changed-files.outputs.any_changed == 'true'
+        env:
+          GRAFANA_COM_TOKEN: ${{ secrets.GRAFANA_COM_TOKEN }}
+        run: |
+          for file in ${{ steps.changed-files.outputs.all_changed_files }}; do
+            title=$(jq -r '.title' "$file")
+            json_str=$(jq -c . "$file" | jq -Rs .)
+
+            existing_id=$(curl -sf \
+              -H "Authorization: Bearer $GRAFANA_COM_TOKEN" \
+              "https://grafana.com/api/dashboards?orgSlug=adinhodovic" \
+              | jq -r --arg title "$title" \
+                '.items[] | select(.name == $title) | .id // empty')
+
+            if [ -n "$existing_id" ]; then
+              echo "Updating: $title (id=$existing_id)"
+              url="https://grafana.com/api/dashboards/${existing_id}/revisions"
+            else
+              echo "Creating: $title"
+              url="https://grafana.com/api/dashboards"
+            fi
+
+            response=$(curl -sf -X POST "$url" \
+              -H "Authorization: Bearer $GRAFANA_COM_TOKEN" \
+              -H "Content-Type: application/json" \
+              -d "{\"json\": $json_str}")
+            echo "$response" | jq '{id: (.id // .dashboardId), revision: .revision, name: (.name // .dashboardName)}'
+          done
