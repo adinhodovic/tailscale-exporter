@@ -454,9 +454,18 @@
             "type": "prometheus",
             "uid": "$datasource"
          },
-         "description": "Breakdown of tags reported per node grouped by category.",
+         "description": "Total number of tags applied across all nodes.",
          "fieldConfig": {
             "defaults": {
+               "mappings": [ ],
+               "thresholds": {
+                  "steps": [
+                     {
+                        "color": "green",
+                        "value": 0
+                     }
+                  ]
+               },
                "unit": "short"
             },
             "overrides": [ ]
@@ -469,21 +478,9 @@
          },
          "id": 11,
          "options": {
-            "displayLabels": [
-               "percent"
-            ],
-            "legend": {
-               "displayMode": "table",
-               "placement": "right",
-               "showLegend": true,
-               "values": [
-                  "percent"
-               ]
-            },
-            "tooltip": {
-               "mode": "multi",
-               "sort": "desc"
-            }
+            "graphMode": "area",
+            "percentChangeColorMode": "standard",
+            "showPercentChange": false
          },
          "pluginVersion": "v11.4.0",
          "targets": [
@@ -492,13 +489,12 @@
                   "type": "prometheus",
                   "uid": "$datasource"
                },
-               "expr": "sum(\n  headscale_nodes_tags{\n    cluster=\"$cluster\"\n,\nnamespace=\"$namespace\",\njob=\"$job\"\n\n  }\n) by (category)\n",
-               "instant": true,
-               "legendFormat": "{{ category }}"
+               "expr": "sum(\n  headscale_nodes_tags{\n    cluster=\"$cluster\"\n,\nnamespace=\"$namespace\",\njob=\"$job\"\n\n  }\n)\n",
+               "instant": false
             }
          ],
          "title": "Node Tags",
-         "type": "piechart"
+         "type": "stat"
       },
       {
          "datasource": {

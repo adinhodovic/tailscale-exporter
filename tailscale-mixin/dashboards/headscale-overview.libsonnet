@@ -95,12 +95,12 @@ local tbOverride = tbStandardOptions.override;
           ) by (register_method)
         ||| % headscaleFilters,
 
-        nodesTagsByCategory: |||
+        nodesTotalTags: |||
           sum(
             headscale_nodes_tags{
               %(headscale)s
             }
-          ) by (category)
+          )
         ||| % headscaleFilters,
 
         nodesApprovedRoutes: |||
@@ -342,13 +342,12 @@ local tbOverride = tbStandardOptions.override;
             description='Distribution of nodes grouped by registration method.',
           ),
 
-        nodesTagsPieChart:
-          mixinUtils.dashboards.pieChartPanel(
+        nodesTotalTagsStat:
+          mixinUtils.dashboards.statPanel(
             'Node Tags',
             'short',
-            queries.nodesTagsByCategory,
-            '{{ category }}',
-            description='Breakdown of tags reported per node grouped by category.',
+            queries.nodesTotalTags,
+            description='Total number of tags applied across all nodes.',
           ),
 
         nodesRoutesPieChart:
@@ -758,7 +757,7 @@ local tbOverride = tbStandardOptions.override;
           [
             panels.nodesRoutesPieChart,
             panels.nodesByRegisterMethodPieChart,
-            panels.nodesTagsPieChart,
+            panels.nodesTotalTagsStat,
           ],
           panelWidth=8,
           panelHeight=6,
