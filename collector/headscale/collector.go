@@ -234,7 +234,14 @@ func execute(
 		)
 		success = 0
 	} else {
-		logger.DebugContext(ctx, "collector succeeded", "name", name, "duration_seconds", duration.Seconds())
+		logger.DebugContext(
+			ctx,
+			"collector succeeded",
+			"name",
+			name,
+			"duration_seconds",
+			duration.Seconds(),
+		)
 		success = 1
 	}
 	ch <- prometheus.MustNewConstMetric(scrapeDurationDesc, prometheus.GaugeValue, duration.Seconds(), name)

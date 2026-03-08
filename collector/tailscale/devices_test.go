@@ -156,7 +156,10 @@ tailscale_devices_routes_enabled{hostname="device-one",id="device-123",name="Dev
 			reg.MustRegister(tempCollector)
 
 			// Compare the metrics
-			if err := testutil.GatherAndCompare(reg, strings.NewReader(tt.expectedMetrics)); err != nil {
+			if err := testutil.GatherAndCompare(
+				reg,
+				strings.NewReader(tt.expectedMetrics),
+			); err != nil {
 				t.Errorf("metrics mismatch: %v", err)
 			}
 		})

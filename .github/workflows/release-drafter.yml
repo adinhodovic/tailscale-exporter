@@ -6,28 +6,21 @@ on:
   push:
     branches:
       - main
-  pull_request:
-    branches:
-      - main
-    types:
-      - opened
-      - reopened
-      - synchronize
-      - edited
   pull_request_target:
-    types: [opened, reopened, synchronize]
+    types: [opened, reopened, synchronize, edited]
 
-permissions:
-  contents: write # for release-drafter/release-drafter to create a github release
-  pull-requests: write # for release-drafter/release-drafter to add label to PR
+permissions: read-all
 
 jobs:
   update_pr_labels:
     name: Update PR Labels
-    if: github.event_name == 'pull_request' || github.event_name == 'pull_request_target'
+    if: github.event_name == 'pull_request_target'
     runs-on: ubuntu-latest
+    permissions:
+      contents: read # for release-drafter to read config/repo metadata
+      pull-requests: write # for release-drafter to add labels to PR
     steps:
-      - uses: release-drafter/release-drafter@v5
+      - uses: release-drafter/release-drafter@v6
         with:
           disable-autolabeler: false
           disable-releaser: true
@@ -38,6 +31,9 @@ jobs:
     name: Update Release Draft
     if: github.event_name == 'push'
     runs-on: ubuntu-latest
+    permissions:
+      contents: write # for release-drafter to create/update release draft
+      pull-requests: read # for release-drafter to read PR data associated with commits
     env:
       PUBLISH_DRAFT: false
     steps:
@@ -47,7 +43,7 @@ jobs:
           echo "PUBLISH_DRAFT=true" >> $GITHUB_ENV
 
       # Drafts your next Release notes
-      - uses: release-drafter/release-drafter@v5
+      - uses: release-drafter/release-drafter@v6
         with:
           disable-autolabeler: true
           disable-releaser: false
