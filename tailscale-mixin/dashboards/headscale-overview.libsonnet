@@ -825,7 +825,7 @@ local tbOverride = tbStandardOptions.override;
       dashboard.new(
         'Headscale / Overview',
       ) +
-      dashboard.withDescription('An overview of Headscale metrics collected by tailscale-exporter using the Headscale API. %s' % mixinUtils.dashboards.dashboardDescriptionLink('tailscale-mixin', 'https://github.com/adinhodovic/tailscale-exporter/tree/main/tailscale-mixin')) +
+      dashboard.withDescription('An overview of Headscale metrics including nodes (registration method, routes, lifecycle), users (by provider), and access management (API keys, pre-auth keys usage, reusability, and expiry). %s' % mixinUtils.dashboards.dashboardDescriptionLink('tailscale-mixin', 'https://github.com/adinhodovic/tailscale-exporter/tree/main/tailscale-mixin')) +
       dashboard.withUid($._config.dashboardIds[dashboardName]) +
       dashboard.withTags($._config.tags) +
       dashboard.withTimezone('utc') +

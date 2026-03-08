@@ -245,7 +245,7 @@ local tbQueryOptions = table.queryOptions;
             'bps',
             queries.tailscaledInboundBytesByPathRate1h,
             '{{ path }}',
-            description='A pie chart panel showing the distribution of outbound paths for the selected Tailscale machines.',
+            description='A pie chart panel showing the distribution of inbound paths for the selected Tailscale machines.',
           ),
 
         tailscaledOutboundPathPieChartPanel:
@@ -254,7 +254,7 @@ local tbQueryOptions = table.queryOptions;
             'bps',
             queries.tailscaledOutboundBytesByPathRate1h,
             '{{ path }}',
-            description='A pie chart panel showing the distribution of inbound paths for the selected Tailscale machines.',
+            description='A pie chart panel showing the distribution of outbound paths for the selected Tailscale machines.',
           ),
 
         tailscaledInboundOutboundPieChartPanel:
@@ -272,7 +272,7 @@ local tbQueryOptions = table.queryOptions;
               },
             ],
             '{{ path }}',
-            description='A pie chart panel showing the distribution of outbound paths for the selected Tailscale machines.',
+            description='A pie chart panel showing the total inbound vs outbound traffic distribution for the selected Tailscale machines.',
           ),
 
         tailscaledDroppedPacketsByReasonPieChartPanel:
@@ -380,7 +380,7 @@ local tbQueryOptions = table.queryOptions;
             'short',
             queries.tailscaledHealthMessagesByType,
             '{{ type }}',
-            description='A bar gauge panel showing the number of health messages by type.',
+            description='A timeseries panel showing the number of health messages by type.',
             stack='normal',
           ),
 
@@ -484,7 +484,7 @@ local tbQueryOptions = table.queryOptions;
             'short',
             queries.tailscaledHealthMessagesMachineByType,
             '{{ type }}',
-            description='A bar gauge panel showing the number of health messages by type for the selected Tailscale machine.',
+            description='A timeseries panel showing the number of health messages by type for the selected Tailscale machine.',
             stack='normal',
           ),
 
@@ -625,7 +625,7 @@ local tbQueryOptions = table.queryOptions;
       dashboard.new(
         'Tailscale / Machine',
       ) +
-      dashboard.withDescription('A dashboard that gives an overview of Tailscale Machine daemon metrics. %s' % mixinUtils.dashboards.dashboardDescriptionLink('tailscale-mixin', 'https://github.com/adinhodovic/tailscale-exporter/tree/main/tailscale-mixin')) +
+      dashboard.withDescription('An overview of tailscaled daemon metrics including inbound/outbound traffic by path, dropped packets by reason, health messages, and per-machine drilldown with DERP vs non-DERP traffic breakdown. %s' % mixinUtils.dashboards.dashboardDescriptionLink('tailscale-mixin', 'https://github.com/adinhodovic/tailscale-exporter/tree/main/tailscale-mixin')) +
       dashboard.withUid($._config.dashboardIds[dashboardName]) +
       dashboard.withTags($._config.tags) +
       dashboard.withTimezone('utc') +

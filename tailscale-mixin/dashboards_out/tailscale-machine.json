@@ -4,7 +4,7 @@
    "annotations": {
       "list": [ ]
    },
-   "description": "A dashboard that gives an overview of Tailscale Machine daemon metrics. The dashboards were generated using [tailscale-mixin](https://github.com/adinhodovic/tailscale-exporter/tree/main/tailscale-mixin). Open issues and create feature requests in the repository.",
+   "description": "An overview of tailscaled daemon metrics including inbound/outbound traffic by path, dropped packets by reason, health messages, and per-machine drilldown with DERP vs non-DERP traffic breakdown. The dashboards were generated using [tailscale-mixin](https://github.com/adinhodovic/tailscale-exporter/tree/main/tailscale-mixin). Open issues and create feature requests in the repository.",
    "editable": false,
    "links": [
       {
@@ -147,7 +147,7 @@
             "type": "prometheus",
             "uid": "$datasource"
          },
-         "description": "A pie chart panel showing the distribution of outbound paths for the selected Tailscale machines.",
+         "description": "A pie chart panel showing the distribution of inbound paths for the selected Tailscale machines.",
          "fieldConfig": {
             "defaults": {
                "unit": "bps"
@@ -198,7 +198,7 @@
             "type": "prometheus",
             "uid": "$datasource"
          },
-         "description": "A pie chart panel showing the distribution of inbound paths for the selected Tailscale machines.",
+         "description": "A pie chart panel showing the distribution of outbound paths for the selected Tailscale machines.",
          "fieldConfig": {
             "defaults": {
                "unit": "bps"
@@ -249,7 +249,7 @@
             "type": "prometheus",
             "uid": "$datasource"
          },
-         "description": "A pie chart panel showing the distribution of outbound paths for the selected Tailscale machines.",
+         "description": "A pie chart panel showing the total inbound vs outbound traffic distribution for the selected Tailscale machines.",
          "fieldConfig": {
             "defaults": {
                "unit": "bps"
@@ -576,7 +576,7 @@
             "type": "prometheus",
             "uid": "$datasource"
          },
-         "description": "A bar gauge panel showing the number of health messages by type.",
+         "description": "A timeseries panel showing the number of health messages by type.",
          "fieldConfig": {
             "defaults": {
                "custom": {
@@ -1114,7 +1114,7 @@
             "type": "prometheus",
             "uid": "$datasource"
          },
-         "description": "A bar gauge panel showing the number of health messages by type for the selected Tailscale machine.",
+         "description": "A timeseries panel showing the number of health messages by type for the selected Tailscale machine.",
          "fieldConfig": {
             "defaults": {
                "custom": {
