@@ -8,6 +8,14 @@ updates:
       interval: monthly
     cooldown:
       default-days: 14
+    ignore:
+      - dependency-name: "*"
+        update-types:
+          - version-update:semver-patch
+    groups:
+      go-dependencies:
+        patterns:
+          - "*"
 
   - package-ecosystem: gomod
     directory: /tailscale-mixin/scripts
@@ -17,6 +25,14 @@ updates:
       interval: monthly
     cooldown:
       default-days: 14
+    ignore:
+      - dependency-name: "*"
+        update-types:
+          - version-update:semver-patch
+    groups:
+      go-dependencies:
+        patterns:
+          - "*"
 
   - package-ecosystem: github-actions
     directory: /
@@ -26,3 +42,11 @@ updates:
       interval: monthly
     cooldown:
       default-days: 14
+    ignore:
+      - dependency-name: "*"
+        update-types:
+          - version-update:semver-patch
+    groups:
+      github-actions:
+        patterns:
+          - "*"
