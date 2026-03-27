@@ -111,7 +111,7 @@ type DNSAPI interface {
 
 // DevicesAPI is the subset of *tailscale.DevicesResource you actually use
 type DevicesAPI interface {
-	List(ctx context.Context) ([]tailscale.Device, error)
+	List(ctx context.Context, opts ...tailscale.ListDevicesOptions) ([]tailscale.Device, error)
 	SubnetRoutes(ctx context.Context, deviceID string) (*tailscale.DeviceRoutes, error)
 }
 
