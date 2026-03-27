@@ -1,0 +1,28 @@
+version: 2
+updates:
+  - package-ecosystem: gomod
+    directory: /
+    assignees:
+      - adinhodovic
+    schedule:
+      interval: monthly
+    cooldown:
+      default-days: 14
+
+  - package-ecosystem: gomod
+    directory: /tailscale-mixin/scripts
+    assignees:
+      - adinhodovic
+    schedule:
+      interval: monthly
+    cooldown:
+      default-days: 14
+
+  - package-ecosystem: github-actions
+    directory: /
+    assignees:
+      - adinhodovic
+    schedule:
+      interval: monthly
+    cooldown:
+      default-days: 14
