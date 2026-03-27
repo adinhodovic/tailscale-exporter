@@ -547,21 +547,16 @@
             {
                "id": "organize",
                "options": {
-                  "excludeByName": {
-                     "Time": true,
-                     "Value": true,
-                     "__name__": true,
-                     "cluster": true,
-                     "container": true,
-                     "endpoint": true,
-                     "environment": true,
-                     "instance": true,
-                     "job": true,
-                     "namespace": true,
-                     "pod": true,
-                     "prometheus": true,
-                     "region": true,
-                     "service": true
+                  "includeByName": {
+                     "disco_key": true,
+                     "given_name": true,
+                     "id": true,
+                     "machine_key": true,
+                     "name": true,
+                     "node_key": true,
+                     "register_method": true,
+                     "user": true,
+                     "user_id": true
                   },
                   "indexByName": {
                      "disco_key": 7,
@@ -699,20 +694,13 @@
             {
                "id": "organize",
                "options": {
-                  "excludeByName": {
-                     "Time": true,
-                     "__name__": true,
-                     "cluster": true,
-                     "container": true,
-                     "endpoint": true,
-                     "environment": true,
-                     "instance": true,
-                     "job": true,
-                     "namespace": true,
-                     "pod": true,
-                     "prometheus": true,
-                     "region": true,
-                     "service": true
+                  "includeByName": {
+                     "Value #A": true,
+                     "Value #B": true,
+                     "Value #C": true,
+                     "id": true,
+                     "name": true,
+                     "user": true
                   },
                   "indexByName": {
                      "Value #A": 3,
@@ -849,21 +837,13 @@
             {
                "id": "organize",
                "options": {
-                  "excludeByName": {
-                     "Time": true,
-                     "Value": true,
-                     "__name__": true,
-                     "cluster": true,
-                     "container": true,
-                     "endpoint": true,
-                     "environment": true,
-                     "instance": true,
-                     "job": true,
-                     "namespace": true,
-                     "pod": true,
-                     "prometheus": true,
-                     "region": true,
-                     "service": true
+                  "includeByName": {
+                     "display_name": true,
+                     "email": true,
+                     "id": true,
+                     "name": true,
+                     "provider": true,
+                     "provider_id": true
                   },
                   "indexByName": {
                      "display_name": 1,
@@ -1187,20 +1167,12 @@
             {
                "id": "organize",
                "options": {
-                  "excludeByName": {
-                     "Time": true,
-                     "__name__": true,
-                     "cluster": true,
-                     "container": true,
-                     "endpoint": true,
-                     "environment": true,
-                     "instance": true,
-                     "job": true,
-                     "namespace": true,
-                     "pod": true,
-                     "prometheus": true,
-                     "region": true,
-                     "service": true
+                  "includeByName": {
+                     "Value #A": true,
+                     "Value #B": true,
+                     "Value #C": true,
+                     "id": true,
+                     "prefix": true
                   },
                   "indexByName": {
                      "Value #A": 2,
@@ -1318,22 +1290,15 @@
             {
                "id": "organize",
                "options": {
-                  "excludeByName": {
-                     "#Value #A": true,
-                     "Time": true,
-                     "Value": true,
-                     "__name__": true,
-                     "cluster": true,
-                     "container": true,
-                     "endpoint": true,
-                     "environment": true,
-                     "instance": true,
-                     "job": true,
-                     "namespace": true,
-                     "pod": true,
-                     "prometheus": true,
-                     "region": true,
-                     "service": true
+                  "includeByName": {
+                     "Value #B": true,
+                     "Value #C": true,
+                     "acl_tags": true,
+                     "ephemeral": true,
+                     "id": true,
+                     "reusable": true,
+                     "used": true,
+                     "user": true
                   },
                   "indexByName": {
                      "Value #A": 6,

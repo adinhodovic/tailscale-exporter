@@ -406,9 +406,9 @@
             {
                "id": "organize",
                "options": {
-                  "excludeByName": {
-                     "Time": true,
-                     "job": true
+                  "includeByName": {
+                     "Value": true,
+                     "tailscale_machine": true
                   },
                   "indexByName": {
                      "Value": 1,
@@ -474,9 +474,9 @@
             {
                "id": "organize",
                "options": {
-                  "excludeByName": {
-                     "Time": true,
-                     "job": true
+                  "includeByName": {
+                     "Value": true,
+                     "tailscale_machine": true
                   },
                   "indexByName": {
                      "Value": 1,
@@ -542,9 +542,9 @@
             {
                "id": "organize",
                "options": {
-                  "excludeByName": {
-                     "Time": true,
-                     "job": true
+                  "includeByName": {
+                     "Value": true,
+                     "tailscale_machine": true
                   },
                   "indexByName": {
                      "Value": 1,

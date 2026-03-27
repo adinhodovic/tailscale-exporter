@@ -274,9 +274,8 @@
             {
                "id": "organize",
                "options": {
-                  "excludeByName": {
-                     "Time": true,
-                     "Value": true
+                  "includeByName": {
+                     "nameserver": true
                   },
                   "indexByName": {
                      "Value": 1,
@@ -391,23 +390,20 @@
             {
                "id": "organize",
                "options": {
-                  "excludeByName": {
-                     "Time": true,
-                     "__name__": true,
-                     "cluster": true,
-                     "container": true,
-                     "endpoint": true,
-                     "environment": true,
-                     "instance": true,
-                     "job": true,
-                     "namespace": true,
-                     "pod": true,
-                     "prometheus": true,
-                     "region": true,
-                     "service": true
+                  "includeByName": {
+                     "Value": true,
+                     "acls_externally_managed_on": true,
+                     "devices_approval_on": true,
+                     "devices_auto_updates_on": true,
+                     "network_flow_logging_on": true,
+                     "posture_identity_collection_on": true,
+                     "regional_routing_on": true,
+                     "tailnet": true,
+                     "users_approval_on": true,
+                     "users_role_allowed_to_join_external_tailnets": true
                   },
                   "indexByName": {
-                     "Value": 8,
+                     "Value": 9,
                      "acls_externally_managed_on": 1,
                      "devices_approval_on": 2,
                      "devices_auto_updates_on": 3,
@@ -415,7 +411,8 @@
                      "posture_identity_collection_on": 5,
                      "regional_routing_on": 6,
                      "tailnet": 0,
-                     "users_approval_on": 7
+                     "users_approval_on": 7,
+                     "users_role_allowed_to_join_external_tailnets": 8
                   },
                   "renameByName": {
                      "Value": "Up",
@@ -426,7 +423,8 @@
                      "posture_identity_collection_on": "Posture Identity Collection",
                      "regional_routing_on": "Regional Routing",
                      "tailnet": "Tailnet",
-                     "users_approval_on": "Users Approval"
+                     "users_approval_on": "Users Approval",
+                     "users_role_allowed_to_join_external_tailnets": "Users Role Allowed To Join External Tailnets"
                   }
                }
             }
@@ -718,22 +716,16 @@
             {
                "id": "organize",
                "options": {
-                  "excludeByName": {
-                     "Time": true,
-                     "Value": true,
-                     "__name__": true,
-                     "cluster": true,
-                     "container": true,
-                     "endpoint": true,
-                     "environment": true,
-                     "instance": true,
-                     "job": true,
-                     "namespace": true,
-                     "pod": true,
-                     "prometheus": true,
-                     "region": true,
-                     "service": true,
-                     "tailnet": true
+                  "includeByName": {
+                     "client_version": true,
+                     "hostname": true,
+                     "id": true,
+                     "machine_key": true,
+                     "name": true,
+                     "node_key": true,
+                     "os": true,
+                     "tailscale_ip": true,
+                     "user": true
                   },
                   "indexByName": {
                      "client_version": 3,
@@ -940,21 +932,17 @@
             {
                "id": "organize",
                "options": {
-                  "excludeByName": {
-                     "Time": true,
-                     "__name__": true,
-                     "cluster": true,
-                     "container": true,
-                     "endpoint": true,
-                     "environment": true,
-                     "instance": true,
-                     "job": true,
-                     "namespace": true,
-                     "pod": true,
-                     "prometheus": true,
-                     "region": true,
-                     "service": true,
-                     "tailnet": true
+                  "includeByName": {
+                     "Value #A": true,
+                     "Value #B": true,
+                     "Value #C": true,
+                     "Value #D": true,
+                     "Value #E": true,
+                     "Value #F": true,
+                     "Value #G": true,
+                     "Value #H": true,
+                     "id": true,
+                     "name": true
                   },
                   "indexByName": {
                      "Value #A": 2,
@@ -1415,22 +1403,15 @@
             {
                "id": "organize",
                "options": {
-                  "excludeByName": {
-                     "Time": true,
-                     "Value #A": true,
-                     "__name__": true,
-                     "cluster": true,
-                     "container": true,
-                     "endpoint": true,
-                     "environment": true,
-                     "instance": true,
-                     "job": true,
-                     "namespace": true,
-                     "pod": true,
-                     "prometheus": true,
-                     "region": true,
-                     "service": true,
-                     "tailnet": true
+                  "includeByName": {
+                     "Value #B": true,
+                     "Value #C": true,
+                     "display_name": true,
+                     "id": true,
+                     "login_name": true,
+                     "role": true,
+                     "status": true,
+                     "type": true
                   },
                   "indexByName": {
                      "Value #B": 3,
@@ -1566,23 +1547,13 @@
             {
                "id": "organize",
                "options": {
-                  "excludeByName": {
-                     "#Value #A": true,
-                     "Time": true,
-                     "Value": true,
-                     "__name__": true,
-                     "cluster": true,
-                     "container": true,
-                     "endpoint": true,
-                     "environment": true,
-                     "instance": true,
-                     "job": true,
-                     "namespace": true,
-                     "pod": true,
-                     "prometheus": true,
-                     "region": true,
-                     "service": true,
-                     "tailnet": true
+                  "includeByName": {
+                     "Value #B": true,
+                     "Value #C": true,
+                     "id": true,
+                     "key_type": true,
+                     "name": true,
+                     "user_id": true
                   },
                   "indexByName": {
                      "Value #B": 4,

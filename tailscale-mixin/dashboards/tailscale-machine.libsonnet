@@ -305,9 +305,9 @@ local tbQueryOptions = table.queryOptions;
                     tailscale_machine: 0,
                     Value: 1,
                   },
-                  excludeByName: {
-                    Time: true,
-                    job: true,
+                  includeByName: {
+                    tailscale_machine: true,
+                    Value: true,
                   },
                 }
               ),
@@ -335,9 +335,9 @@ local tbQueryOptions = table.queryOptions;
                     tailscale_machine: 0,
                     Value: 1,
                   },
-                  excludeByName: {
-                    Time: true,
-                    job: true,
+                  includeByName: {
+                    tailscale_machine: true,
+                    Value: true,
                   },
                 }
               ),
@@ -365,9 +365,9 @@ local tbQueryOptions = table.queryOptions;
                     tailscale_machine: 0,
                     Value: 1,
                   },
-                  excludeByName: {
-                    Time: true,
-                    job: true,
+                  includeByName: {
+                    tailscale_machine: true,
+                    Value: true,
                   },
                 }
               ),
