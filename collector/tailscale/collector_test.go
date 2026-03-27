@@ -65,7 +65,10 @@ type MockDevicesClient struct {
 	routesErr  error
 }
 
-func (m *MockDevicesClient) List(ctx context.Context) ([]tailscale.Device, error) {
+func (m *MockDevicesClient) List(
+	ctx context.Context,
+	opts ...tailscale.ListDevicesOptions,
+) ([]tailscale.Device, error) {
 	if m.devicesErr != nil {
 		return nil, m.devicesErr
 	}

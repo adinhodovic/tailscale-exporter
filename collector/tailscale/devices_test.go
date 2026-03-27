@@ -46,7 +46,7 @@ func TestTailscaleDevicesCollector_Update(t *testing.T) {
 							Created: tailscale.Time{
 								Time: time.Unix(1609459200, 0),
 							},
-							LastSeen: tailscale.Time{
+							LastSeen: &tailscale.Time{
 								Time: time.Unix(1612137600, 0),
 							},
 							Expires: tailscale.Time{

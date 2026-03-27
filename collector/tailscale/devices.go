@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/prometheus/client_golang/prometheus"
+	"tailscale.com/client/tailscale/v2"
 )
 
 const devicesSubsystem = "devices"
@@ -141,7 +142,10 @@ func (c TailscaleDevicesCollector) Update(
 ) error {
 	c.log.DebugContext(ctx, "Collecting devices metrics")
 
-	devices, err := client.Devices().List(ctx)
+	devices, err := client.Devices().List(
+		ctx,
+		tailscale.WithFields(tailscale.IncludeFieldsAll),
+	)
 	if err != nil {
 		c.log.ErrorContext(
 			ctx,
@@ -169,7 +173,8 @@ func (c TailscaleDevicesCollector) Update(
 
 		// Device status metrics
 		online := 0.0
-		if time.Since(device.LastSeen.Time) < 5*time.Minute {
+		if device.ConnectedToControl ||
+			(device.LastSeen != nil && time.Since(device.LastSeen.Time) < 5*time.Minute) {
 			online = 1.0
 		}
 		ch <- prometheus.MustNewConstMetric(devicesOnlineDesc, prometheus.GaugeValue, online,
@@ -211,7 +216,7 @@ func (c TailscaleDevicesCollector) Update(
 			device.ID, device.Name, device.Hostname, device.OS, device.User)
 
 		// Timestamp metrics
-		if !device.LastSeen.IsZero() {
+		if device.LastSeen != nil && !device.LastSeen.IsZero() {
 			ch <- prometheus.MustNewConstMetric(devicesLastSeenDesc, prometheus.GaugeValue, float64(device.LastSeen.Unix()),
 				device.ID, device.Name, device.Hostname, device.OS, device.User)
 		}
