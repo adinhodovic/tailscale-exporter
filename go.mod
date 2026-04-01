@@ -8,7 +8,7 @@ require (
 	github.com/spf13/viper v1.21.0
 	golang.org/x/oauth2 v0.36.0
 	google.golang.org/grpc v1.79.2
-	tailscale.com/client/tailscale/v2 v2.8.0
+	tailscale.com/client/tailscale/v2 v2.9.0
 )
 
 require (
