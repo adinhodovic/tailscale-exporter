@@ -12,28 +12,24 @@ on:
 permissions: read-all
 
 jobs:
-  update_pr_labels:
+  autolabeler:
     name: Update PR Labels
     if: github.event_name == 'pull_request_target'
     runs-on: ubuntu-latest
     permissions:
-      contents: read # for release-drafter to read config/repo metadata
-      pull-requests: write # for release-drafter to add labels to PR
+      pull-requests: write
     steps:
-      - uses: release-drafter/release-drafter@v6
-        with:
-          disable-autolabeler: false
-          disable-releaser: true
+      - uses: release-drafter/release-drafter/autolabeler@139054aeaa9adc52ab36ddf67437541f039b88e2 # v7.1.1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-  update_release_draft:
+  release_draft:
     name: Update Release Draft
     if: github.event_name == 'push'
     runs-on: ubuntu-latest
     permissions:
-      contents: write # for release-drafter to create/update release draft
-      pull-requests: read # for release-drafter to read PR data associated with commits
+      contents: write
+      pull-requests: read
     env:
       PUBLISH_DRAFT: false
     steps:
@@ -42,11 +38,8 @@ jobs:
         run: |
           echo "PUBLISH_DRAFT=true" >> $GITHUB_ENV
 
-      # Drafts your next Release notes
-      - uses: release-drafter/release-drafter@v6
+      - uses: release-drafter/release-drafter@139054aeaa9adc52ab36ddf67437541f039b88e2 # v7.1.1
         with:
-          disable-autolabeler: true
-          disable-releaser: false
           publish: ${{ env.PUBLISH_DRAFT }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
