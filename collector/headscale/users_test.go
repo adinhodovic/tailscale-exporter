@@ -39,3 +39,27 @@ headscale_users_created_timestamp{id="42",name="alice"} 1.68e+09
 `
 	gatherMetrics(t, metrics, expected)
 }
+
+func TestHeadscaleUsersCollector_Update_DefaultsEmptyProviderToCLI(t *testing.T) {
+	collector, err := NewHeadscaleUsersCollector(collectorConfig{logger: testLogger(t)})
+	if err != nil {
+		t.Fatalf("failed to create users collector: %v", err)
+	}
+
+	user := &headscalev1.User{
+		Id:   7,
+		Name: "local-user",
+	}
+
+	client := &mockHeadscaleClient{
+		users: []*headscalev1.User{user},
+	}
+
+	metrics := collectFromCollector(t, collector, client)
+	expected := `
+# HELP headscale_users_info User information and metadata
+# TYPE headscale_users_info gauge
+headscale_users_info{display_name="",email="",id="7",name="local-user",provider="cli",provider_id=""} 1
+`
+	gatherMetrics(t, metrics, expected)
+}

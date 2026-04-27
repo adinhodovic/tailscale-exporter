@@ -9,6 +9,8 @@ import (
 
 const usersSubsystem = "users"
 
+const defaultUserProvider = "cli"
+
 var (
 	usersInfoDesc = newDesc(
 		usersSubsystem,
@@ -58,7 +60,7 @@ func (c HeadscaleUsersCollector) Update(
 			user.GetName(),
 			user.GetDisplayName(),
 			user.GetEmail(),
-			user.GetProvider(),
+			headscaleUserProvider(user.GetProvider()),
 			user.GetProviderId(),
 		)
 
@@ -70,4 +72,13 @@ func (c HeadscaleUsersCollector) Update(
 	}
 
 	return nil
+}
+
+func headscaleUserProvider(provider string) string {
+	if provider == "" {
+		// Headscale leaves Provider empty for local/CLI-created users.
+		return defaultUserProvider
+	}
+
+	return provider
 }

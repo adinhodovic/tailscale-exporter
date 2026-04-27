@@ -18,7 +18,7 @@ local query = variable.query;
     tailnetV: 'tailnet="$tailnet"',
 
     // Tailscaled
-    tailscaledMachineV: 'tailscale_machine="$tailscale_machine"',
+    tailscaledMachineV: 'tailscale_machine=~"$tailscale_machine"',
 
     base: |||
       %(cluster)s
@@ -185,6 +185,8 @@ local query = variable.query;
       query.withDatasourceFromVariable(this.datasource) +
       query.withSort() +
       query.generalOptions.withLabel('Tailscale Machine') +
+      query.selectionOptions.withMulti(true) +
+      query.selectionOptions.withIncludeAll(false) +
       query.refresh.onLoad() +
       query.refresh.onTime(),
   },

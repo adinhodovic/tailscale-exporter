@@ -6,11 +6,13 @@ local dashboard = g.dashboard;
 local row = g.panel.row;
 local grid = g.util.grid;
 
+local statPanel = g.panel.stat;
 local table = g.panel.table;
 
 // Table
 local tbStandardOptions = table.standardOptions;
 local tbQueryOptions = table.queryOptions;
+local tbOptions = table.options;
 local tbOverride = tbStandardOptions.override;
 
 {
@@ -29,6 +31,20 @@ local tbOverride = tbStandardOptions.override;
       ];
 
       local defaultFilters = dashboardUtil.filters($._config);
+      local statBoolMappings = [
+        statPanel.standardOptions.mapping.ValueMap.withType() +
+        statPanel.standardOptions.mapping.ValueMap.withOptions({
+          '0': { text: 'No', color: 'red' },
+          '1': { text: 'Yes', color: 'green' },
+        }),
+      ];
+      local tableBoolMappings = [
+        tbStandardOptions.mapping.ValueMap.withType() +
+        tbStandardOptions.mapping.ValueMap.withOptions({
+          '0': { text: 'No' },
+          '1': { text: 'Yes' },
+        }),
+      ];
       local queries = {
 
         tailnetSettingsInfo: |||
@@ -181,6 +197,17 @@ local tbOverride = tbStandardOptions.override;
           ) by (name, id)
         ||| % defaultFilters,
 
+        devicesUnauthorizedByNameId: |||
+          1
+          -
+          sum(
+            tailscale_devices_authorized{
+              %(tailnet)s
+            }
+          ) by (name, id)
+          > 0
+        ||| % defaultFilters,
+
         devicesBlocksIncoming: |||
           sum(
             tailscale_devices_blocks_incoming{
@@ -203,6 +230,21 @@ local tbOverride = tbStandardOptions.override;
               %(tailnet)s
             }
           ) by (name, id)
+        ||| % defaultFilters,
+
+        devicesUnapprovedRoutes: |||
+          sum(
+            tailscale_devices_routes_advertised{
+              %(tailnet)s
+            }
+          ) by (name, id)
+          -
+          sum(
+            tailscale_devices_routes_enabled{
+              %(tailnet)s
+            }
+          ) by (name, id)
+          > 0
         ||| % defaultFilters,
 
         devicesKeyExpiryDisabled: |||
@@ -364,7 +406,9 @@ local tbOverride = tbStandardOptions.override;
                 }
               ),
             ],
-          ),
+          ) +
+          tbOptions.footer.withShow(false) +
+          tbOptions.footer.withEnablePagination(false),
 
         usersTotalStat:
           mixinUtils.dashboards.statPanel(
@@ -424,7 +468,10 @@ local tbOverride = tbStandardOptions.override;
                 }
               ),
             ],
-          ),
+          ) +
+          tbOptions.footer.withShow(false) +
+          tbOptions.footer.withEnablePagination(false) +
+          tbOptions.withShowHeader(false),
 
         magicDnsEnabledStat:
           mixinUtils.dashboards.statPanel(
@@ -432,6 +479,7 @@ local tbOverride = tbStandardOptions.override;
             'bool',
             queries.magicDnsEnabled,
             description='Whether Magic DNS is enabled for the selected tailnet.',
+            mappings=statBoolMappings,
           ),
 
         // Devices
@@ -512,24 +560,24 @@ local tbOverride = tbStandardOptions.override;
                     node_key: 'Node Key',
                   },
                   indexByName: {
-                    name: 0,
-                    user: 1,
-                    os: 2,
-                    client_version: 3,
-                    hostname: 4,
-                    tailscale_ip: 5,
-                    id: 6,
+                    id: 0,
+                    name: 1,
+                    user: 2,
+                    os: 3,
+                    client_version: 4,
+                    hostname: 5,
+                    tailscale_ip: 6,
                     machine_key: 7,
                     node_key: 8,
                   },
                   includeByName: {
+                    id: true,
                     name: true,
                     user: true,
                     os: true,
                     client_version: true,
                     hostname: true,
                     tailscale_ip: true,
-                    id: true,
                     machine_key: true,
                     node_key: true,
                   },
@@ -610,8 +658,8 @@ local tbOverride = tbStandardOptions.override;
                     'Value #H': 'External',
                   },
                   indexByName: {
-                    name: 0,
-                    id: 1,
+                    id: 0,
+                    name: 1,
                     'Value #A': 2,
                     'Value #B': 3,
                     'Value #C': 4,
@@ -622,8 +670,8 @@ local tbOverride = tbStandardOptions.override;
                     'Value #H': 9,
                   },
                   includeByName: {
-                    name: true,
                     id: true,
+                    name: true,
                     'Value #A': true,
                     'Value #B': true,
                     'Value #C': true,
@@ -649,6 +697,14 @@ local tbOverride = tbStandardOptions.override;
               tbOverride.byName.withPropertiesFromOptions(
                 tbStandardOptions.withUnit('string')
               ),
+              tbOverride.byName.new('Authorized') +
+              tbOverride.byName.withPropertiesFromOptions(
+                tbStandardOptions.withMappings(tableBoolMappings)
+              ),
+              tbOverride.byName.new('Blocks Incoming') +
+              tbOverride.byName.withPropertiesFromOptions(
+                tbStandardOptions.withMappings(tableBoolMappings)
+              ),
               tbOverride.byName.new('Routes Enabled') +
               tbOverride.byName.withPropertiesFromOptions(
                 tbStandardOptions.withUnit('short')
@@ -656,6 +712,78 @@ local tbOverride = tbStandardOptions.override;
               tbOverride.byName.new('Routes Advertised') +
               tbOverride.byName.withPropertiesFromOptions(
                 tbStandardOptions.withUnit('short')
+              ),
+              tbOverride.byName.new('Key Expiry Disabled') +
+              tbOverride.byName.withPropertiesFromOptions(
+                tbStandardOptions.withMappings(tableBoolMappings)
+              ),
+              tbOverride.byName.new('External') +
+              tbOverride.byName.withPropertiesFromOptions(
+                tbStandardOptions.withMappings(tableBoolMappings)
+              ),
+            ]
+          ),
+
+        devicesRequiringAttentionTable:
+          mixinUtils.dashboards.tablePanel(
+            'Devices Requiring Attention',
+            'short',
+            [
+              {
+                expr: queries.devicesUpdateAvailableByNameId,
+              },
+              {
+                expr: queries.devicesUnauthorizedByNameId,
+              },
+              {
+                expr: queries.devicesUnapprovedRoutes,
+              },
+            ],
+            description='Devices with operational follow-up items: available client updates, missing authorization, or advertised routes that are not enabled.',
+            sortBy={ name: 'Name', desc: false },
+            transformations=[
+              tbQueryOptions.transformation.withId('merge'),
+              tbQueryOptions.transformation.withId(
+                'organize'
+              ) +
+              tbQueryOptions.transformation.withOptions(
+                {
+                  renameByName: {
+                    name: 'Name',
+                    id: 'ID',
+                    'Value #A': 'Update Available',
+                    'Value #B': 'Unauthorized',
+                    'Value #C': 'Unapproved Routes',
+                  },
+                  indexByName: {
+                    id: 0,
+                    name: 1,
+                    'Value #A': 2,
+                    'Value #B': 3,
+                    'Value #C': 4,
+                  },
+                  includeByName: {
+                    id: true,
+                    name: true,
+                    'Value #A': true,
+                    'Value #B': true,
+                    'Value #C': true,
+                  },
+                }
+              ),
+            ],
+            overrides=[
+              tbOverride.byName.new('ID') +
+              tbOverride.byName.withPropertiesFromOptions(
+                tbStandardOptions.withUnit('string')
+              ),
+              tbOverride.byName.new('Update Available') +
+              tbOverride.byName.withPropertiesFromOptions(
+                tbStandardOptions.withMappings(tableBoolMappings)
+              ),
+              tbOverride.byName.new('Unauthorized') +
+              tbOverride.byName.withPropertiesFromOptions(
+                tbStandardOptions.withMappings(tableBoolMappings)
               ),
             ]
           ),
@@ -742,9 +870,9 @@ local tbOverride = tbStandardOptions.override;
                     type: 'Type',
                   },
                   indexByName: {
-                    login_name: 0,
-                    display_name: 1,
-                    id: 2,
+                    id: 0,
+                    login_name: 1,
+                    display_name: 2,
                     'Value #B': 3,
                     'Value #C': 4,
                     role: 5,
@@ -752,9 +880,9 @@ local tbOverride = tbStandardOptions.override;
                     type: 7,
                   },
                   includeByName: {
+                    id: true,
                     login_name: true,
                     display_name: true,
-                    id: true,
                     'Value #B': true,
                     'Value #C': true,
                     role: true,
@@ -765,6 +893,10 @@ local tbOverride = tbStandardOptions.override;
               ),
             ],
             overrides=[
+              tbOverride.byName.new('ID') +
+              tbOverride.byName.withPropertiesFromOptions(
+                tbStandardOptions.withUnit('string')
+              ),
               tbOverride.byName.new('Created') +
               tbOverride.byName.withPropertiesFromOptions(
                 tbStandardOptions.withUnit('dateTimeAsIso')
@@ -811,16 +943,16 @@ local tbOverride = tbStandardOptions.override;
                     key_type: 'Key Type',
                   },
                   indexByName: {
-                    name: 0,
-                    id: 1,
+                    id: 0,
+                    name: 1,
                     user_id: 2,
                     key_type: 3,
                     'Value #B': 4,
                     'Value #C': 5,
                   },
                   includeByName: {
-                    name: true,
                     id: true,
+                    name: true,
                     user_id: true,
                     key_type: true,
                     'Value #B': true,
@@ -907,17 +1039,25 @@ local tbOverride = tbStandardOptions.override;
         ) +
         grid.wrapPanels(
           [
+            panels.devicesRequiringAttentionTable,
+          ],
+          panelWidth=24,
+          panelHeight=8,
+          startY=36,
+        ) +
+        grid.wrapPanels(
+          [
             panels.devicesUpdateAvailableTimeSeries,
             panels.devicesLastSeenTimeSeries,
           ],
           panelWidth=12,
           panelHeight=8,
-          startY=36,
+          startY=44,
         ) +
         [
           row.new('Users') +
           row.gridPos.withX(0) +
-          row.gridPos.withY(44) +
+          row.gridPos.withY(52) +
           row.gridPos.withW(24) +
           row.gridPos.withH(1),
         ] +
@@ -930,7 +1070,7 @@ local tbOverride = tbStandardOptions.override;
           ],
           panelWidth=6,
           panelHeight=5,
-          startY=45,
+          startY=53,
         ) +
         grid.wrapPanels(
           [
@@ -938,12 +1078,12 @@ local tbOverride = tbStandardOptions.override;
           ],
           panelWidth=24,
           panelHeight=10,
-          startY=50,
+          startY=58,
         ) +
         [
           row.new('Keys') +
           row.gridPos.withX(0) +
-          row.gridPos.withY(60) +
+          row.gridPos.withY(68) +
           row.gridPos.withW(24) +
           row.gridPos.withH(1),
         ] +
@@ -953,7 +1093,7 @@ local tbOverride = tbStandardOptions.override;
           ],
           panelWidth=24,
           panelHeight=10,
-          startY=61,
+          startY=69,
         );
 
       mixinUtils.dashboards.bypassDashboardValidation +
