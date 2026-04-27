@@ -9,7 +9,10 @@ local grid = g.util.grid;
 local table = g.panel.table;
 
 // Table
+local tbStandardOptions = table.standardOptions;
 local tbQueryOptions = table.queryOptions;
+local tbPanelOptions = table.panelOptions;
+local tbOverride = tbStandardOptions.override;
 
 {
   local dashboardName = 'tailscale-machine',
@@ -219,7 +222,7 @@ local tbQueryOptions = table.queryOptions;
             'Tailscale Machines',
             'short',
             queries.tailscaledMachineCount,
-            description='A stat panel showing the number of Tailscale machines reporting to the selected Tailscale control plane.',
+            description='Number of tailscaled instances currently reporting metrics. A sudden drop usually means scrape failures, stopped daemons, or machines that can no longer reach Prometheus.',
           ),
 
         tailscaledRoutesPieChartPanel:
@@ -236,7 +239,7 @@ local tbQueryOptions = table.queryOptions;
                 legend: 'Approved',
               },
             ],
-            description='A pie chart panel showing the number of advertised and approved routes for the selected Tailscale machines.',
+            description='Advertised routes are routes machines offer to the tailnet. Approved routes are routes the control plane allows clients to use. A gap means subnet routing is configured but not fully enabled.',
           ),
 
         tailscaledInboundPathPieChartPanel:
@@ -245,7 +248,7 @@ local tbQueryOptions = table.queryOptions;
             'bps',
             queries.tailscaledInboundBytesByPathRate1h,
             '{{ path }}',
-            description='A pie chart panel showing the distribution of inbound paths for the selected Tailscale machines.',
+            description='Inbound traffic split by path over the last hour. DERP-heavy traffic can indicate failed direct connectivity, restrictive NAT, or firewall changes.',
           ),
 
         tailscaledOutboundPathPieChartPanel:
@@ -254,7 +257,7 @@ local tbQueryOptions = table.queryOptions;
             'bps',
             queries.tailscaledOutboundBytesByPathRate1h,
             '{{ path }}',
-            description='A pie chart panel showing the distribution of outbound paths for the selected Tailscale machines.',
+            description='Outbound traffic split by path over the last hour. A high DERP share is useful when investigating latency or relay dependency.',
           ),
 
         tailscaledInboundOutboundPieChartPanel:
@@ -272,7 +275,7 @@ local tbQueryOptions = table.queryOptions;
               },
             ],
             '{{ path }}',
-            description='A pie chart panel showing the total inbound vs outbound traffic distribution for the selected Tailscale machines.',
+            description='Inbound and outbound traffic over the last hour. Large asymmetry can help identify machines acting as gateways, subnet routers, or unexpectedly chatty clients.',
           ),
 
         tailscaledDroppedPacketsByReasonPieChartPanel:
@@ -281,7 +284,7 @@ local tbQueryOptions = table.queryOptions;
             'pps',
             queries.tailscaledOutboundDroppedPacketsByReasonRate1h,
             '{{ reason }}',
-            description='A pie chart panel showing the distribution of dropped packets by reason for the selected Tailscale machines.',
+            description='Dropped outbound packets grouped by reason over the last hour. Non-zero values are worth correlating with route approval, ACLs, and path changes.',
           ),
 
         tailscaledTop20MachinesByInboundTrafficTable:
@@ -289,7 +292,7 @@ local tbQueryOptions = table.queryOptions;
             'Top 20 Machines by Inbound Traffic (1h)',
             'Bps',
             queries.tailscaledTop20MachinesByInboundTraffic1h,
-            description='A table panel showing the top 20 Tailscale machines by inbound traffic over the last hour.',
+            description='Highest inbound-traffic machines over the last hour. Use this to spot subnet routers, gateways, or unexpected traffic concentration, then drill into the machine row.',
             sortBy={ name: 'Inbound Traffic (Bps)', desc: true },
             transformations=[
               tbQueryOptions.transformation.withId(
@@ -312,6 +315,14 @@ local tbQueryOptions = table.queryOptions;
                 }
               ),
             ],
+            links=[
+              tbPanelOptions.link.withTitle('Go To Machine') +
+              tbPanelOptions.link.withType('dashboard') +
+              tbPanelOptions.link.withUrl(
+                '/d/%s/tailscale-machine?var-tailscale_machine=${__data.fields.Tailscale Machine}' % $._config.dashboardIds['tailscale-machine']
+              ) +
+              tbPanelOptions.link.withTargetBlank(true),
+            ],
           ),
 
         tailscaledMachinesWithUnapprovedRoutesTable:
@@ -319,7 +330,7 @@ local tbQueryOptions = table.queryOptions;
             'Machines with Unapproved Routes',
             'short',
             queries.tailscaledMachinesWithUnapprovedRoutes,
-            description='A table panel showing the Tailscale machines with unadvertised routes.',
+            description='Machines where advertised routes exceed approved routes. These machines are offering routes that clients cannot use until the routes are approved.',
             sortBy={ name: 'Unapproved Routes', desc: true },
             transformations=[
               tbQueryOptions.transformation.withId(
@@ -342,6 +353,14 @@ local tbQueryOptions = table.queryOptions;
                 }
               ),
             ],
+            links=[
+              tbPanelOptions.link.withTitle('Go To Machine') +
+              tbPanelOptions.link.withType('dashboard') +
+              tbPanelOptions.link.withUrl(
+                '/d/%s/tailscale-machine?var-tailscale_machine=${__data.fields.Tailscale Machine}' % $._config.dashboardIds['tailscale-machine']
+              ) +
+              tbPanelOptions.link.withTargetBlank(true),
+            ],
           ),
 
         tailscaledMachinesWithDroppedPacketsTable:
@@ -349,7 +368,7 @@ local tbQueryOptions = table.queryOptions;
             'Machines with Dropped Packets (1h)',
             'percent',
             queries.tailscaledMachinesWithDroppedPackets1h,
-            description='A table panel showing the Tailscale machines with dropped packets in the last hour.',
+            description='Machines with outbound packet drops in the last hour. Investigate persistent values with path, route, and ACL changes for the same machine.',
             sortBy={ name: 'Dropped Packets', desc: true },
             transformations=[
               tbQueryOptions.transformation.withId(
@@ -372,6 +391,22 @@ local tbQueryOptions = table.queryOptions;
                 }
               ),
             ],
+            overrides=[
+              tbOverride.byName.new('Dropped Packets') +
+              tbOverride.byName.withPropertiesFromOptions(
+                tbStandardOptions.withUnit('percent') +
+                tbStandardOptions.withMin(0) +
+                tbStandardOptions.withMax(100)
+              ),
+            ],
+            links=[
+              tbPanelOptions.link.withTitle('Go To Machine') +
+              tbPanelOptions.link.withType('dashboard') +
+              tbPanelOptions.link.withUrl(
+                '/d/%s/tailscale-machine?var-tailscale_machine=${__data.fields.Tailscale Machine}' % $._config.dashboardIds['tailscale-machine']
+              ) +
+              tbPanelOptions.link.withTargetBlank(true),
+            ],
           ),
 
         tailscaledHealthMessagesByTypeTimeSeries:
@@ -380,7 +415,7 @@ local tbQueryOptions = table.queryOptions;
             'short',
             queries.tailscaledHealthMessagesByType,
             '{{ type }}',
-            description='A timeseries panel showing the number of health messages by type.',
+            description='Health messages grouped by type across selected machines. Spikes usually point to daemon warnings, network path degradation, or local host issues that need machine-level drilldown.',
             stack='normal',
           ),
 
@@ -390,7 +425,7 @@ local tbQueryOptions = table.queryOptions;
             'pps',
             queries.tailscaledOutboundDroppedPacketsByReasonRate,
             '{{ reason }}',
-            description='A timeseries panel showing the outbound dropped packets by reason.',
+            description='Outbound packet drops grouped by reason. Use this with the affected-machine table to identify whether drops are isolated to one host or broad across the fleet.',
             stack='normal',
           ),
 
@@ -400,7 +435,7 @@ local tbQueryOptions = table.queryOptions;
             'bps',
             queries.tailscaledInboundBytesByPathRate,
             '{{ path }}',
-            description='A timeseries panel showing the inbound bytes by path.',
+            description='Inbound traffic grouped by direct and relay paths. Changes in path mix can explain latency shifts even when total traffic is stable.',
             stack='normal',
           ),
 
@@ -410,7 +445,7 @@ local tbQueryOptions = table.queryOptions;
             'bps',
             queries.tailscaledOutboundBytesByPathRate,
             '{{ path }}',
-            description='A timeseries panel showing the outbound bytes by path.',
+            description='Outbound traffic grouped by direct and relay paths. A rising DERP line often means direct peer connectivity is failing or becoming less reliable.',
             stack='normal',
           ),
 
@@ -420,7 +455,7 @@ local tbQueryOptions = table.queryOptions;
             'pps',
             queries.tailscaledInboundPacketByPathRate,
             '{{ path }}',
-            description='A timeseries panel showing the inbound packets by path.',
+            description='Inbound packet rate by path. Compare with bytes by path to distinguish many small control packets from large data transfers.',
             stack='normal',
           ),
 
@@ -430,7 +465,7 @@ local tbQueryOptions = table.queryOptions;
             'pps',
             queries.tailscaledOutboundPacketByPathRate,
             '{{ path }}',
-            description='A timeseries panel showing the outbound packets by path.',
+            description='Outbound packet rate by path. Sustained DERP packet volume can indicate relay dependency even when bandwidth is modest.',
             stack='normal',
           ),
 
@@ -449,7 +484,7 @@ local tbQueryOptions = table.queryOptions;
                 legend: 'Approved',
               },
             ],
-            description='A pie chart panel showing the number of advertised and approved routes for the selected Tailscale machines.',
+            description='Advertised versus approved routes for the selected machine. A mismatch means the machine is offering routes that are not active for clients.',
           ),
 
         tailscaledDerpNonDerpOutboundBytesMachinePieChartPanel:
@@ -466,7 +501,7 @@ local tbQueryOptions = table.queryOptions;
                 legend: 'Non-DERP',
               },
             ],
-            description='A pie chart panel showing the DERP vs Non-DERP outbound traffic for the selected Tailscale machine.',
+            description='DERP versus direct outbound traffic for the selected machine over the last hour. High DERP usage can explain latency and is often caused by NAT, firewall, or connectivity changes.',
           ),
 
         tailscaledDroppedPacketsMachineByReasonPieChartPanel:
@@ -475,7 +510,7 @@ local tbQueryOptions = table.queryOptions;
             'pps',
             queries.tailscaledOutboundDroppedPacketsMachineByReasonRate1h,
             '{{ reason }}',
-            description='A pie chart panel showing the distribution of dropped packets by reason for the selected Tailscale machines.',
+            description='Dropped outbound packets by reason for the selected machine over the last hour. Non-zero values should be checked against health messages and route state.',
           ),
 
         tailscaledHealthMessagesMachineByTypeTimeSeries:
@@ -484,7 +519,7 @@ local tbQueryOptions = table.queryOptions;
             'short',
             queries.tailscaledHealthMessagesMachineByType,
             '{{ type }}',
-            description='A timeseries panel showing the number of health messages by type for the selected Tailscale machine.',
+            description='Health messages by type for the selected machine. Persistent or new message types are often the first signal of local daemon or network-path problems.',
             stack='normal',
           ),
 
@@ -494,7 +529,7 @@ local tbQueryOptions = table.queryOptions;
             'short',
             queries.tailscaledOutboundDroppedPacketsMachineByReasonRate,
             '{{ reason }}',
-            description='A timeseries panel showing the outbound dropped packets by reason for the selected Tailscale machine.',
+            description='Outbound packet drops by reason for the selected machine. Use this to verify whether packet loss is transient or tied to a specific drop reason.',
             stack='normal',
           ),
         tailscaledInboundBytesMachineByPathTimeSeries:
@@ -503,7 +538,7 @@ local tbQueryOptions = table.queryOptions;
             'Bps',
             queries.tailscaledInboundBytesMachineByPathRate,
             '{{ path }}',
-            description='A timeseries panel showing the inbound bytes by path for the selected Tailscale machine.',
+            description='Inbound traffic by path for the selected machine. A move from direct to DERP usually indicates peer-to-peer connectivity regression.',
             stack='normal',
           ),
 
@@ -513,7 +548,7 @@ local tbQueryOptions = table.queryOptions;
             'Bps',
             queries.tailscaledOutboundBytesMachineByPathRate,
             '{{ path }}',
-            description='A timeseries panel showing the outbound bytes by path for the selected Tailscale machine.',
+            description='Outbound traffic by path for the selected machine. High DERP traffic can point to relay dependency and higher expected latency.',
             stack='normal',
           ),
 
@@ -523,7 +558,7 @@ local tbQueryOptions = table.queryOptions;
             'pps',
             queries.tailscaledInboundPacketMachineByPathRate,
             '{{ path }}',
-            description='A timeseries panel showing the inbound packets by path for the selected Tailscale machine.',
+            description='Inbound packets by path for the selected machine. Compare with byte volume to understand packet size and control-plane chatter.',
             stack='normal',
           ),
 
@@ -533,7 +568,7 @@ local tbQueryOptions = table.queryOptions;
             'pps',
             queries.tailscaledOutboundPacketMachineByPathRate,
             '{{ path }}',
-            description='A timeseries panel showing the outbound packets by path for the selected Tailscale machine.',
+            description='Outbound packets by path for the selected machine. Sustained relay packet rate is a useful signal when troubleshooting latency or firewall behavior.',
             stack='normal',
           ),
       };
@@ -630,7 +665,7 @@ local tbQueryOptions = table.queryOptions;
       dashboard.withTags($._config.tags) +
       dashboard.withTimezone('utc') +
       dashboard.withEditable(false) +
-      dashboard.time.withFrom('now-24h') +
+      dashboard.time.withFrom('now-6h') +
       dashboard.time.withTo('now') +
       dashboard.withVariables(variables) +
       dashboard.withLinks(

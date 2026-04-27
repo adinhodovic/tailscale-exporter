@@ -6,6 +6,7 @@ local dashboard = g.dashboard;
 local row = g.panel.row;
 local grid = g.util.grid;
 
+local statPanel = g.panel.stat;
 local table = g.panel.table;
 
 // Table helpers
@@ -35,6 +36,20 @@ local tbOverride = tbStandardOptions.override;
           %(job)s
         ||| % defaultFilters,
       };
+      local statHealthMappings = [
+        statPanel.standardOptions.mapping.ValueMap.withType() +
+        statPanel.standardOptions.mapping.ValueMap.withOptions({
+          '0': { text: 'Down', color: 'red' },
+          '1': { text: 'Up', color: 'green' },
+        }),
+      ];
+      local tableBoolMappings = [
+        tbStandardOptions.mapping.ValueMap.withType() +
+        tbStandardOptions.mapping.ValueMap.withOptions({
+          '0': { text: 'No' },
+          '1': { text: 'Yes' },
+        }),
+      ];
 
       local queries = {
         // Summary
@@ -52,6 +67,17 @@ local tbOverride = tbStandardOptions.override;
               %(headscale)s
             }
           )
+        ||| % headscaleFilters,
+
+        nodesOfflineByNode: |||
+          1
+          -
+          max(
+            headscale_nodes_online{
+              %(headscale)s
+            }
+          ) by (id, name, user)
+          > 0
         ||| % headscaleFilters,
 
         usersTotal: |||
@@ -127,6 +153,21 @@ local tbOverride = tbStandardOptions.override;
           )
         ||| % headscaleFilters,
 
+        nodesUnapprovedRoutesByNode: |||
+          sum(
+            headscale_nodes_available_routes{
+              %(headscale)s
+            }
+          ) by (id, name, user)
+          -
+          sum(
+            headscale_nodes_approved_routes{
+              %(headscale)s
+            }
+          ) by (id, name, user)
+          > 0
+        ||| % headscaleFilters,
+
         nodesInfo: |||
           headscale_nodes_info{
             %(headscale)s
@@ -197,12 +238,34 @@ local tbOverride = tbStandardOptions.override;
           ) by (id, prefix)
         ||| % headscaleFilters,
 
+        apiKeysExpiringSoon: |||
+          time() + 7 * 24 * 60 * 60
+          -
+          max(
+            headscale_apikeys_expiration_timestamp{
+              %(headscale)s
+            }
+          ) by (id, prefix)
+          > 0
+        ||| % headscaleFilters,
+
         preAuthKeysExpiringSoon: |||
           count(
             headscale_preauthkeys_expiration_timestamp{
               %(headscale)s
             } < time() + 7 * 24 * 60 * 60
           )
+        ||| % headscaleFilters,
+
+        preAuthKeysExpiringSoonByKey: |||
+          time() + 7 * 24 * 60 * 60
+          -
+          max(
+            headscale_preauthkeys_expiration_timestamp{
+              %(headscale)s
+            }
+          ) by (id, user)
+          > 0
         ||| % headscaleFilters,
 
         preAuthKeysInfo: |||
@@ -330,6 +393,7 @@ local tbOverride = tbStandardOptions.override;
             'bool',
             queries.databaseConnectivity,
             description='Reported database connectivity state from the Headscale health endpoint.',
+            mappings=statHealthMappings,
           ),
 
         // Nodes
@@ -365,11 +429,25 @@ local tbOverride = tbStandardOptions.override;
         nodesInfoTable:
           mixinUtils.dashboards.tablePanel(
             'Nodes',
-            'short',
-            queries.nodesInfo,
-            description='Node metadata reported by Headscale.',
+            'string',
+            [
+              {
+                expr: queries.nodesInfo,
+              },
+              {
+                expr: queries.nodesCreated,
+              },
+              {
+                expr: queries.nodesLastSeen,
+              },
+              {
+                expr: queries.nodesExpiry,
+              },
+            ],
+            description='Node metadata, ownership, registration details, and lifecycle timestamps reported by Headscale.',
             sortBy={ name: 'Name', desc: false },
             transformations=[
+              tbQueryOptions.transformation.withId('merge'),
               tbQueryOptions.transformation.withId(
                 'organize'
               ) +
@@ -385,19 +463,26 @@ local tbOverride = tbStandardOptions.override;
                     machine_key: 'Machine Key',
                     node_key: 'Node Key',
                     disco_key: 'Disco Key',
+                    'Value #B': 'Created',
+                    'Value #C': 'Last Seen',
+                    'Value #D': 'Expiry',
                   },
                   indexByName: {
-                    name: 0,
-                    user: 1,
-                    user_id: 2,
-                    given_name: 3,
-                    register_method: 4,
-                    machine_key: 5,
-                    node_key: 6,
-                    disco_key: 7,
-                    id: 8,
+                    id: 0,
+                    name: 1,
+                    user: 2,
+                    user_id: 3,
+                    given_name: 4,
+                    register_method: 5,
+                    machine_key: 6,
+                    node_key: 7,
+                    disco_key: 8,
+                    'Value #B': 9,
+                    'Value #C': 10,
+                    'Value #D': 11,
                   },
                   includeByName: {
+                    id: true,
                     name: true,
                     user: true,
                     user_id: true,
@@ -406,65 +491,18 @@ local tbOverride = tbStandardOptions.override;
                     machine_key: true,
                     node_key: true,
                     disco_key: true,
-                    id: true,
-                  },
-                }
-              ),
-            ],
-          ),
-
-        nodesLifecycleTable:
-          mixinUtils.dashboards.tablePanel(
-            'Node Lifecycle',
-            'string',
-            [
-              {
-                expr: queries.nodesCreated,
-              },
-              {
-                expr: queries.nodesLastSeen,
-              },
-              {
-                expr: queries.nodesExpiry,
-              },
-            ],
-            description='Creation, last seen, and expiry timestamps per node.',
-            sortBy={ name: 'Name', desc: false },
-            transformations=[
-              tbQueryOptions.transformation.withId('merge'),
-              tbQueryOptions.transformation.withId(
-                'organize'
-              ) +
-              tbQueryOptions.transformation.withOptions(
-                {
-                  renameByName: {
-                    name: 'Name',
-                    id: 'ID',
-                    user: 'User',
-                    'Value #A': 'Created',
-                    'Value #B': 'Last Seen',
-                    'Value #C': 'Expiry',
-                  },
-                  indexByName: {
-                    name: 0,
-                    id: 1,
-                    user: 2,
-                    'Value #A': 3,
-                    'Value #B': 4,
-                    'Value #C': 5,
-                  },
-                  includeByName: {
-                    name: true,
-                    id: true,
-                    user: true,
-                    'Value #A': true,
                     'Value #B': true,
                     'Value #C': true,
+                    'Value #D': true,
                   },
                 }
               ),
             ],
             overrides=[
+              tbOverride.byName.new('ID') +
+              tbOverride.byName.withPropertiesFromOptions(
+                tbStandardOptions.withUnit('string')
+              ),
               tbOverride.byName.new('Created') +
               tbOverride.byName.withPropertiesFromOptions(
                 tbStandardOptions.withUnit('dateTimeAsIso')
@@ -478,6 +516,59 @@ local tbOverride = tbStandardOptions.override;
                 tbStandardOptions.withUnit('dateTimeAsIso')
               ),
             ],
+          ),
+
+        nodesRequiringAttentionTable:
+          mixinUtils.dashboards.tablePanel(
+            'Nodes Requiring Attention',
+            'short',
+            [
+              {
+                expr: queries.nodesOfflineByNode,
+              },
+              {
+                expr: queries.nodesUnapprovedRoutesByNode,
+              },
+            ],
+            description='Nodes with operational follow-up items: offline status or available routes that are not approved.',
+            sortBy={ name: 'Name', desc: false },
+            transformations=[
+              tbQueryOptions.transformation.withId('merge'),
+              tbQueryOptions.transformation.withId(
+                'organize'
+              ) +
+              tbQueryOptions.transformation.withOptions(
+                {
+                  renameByName: {
+                    name: 'Name',
+                    id: 'ID',
+                    user: 'User',
+                    'Value #A': 'Offline',
+                    'Value #B': 'Unapproved Routes',
+                  },
+                  indexByName: {
+                    id: 0,
+                    name: 1,
+                    user: 2,
+                    'Value #A': 3,
+                    'Value #B': 4,
+                  },
+                  includeByName: {
+                    id: true,
+                    name: true,
+                    user: true,
+                    'Value #A': true,
+                    'Value #B': true,
+                  },
+                }
+              ),
+            ],
+            overrides=[
+              tbOverride.byName.new('Offline') +
+              tbOverride.byName.withPropertiesFromOptions(
+                tbStandardOptions.withMappings(tableBoolMappings)
+              ),
+            ]
           ),
 
         // Users
@@ -512,20 +603,20 @@ local tbOverride = tbStandardOptions.override;
                     provider_id: 'Provider ID',
                   },
                   indexByName: {
-                    name: 0,
-                    display_name: 1,
-                    email: 2,
-                    provider: 3,
-                    provider_id: 4,
-                    id: 5,
+                    id: 0,
+                    name: 1,
+                    display_name: 2,
+                    email: 3,
+                    provider: 4,
+                    provider_id: 5,
                   },
                   includeByName: {
+                    id: true,
                     name: true,
                     display_name: true,
                     email: true,
                     provider: true,
                     provider_id: true,
-                    id: true,
                   },
                 }
               ),
@@ -592,15 +683,15 @@ local tbOverride = tbStandardOptions.override;
                     'Value #C': 'Last Seen',
                   },
                   indexByName: {
-                    prefix: 0,
-                    id: 1,
+                    id: 0,
+                    prefix: 1,
                     'Value #A': 2,
                     'Value #B': 3,
                     'Value #C': 4,
                   },
                   includeByName: {
-                    prefix: true,
                     id: true,
+                    prefix: true,
                     'Value #A': true,
                     'Value #B': true,
                     'Value #C': true,
@@ -622,6 +713,52 @@ local tbOverride = tbStandardOptions.override;
                 tbStandardOptions.withUnit('dateTimeAsIso')
               ),
             ],
+          ),
+
+        accessRequiringAttentionTable:
+          mixinUtils.dashboards.tablePanel(
+            'Access Keys Requiring Attention',
+            's',
+            [
+              {
+                expr: queries.apiKeysExpiringSoon,
+              },
+              {
+                expr: queries.preAuthKeysExpiringSoonByKey,
+              },
+            ],
+            description='API keys and pre-authentication keys expiring in the next seven days. Values are seconds until expiry.',
+            transformations=[
+              tbQueryOptions.transformation.withId('merge'),
+              tbQueryOptions.transformation.withId(
+                'organize'
+              ) +
+              tbQueryOptions.transformation.withOptions(
+                {
+                  renameByName: {
+                    id: 'ID',
+                    prefix: 'Prefix',
+                    user: 'User',
+                    'Value #A': 'API Key Seconds Until Expiry',
+                    'Value #B': 'Pre-auth Key Seconds Until Expiry',
+                  },
+                  indexByName: {
+                    id: 0,
+                    prefix: 1,
+                    user: 2,
+                    'Value #A': 3,
+                    'Value #B': 4,
+                  },
+                  includeByName: {
+                    id: true,
+                    prefix: true,
+                    user: true,
+                    'Value #A': true,
+                    'Value #B': true,
+                  },
+                }
+              ),
+            ]
           ),
 
         preAuthKeysInfoTable:
@@ -654,8 +791,8 @@ local tbOverride = tbStandardOptions.override;
                     'Value #C': 'Expiration',
                   },
                   indexByName: {
-                    user: 0,
-                    id: 1,
+                    id: 0,
+                    user: 1,
                     reusable: 2,
                     ephemeral: 3,
                     used: 4,
@@ -665,8 +802,8 @@ local tbOverride = tbStandardOptions.override;
                     'Value #C': 7,
                   },
                   includeByName: {
-                    user: true,
                     id: true,
+                    user: true,
                     reusable: true,
                     ephemeral: true,
                     used: true,
@@ -725,22 +862,29 @@ local tbOverride = tbStandardOptions.override;
             panels.nodesTotalTagsStat,
           ],
           panelWidth=8,
-          panelHeight=6,
+          panelHeight=5,
           startY=6,
         ) +
         grid.wrapPanels(
           [
             panels.nodesInfoTable,
-            panels.nodesLifecycleTable,
           ],
           panelWidth=24,
           panelHeight=10,
-          startY=14,
+          startY=11,
+        ) +
+        grid.wrapPanels(
+          [
+            panels.nodesRequiringAttentionTable,
+          ],
+          panelWidth=24,
+          panelHeight=8,
+          startY=31,
         ) +
         [
           row.new('Users') +
           row.gridPos.withX(0) +
-          row.gridPos.withY(34) +
+          row.gridPos.withY(39) +
           row.gridPos.withW(24) +
           row.gridPos.withH(1),
         ] +
@@ -750,19 +894,19 @@ local tbOverride = tbStandardOptions.override;
           ],
           panelWidth=4,
           panelHeight=8,
-          startY=35,
+          startY=40,
         ) +
         [
           panels.usersInfoTable +
           table.gridPos.withX(4) +
-          table.gridPos.withY(35) +
+          table.gridPos.withY(40) +
           table.gridPos.withW(20) +
           table.gridPos.withH(8),
         ] +
         [
           row.new('Access Management') +
           row.gridPos.withX(0) +
-          row.gridPos.withY(43) +
+          row.gridPos.withY(48) +
           row.gridPos.withW(24) +
           row.gridPos.withH(1),
         ] +
@@ -773,9 +917,24 @@ local tbOverride = tbStandardOptions.override;
             panels.preAuthKeysEphemeralPieChart,
           ],
           panelWidth=8,
-          panelHeight=6,
-          startY=44,
+          panelHeight=5,
+          startY=49,
         ) +
+        grid.wrapPanels(
+          [
+            panels.accessRequiringAttentionTable,
+          ],
+          panelWidth=24,
+          panelHeight=8,
+          startY=54,
+        ) +
+        [
+          row.new('Access Key Details') +
+          row.gridPos.withX(0) +
+          row.gridPos.withY(62) +
+          row.gridPos.withW(24) +
+          row.gridPos.withH(1),
+        ] +
         grid.wrapPanels(
           [
             panels.apiKeysInfoTable,
@@ -783,8 +942,9 @@ local tbOverride = tbStandardOptions.override;
           ],
           panelWidth=24,
           panelHeight=10,
-          startY=50,
-        );
+          startY=63,
+        ) +
+        [];
 
       mixinUtils.dashboards.bypassDashboardValidation +
       dashboard.new(

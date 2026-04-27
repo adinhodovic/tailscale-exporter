@@ -278,7 +278,21 @@
          "description": "Reported database connectivity state from the Headscale health endpoint.",
          "fieldConfig": {
             "defaults": {
-               "mappings": [ ],
+               "mappings": [
+                  {
+                     "options": {
+                        "0": {
+                           "color": "red",
+                           "text": "Down"
+                        },
+                        "1": {
+                           "color": "green",
+                           "text": "Up"
+                        }
+                     },
+                     "type": "value"
+                  }
+               ],
                "thresholds": {
                   "steps": [
                      {
@@ -342,7 +356,7 @@
             "overrides": [ ]
          },
          "gridPos": {
-            "h": 6,
+            "h": 5,
             "w": 8,
             "x": 0,
             "y": 6
@@ -411,7 +425,7 @@
             "overrides": [ ]
          },
          "gridPos": {
-            "h": 6,
+            "h": 5,
             "w": 8,
             "x": 8,
             "y": 6
@@ -471,7 +485,7 @@
             "overrides": [ ]
          },
          "gridPos": {
-            "h": 6,
+            "h": 5,
             "w": 8,
             "x": 16,
             "y": 6
@@ -501,96 +515,7 @@
             "type": "prometheus",
             "uid": "$datasource"
          },
-         "description": "Node metadata reported by Headscale.",
-         "fieldConfig": {
-            "defaults": {
-               "links": [ ],
-               "thresholds": {
-                  "steps": [ ]
-               },
-               "unit": "short"
-            },
-            "overrides": [ ]
-         },
-         "gridPos": {
-            "h": 10,
-            "w": 24,
-            "x": 0,
-            "y": 14
-         },
-         "id": 12,
-         "options": {
-            "footer": {
-               "enablePagination": true
-            },
-            "sortBy": [
-               {
-                  "desc": false,
-                  "displayName": "Name"
-               }
-            ]
-         },
-         "pluginVersion": "v11.4.0",
-         "targets": [
-            {
-               "datasource": {
-                  "type": "prometheus",
-                  "uid": "$datasource"
-               },
-               "expr": "headscale_nodes_info{\n  cluster=\"$cluster\"\n,\nnamespace=\"$namespace\",\njob=\"$job\"\n\n}\n",
-               "format": "table",
-               "instant": true
-            }
-         ],
-         "title": "Nodes",
-         "transformations": [
-            {
-               "id": "organize",
-               "options": {
-                  "includeByName": {
-                     "disco_key": true,
-                     "given_name": true,
-                     "id": true,
-                     "machine_key": true,
-                     "name": true,
-                     "node_key": true,
-                     "register_method": true,
-                     "user": true,
-                     "user_id": true
-                  },
-                  "indexByName": {
-                     "disco_key": 7,
-                     "given_name": 3,
-                     "id": 8,
-                     "machine_key": 5,
-                     "name": 0,
-                     "node_key": 6,
-                     "register_method": 4,
-                     "user": 1,
-                     "user_id": 2
-                  },
-                  "renameByName": {
-                     "disco_key": "Disco Key",
-                     "given_name": "Given Name",
-                     "id": "ID",
-                     "machine_key": "Machine Key",
-                     "name": "Name",
-                     "node_key": "Node Key",
-                     "register_method": "Register Method",
-                     "user": "User",
-                     "user_id": "User ID"
-                  }
-               }
-            }
-         ],
-         "type": "table"
-      },
-      {
-         "datasource": {
-            "type": "prometheus",
-            "uid": "$datasource"
-         },
-         "description": "Creation, last seen, and expiry timestamps per node.",
+         "description": "Node metadata, ownership, registration details, and lifecycle timestamps reported by Headscale.",
          "fieldConfig": {
             "defaults": {
                "links": [ ],
@@ -600,6 +525,18 @@
                "unit": "string"
             },
             "overrides": [
+               {
+                  "matcher": {
+                     "id": "byName",
+                     "options": "ID"
+                  },
+                  "properties": [
+                     {
+                        "id": "unit",
+                        "value": "string"
+                     }
+                  ]
+               },
                {
                   "matcher": {
                      "id": "byName",
@@ -642,9 +579,9 @@
             "h": 10,
             "w": 24,
             "x": 0,
-            "y": 24
+            "y": 11
          },
-         "id": 13,
+         "id": 12,
          "options": {
             "footer": {
                "enablePagination": true
@@ -658,6 +595,15 @@
          },
          "pluginVersion": "v11.4.0",
          "targets": [
+            {
+               "datasource": {
+                  "type": "prometheus",
+                  "uid": "$datasource"
+               },
+               "expr": "headscale_nodes_info{\n  cluster=\"$cluster\"\n,\nnamespace=\"$namespace\",\njob=\"$job\"\n\n}\n",
+               "format": "table",
+               "instant": true
+            },
             {
                "datasource": {
                   "type": "prometheus",
@@ -686,7 +632,142 @@
                "instant": true
             }
          ],
-         "title": "Node Lifecycle",
+         "title": "Nodes",
+         "transformations": [
+            {
+               "id": "merge"
+            },
+            {
+               "id": "organize",
+               "options": {
+                  "includeByName": {
+                     "Value #B": true,
+                     "Value #C": true,
+                     "Value #D": true,
+                     "disco_key": true,
+                     "given_name": true,
+                     "id": true,
+                     "machine_key": true,
+                     "name": true,
+                     "node_key": true,
+                     "register_method": true,
+                     "user": true,
+                     "user_id": true
+                  },
+                  "indexByName": {
+                     "Value #B": 9,
+                     "Value #C": 10,
+                     "Value #D": 11,
+                     "disco_key": 8,
+                     "given_name": 4,
+                     "id": 0,
+                     "machine_key": 6,
+                     "name": 1,
+                     "node_key": 7,
+                     "register_method": 5,
+                     "user": 2,
+                     "user_id": 3
+                  },
+                  "renameByName": {
+                     "Value #B": "Created",
+                     "Value #C": "Last Seen",
+                     "Value #D": "Expiry",
+                     "disco_key": "Disco Key",
+                     "given_name": "Given Name",
+                     "id": "ID",
+                     "machine_key": "Machine Key",
+                     "name": "Name",
+                     "node_key": "Node Key",
+                     "register_method": "Register Method",
+                     "user": "User",
+                     "user_id": "User ID"
+                  }
+               }
+            }
+         ],
+         "type": "table"
+      },
+      {
+         "datasource": {
+            "type": "prometheus",
+            "uid": "$datasource"
+         },
+         "description": "Nodes with operational follow-up items: offline status or available routes that are not approved.",
+         "fieldConfig": {
+            "defaults": {
+               "links": [ ],
+               "thresholds": {
+                  "steps": [ ]
+               },
+               "unit": "short"
+            },
+            "overrides": [
+               {
+                  "matcher": {
+                     "id": "byName",
+                     "options": "Offline"
+                  },
+                  "properties": [
+                     {
+                        "id": "mappings",
+                        "value": [
+                           {
+                              "options": {
+                                 "0": {
+                                    "text": "No"
+                                 },
+                                 "1": {
+                                    "text": "Yes"
+                                 }
+                              },
+                              "type": "value"
+                           }
+                        ]
+                     }
+                  ]
+               }
+            ]
+         },
+         "gridPos": {
+            "h": 8,
+            "w": 24,
+            "x": 0,
+            "y": 31
+         },
+         "id": 13,
+         "options": {
+            "footer": {
+               "enablePagination": true
+            },
+            "sortBy": [
+               {
+                  "desc": false,
+                  "displayName": "Name"
+               }
+            ]
+         },
+         "pluginVersion": "v11.4.0",
+         "targets": [
+            {
+               "datasource": {
+                  "type": "prometheus",
+                  "uid": "$datasource"
+               },
+               "expr": "1\n-\nmax(\n  headscale_nodes_online{\n    cluster=\"$cluster\"\n,\nnamespace=\"$namespace\",\njob=\"$job\"\n\n  }\n) by (id, name, user)\n> 0\n",
+               "format": "table",
+               "instant": true
+            },
+            {
+               "datasource": {
+                  "type": "prometheus",
+                  "uid": "$datasource"
+               },
+               "expr": "sum(\n  headscale_nodes_available_routes{\n    cluster=\"$cluster\"\n,\nnamespace=\"$namespace\",\njob=\"$job\"\n\n  }\n) by (id, name, user)\n-\nsum(\n  headscale_nodes_approved_routes{\n    cluster=\"$cluster\"\n,\nnamespace=\"$namespace\",\njob=\"$job\"\n\n  }\n) by (id, name, user)\n> 0\n",
+               "format": "table",
+               "instant": true
+            }
+         ],
+         "title": "Nodes Requiring Attention",
          "transformations": [
             {
                "id": "merge"
@@ -697,7 +778,6 @@
                   "includeByName": {
                      "Value #A": true,
                      "Value #B": true,
-                     "Value #C": true,
                      "id": true,
                      "name": true,
                      "user": true
@@ -705,15 +785,13 @@
                   "indexByName": {
                      "Value #A": 3,
                      "Value #B": 4,
-                     "Value #C": 5,
-                     "id": 1,
-                     "name": 0,
+                     "id": 0,
+                     "name": 1,
                      "user": 2
                   },
                   "renameByName": {
-                     "Value #A": "Created",
-                     "Value #B": "Last Seen",
-                     "Value #C": "Expiry",
+                     "Value #A": "Offline",
+                     "Value #B": "Unapproved Routes",
                      "id": "ID",
                      "name": "Name",
                      "user": "User"
@@ -729,7 +807,7 @@
             "h": 1,
             "w": 24,
             "x": 0,
-            "y": 34
+            "y": 39
          },
          "id": 14,
          "title": "Users",
@@ -751,7 +829,7 @@
             "h": 8,
             "w": 4,
             "x": 0,
-            "y": 35
+            "y": 40
          },
          "id": 15,
          "options": {
@@ -806,7 +884,7 @@
             "h": 8,
             "w": 20,
             "x": 4,
-            "y": 35
+            "y": 40
          },
          "id": 16,
          "options": {
@@ -846,12 +924,12 @@
                      "provider_id": true
                   },
                   "indexByName": {
-                     "display_name": 1,
-                     "email": 2,
-                     "id": 5,
-                     "name": 0,
-                     "provider": 3,
-                     "provider_id": 4
+                     "display_name": 2,
+                     "email": 3,
+                     "id": 0,
+                     "name": 1,
+                     "provider": 4,
+                     "provider_id": 5
                   },
                   "renameByName": {
                      "display_name": "Display Name",
@@ -872,7 +950,7 @@
             "h": 1,
             "w": 24,
             "x": 0,
-            "y": 43
+            "y": 48
          },
          "id": 17,
          "title": "Access Management",
@@ -891,10 +969,10 @@
             "overrides": [ ]
          },
          "gridPos": {
-            "h": 6,
+            "h": 5,
             "w": 8,
             "x": 0,
-            "y": 44
+            "y": 49
          },
          "id": 18,
          "options": {
@@ -951,10 +1029,10 @@
             "overrides": [ ]
          },
          "gridPos": {
-            "h": 6,
+            "h": 5,
             "w": 8,
             "x": 8,
-            "y": 44
+            "y": 49
          },
          "id": 19,
          "options": {
@@ -1011,10 +1089,10 @@
             "overrides": [ ]
          },
          "gridPos": {
-            "h": 6,
+            "h": 5,
             "w": 8,
             "x": 16,
-            "y": 44
+            "y": 49
          },
          "id": 20,
          "options": {
@@ -1057,6 +1135,101 @@
          ],
          "title": "Pre-auth Keys Ephemeral",
          "type": "piechart"
+      },
+      {
+         "datasource": {
+            "type": "prometheus",
+            "uid": "$datasource"
+         },
+         "description": "API keys and pre-authentication keys expiring in the next seven days. Values are seconds until expiry.",
+         "fieldConfig": {
+            "defaults": {
+               "links": [ ],
+               "thresholds": {
+                  "steps": [ ]
+               },
+               "unit": "s"
+            },
+            "overrides": [ ]
+         },
+         "gridPos": {
+            "h": 8,
+            "w": 24,
+            "x": 0,
+            "y": 54
+         },
+         "id": 21,
+         "options": {
+            "footer": {
+               "enablePagination": true
+            }
+         },
+         "pluginVersion": "v11.4.0",
+         "targets": [
+            {
+               "datasource": {
+                  "type": "prometheus",
+                  "uid": "$datasource"
+               },
+               "expr": "time() + 7 * 24 * 60 * 60\n-\nmax(\n  headscale_apikeys_expiration_timestamp{\n    cluster=\"$cluster\"\n,\nnamespace=\"$namespace\",\njob=\"$job\"\n\n  }\n) by (id, prefix)\n> 0\n",
+               "format": "table",
+               "instant": true
+            },
+            {
+               "datasource": {
+                  "type": "prometheus",
+                  "uid": "$datasource"
+               },
+               "expr": "time() + 7 * 24 * 60 * 60\n-\nmax(\n  headscale_preauthkeys_expiration_timestamp{\n    cluster=\"$cluster\"\n,\nnamespace=\"$namespace\",\njob=\"$job\"\n\n  }\n) by (id, user)\n> 0\n",
+               "format": "table",
+               "instant": true
+            }
+         ],
+         "title": "Access Keys Requiring Attention",
+         "transformations": [
+            {
+               "id": "merge"
+            },
+            {
+               "id": "organize",
+               "options": {
+                  "includeByName": {
+                     "Value #A": true,
+                     "Value #B": true,
+                     "id": true,
+                     "prefix": true,
+                     "user": true
+                  },
+                  "indexByName": {
+                     "Value #A": 3,
+                     "Value #B": 4,
+                     "id": 0,
+                     "prefix": 1,
+                     "user": 2
+                  },
+                  "renameByName": {
+                     "Value #A": "API Key Seconds Until Expiry",
+                     "Value #B": "Pre-auth Key Seconds Until Expiry",
+                     "id": "ID",
+                     "prefix": "Prefix",
+                     "user": "User"
+                  }
+               }
+            }
+         ],
+         "type": "table"
+      },
+      {
+         "collapsed": false,
+         "gridPos": {
+            "h": 1,
+            "w": 24,
+            "x": 0,
+            "y": 62
+         },
+         "id": 22,
+         "title": "Access Key Details",
+         "type": "row"
       },
       {
          "datasource": {
@@ -1115,9 +1288,9 @@
             "h": 10,
             "w": 24,
             "x": 0,
-            "y": 50
+            "y": 63
          },
-         "id": 21,
+         "id": 23,
          "options": {
             "footer": {
                "enablePagination": true
@@ -1178,8 +1351,8 @@
                      "Value #A": 2,
                      "Value #B": 3,
                      "Value #C": 4,
-                     "id": 1,
-                     "prefix": 0
+                     "id": 0,
+                     "prefix": 1
                   },
                   "renameByName": {
                      "Value #A": "Created",
@@ -1238,9 +1411,9 @@
             "h": 10,
             "w": 24,
             "x": 0,
-            "y": 60
+            "y": 73
          },
-         "id": 22,
+         "id": 24,
          "options": {
             "footer": {
                "enablePagination": true
@@ -1306,10 +1479,10 @@
                      "Value #C": 7,
                      "acl_tags": 5,
                      "ephemeral": 3,
-                     "id": 1,
+                     "id": 0,
                      "reusable": 2,
                      "used": 4,
-                     "user": 0
+                     "user": 1
                   },
                   "renameByName": {
                      "Value #A": "ID",
