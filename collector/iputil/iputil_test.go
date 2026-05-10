@@ -4,10 +4,10 @@ import "testing"
 
 func TestSplitIPs(t *testing.T) {
 	tests := []struct {
-		name     string
-		input    []string
-		wantV4   string
-		wantV6   string
+		name   string
+		input  []string
+		wantV4 string
+		wantV6 string
 	}{
 		{
 			name: "empty",
