@@ -73,7 +73,7 @@ func TestTailscaleDevicesCollector_Update(t *testing.T) {
 			expectedMetrics: `
 # HELP tailscale_devices_info Device information
 # TYPE tailscale_devices_info gauge
-tailscale_devices_info{client_version="1.32.0",hostname="device-one",id="device-123",machine_key="mkey:abcd1234",name="Device One",node_key="nodekey:efgh5678",os="linux",tailscale_ip="100.64.0.1",user="user-456"} 1
+tailscale_devices_info{client_version="1.32.0",hostname="device-one",id="device-123",machine_key="mkey:abcd1234",name="Device One",node_key="nodekey:efgh5678",os="linux",tailscale_ip="100.64.0.1",tailscale_ipv6="fd7a:115c:a1e0:ab12:4843:cd96:6255:6a6a",user="user-456"} 1
 # HELP tailscale_devices_online Whether device is online (last seen within 5 minutes)
 # TYPE tailscale_devices_online gauge
 tailscale_devices_online{hostname="device-one",id="device-123",name="Device One",os="linux",user="user-456"} 0

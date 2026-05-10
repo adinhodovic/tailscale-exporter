@@ -23,6 +23,7 @@ func TestHeadscaleNodesCollector_Update(t *testing.T) {
 		MachineKey:     "mkey:123",
 		NodeKey:        "nodekey:abc",
 		DiscoKey:       "discokey:def",
+		IpAddresses:    []string{"100.64.0.1", "fd7a:115c:a1e0::1"},
 		LastSeen:       timestamppb.New(time.Unix(1_700_000_000, 0)),
 		CreatedAt:      timestamppb.New(time.Unix(1_690_000_000, 0)),
 		Expiry:         timestamppb.New(time.Unix(1_710_000_000, 0)),
@@ -43,7 +44,7 @@ func TestHeadscaleNodesCollector_Update(t *testing.T) {
 	expected := `
 # HELP headscale_nodes_info Node information
 # TYPE headscale_nodes_info gauge
-headscale_nodes_info{disco_key="discokey:def",given_name="server-01",id="1",machine_key="mkey:123",name="node-one",node_key="nodekey:abc",register_method="REGISTER_METHOD_AUTH_KEY",user="alice",user_id="42"} 1
+headscale_nodes_info{disco_key="discokey:def",given_name="server-01",id="1",machine_key="mkey:123",name="node-one",node_key="nodekey:abc",register_method="REGISTER_METHOD_AUTH_KEY",tailscale_ip="100.64.0.1",tailscale_ipv6="fd7a:115c:a1e0::1",user="alice",user_id="42"} 1
 # HELP headscale_nodes_last_seen_timestamp Unix timestamp when node was last seen
 # TYPE headscale_nodes_last_seen_timestamp gauge
 headscale_nodes_last_seen_timestamp{id="1",name="node-one",user="alice"} 1.7e+09
