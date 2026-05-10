@@ -737,33 +737,33 @@
                      "client_version": true,
                      "hostname": true,
                      "id": true,
-                     "machine_key": true,
                      "name": true,
                      "node_key": true,
                      "os": true,
                      "tailscale_ip": true,
+                     "tailscale_ipv6": true,
                      "user": true
                   },
                   "indexByName": {
                      "client_version": 4,
                      "hostname": 5,
                      "id": 0,
-                     "machine_key": 7,
                      "name": 1,
                      "node_key": 8,
                      "os": 3,
                      "tailscale_ip": 6,
+                     "tailscale_ipv6": 7,
                      "user": 2
                   },
                   "renameByName": {
                      "client_version": "Client Version",
                      "hostname": "Host Name",
                      "id": "ID",
-                     "machine_key": "Machine Key",
                      "name": "Name",
                      "node_key": "Node Key",
                      "os": "OS",
                      "tailscale_ip": "Tailscale IP",
+                     "tailscale_ipv6": "Tailscale IPv6",
                      "user": "User"
                   }
                }

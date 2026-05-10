@@ -555,8 +555,8 @@ local tbOverride = tbStandardOptions.override;
                     client_version: 'Client Version',
                     hostname: 'Host Name',
                     tailscale_ip: 'Tailscale IP',
+                    tailscale_ipv6: 'Tailscale IPv6',
                     id: 'ID',
-                    machine_key: 'Machine Key',
                     node_key: 'Node Key',
                   },
                   indexByName: {
@@ -567,7 +567,7 @@ local tbOverride = tbStandardOptions.override;
                     client_version: 4,
                     hostname: 5,
                     tailscale_ip: 6,
-                    machine_key: 7,
+                    tailscale_ipv6: 7,
                     node_key: 8,
                   },
                   includeByName: {
@@ -578,7 +578,7 @@ local tbOverride = tbStandardOptions.override;
                     client_version: true,
                     hostname: true,
                     tailscale_ip: true,
-                    machine_key: true,
+                    tailscale_ipv6: true,
                     node_key: true,
                   },
                 }
