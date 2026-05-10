@@ -28,7 +28,7 @@ Metrics related to Tailscale devices in the tailnet:
 
 | Metric Name | Type | Description | Labels |
 |-------------|------|-------------|---------|
-| `tailscale_devices_info` | Gauge | Device information | `id`, `name`, `hostname`, `os`, `client_version`, `user`, `tailscale_ip`, `machine_key`, `node_key` |
+| `tailscale_devices_info` | Gauge | Device information | `id`, `name`, `hostname`, `os`, `client_version`, `user`, `tailscale_ip`, `tailscale_ipv6`, `machine_key`, `node_key` |
 | `tailscale_devices_last_seen_timestamp` | Gauge | Unix timestamp when device was last seen | `id`, `name`, `hostname`, `os`, `user` |
 | `tailscale_devices_expires_timestamp` | Gauge | Unix timestamp when device key expires | `id`, `name`, `hostname`, `os`, `user` |
 | `tailscale_devices_created_timestamp` | Gauge | Unix timestamp when device was created | `id`, `name`, `hostname`, `os`, `user` |
@@ -100,7 +100,7 @@ Metrics related to Headscale nodes:
 
 | Metric Name | Type | Description | Labels |
 |-------------|------|-------------|---------|
-| `headscale_nodes_info` | Gauge | Node information | `id`, `name`, `user`, `user_id`, `given_name`, `register_method`, `machine_key`, `node_key`, `disco_key` |
+| `headscale_nodes_info` | Gauge | Node information | `id`, `name`, `user`, `user_id`, `given_name`, `register_method`, `machine_key`, `node_key`, `disco_key`, `tailscale_ip`, `tailscale_ipv6` |
 | `headscale_nodes_last_seen_timestamp` | Gauge | Unix timestamp when node was last seen | `id`, `name`, `user` |
 | `headscale_nodes_created_timestamp` | Gauge | Unix timestamp when node was created | `id`, `name`, `user` |
 | `headscale_nodes_expiry_timestamp` | Gauge | Unix timestamp when node expires | `id`, `name`, `user` |

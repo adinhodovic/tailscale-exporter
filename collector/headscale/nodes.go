@@ -5,6 +5,8 @@ import (
 	"log/slog"
 
 	"github.com/prometheus/client_golang/prometheus"
+
+	"github.com/adinhodovic/tailscale-exporter/collector/iputil"
 )
 
 const nodesSubsystem = "nodes"
@@ -24,6 +26,8 @@ var (
 			"machine_key",
 			"node_key",
 			"disco_key",
+			"tailscale_ip",
+			"tailscale_ipv6",
 		},
 	)
 	nodesLastSeenDesc = newDesc(
@@ -112,6 +116,8 @@ func (c HeadscaleNodesCollector) Update(
 			userID = formatUint(node.GetUser().GetId())
 		}
 
+		tailscaleIP, tailscaleIPv6 := iputil.SplitIPs(node.GetIpAddresses())
+
 		ch <- prometheus.MustNewConstMetric(nodesInfoDesc, prometheus.GaugeValue, 1,
 			nodeID,
 			node.GetName(),
@@ -122,6 +128,8 @@ func (c HeadscaleNodesCollector) Update(
 			node.GetMachineKey(),
 			node.GetNodeKey(),
 			node.GetDiscoKey(),
+			tailscaleIP,
+			tailscaleIPv6,
 		)
 
 		if ts := node.GetLastSeen(); ts != nil {

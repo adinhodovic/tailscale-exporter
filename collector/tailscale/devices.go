@@ -7,6 +7,8 @@ import (
 
 	"github.com/prometheus/client_golang/prometheus"
 	"tailscale.com/client/tailscale/v2"
+
+	"github.com/adinhodovic/tailscale-exporter/collector/iputil"
 )
 
 const devicesSubsystem = "devices"
@@ -24,6 +26,7 @@ var (
 			"client_version",
 			"user",
 			"tailscale_ip",
+			"tailscale_ipv6",
 			"machine_key",
 			"node_key",
 		},
@@ -158,10 +161,7 @@ func (c TailscaleDevicesCollector) Update(
 
 	// Device metrics
 	for _, device := range devices {
-		tailscaleIP := ""
-		if len(device.Addresses) > 0 {
-			tailscaleIP = device.Addresses[0]
-		}
+		tailscaleIP, tailscaleIPv6 := iputil.SplitIPs(device.Addresses)
 
 		// Normalize client version to semver format
 		normalizedVersion := normalizeVersion(device.ClientVersion)
@@ -169,7 +169,7 @@ func (c TailscaleDevicesCollector) Update(
 		// Device info
 		ch <- prometheus.MustNewConstMetric(deviceesInfoDesc, prometheus.GaugeValue, 1,
 			device.ID, device.Name, device.Hostname, device.OS, normalizedVersion,
-			device.User, tailscaleIP, device.MachineKey, device.NodeKey)
+			device.User, tailscaleIP, tailscaleIPv6, device.MachineKey, device.NodeKey)
 
 		// Device status metrics
 		online := 0.0
