@@ -1,12 +1,11 @@
 # yamllint disable rule:line-length rule:truthy
----
 name: Release Drafter
 
 on:
   push:
     branches:
       - main
-  pull_request_target:
+  pull_request:
     types: [opened, reopened, synchronize, edited]
 
 permissions: read-all
@@ -14,7 +13,7 @@ permissions: read-all
 jobs:
   autolabeler:
     name: Update PR Labels
-    if: github.event_name == 'pull_request_target'
+    if: github.event_name == 'pull_request'
     runs-on: ubuntu-latest
     permissions:
       pull-requests: write

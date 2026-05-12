@@ -30,8 +30,9 @@ jobs:
         if: steps.changed-files.outputs.any_changed == 'true'
         env:
           GRAFANA_COM_TOKEN: ${{ secrets.GRAFANA_COM_TOKEN }}
+          STEPS_CHANGED_FILES_OUTPUTS_ALL_CHANGED_FILES: ${{ steps.changed-files.outputs.all_changed_files }}
         run: |
-          for file in ${{ steps.changed-files.outputs.all_changed_files }}; do
+          for file in ${STEPS_CHANGED_FILES_OUTPUTS_ALL_CHANGED_FILES}; do
             title=$(jq -r '.title' "$file")
             json_str=$(jq -c . "$file" | jq -Rs .)
 
