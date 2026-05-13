@@ -180,9 +180,11 @@ Flags:
   -h, --help                                   help for tailscale-exporter
   -l, --listen-address string                  Address to listen on for web interface and telemetry (default ":9250")
   -m, --metrics-path string                    Path under which to expose metrics (default "/metrics")
+      --read-timeout duration                  HTTP server read timeout. Set to 0 to disable. (can also be set via READ_TIMEOUT environment variable) (default 30s)
       --tailscale-oauth-client-id string       OAuth client ID (can also be set via TAILSCALE_OAUTH_CLIENT_ID environment variable)
       --tailscale-oauth-client-secret string   OAuth client secret (can also be set via TAILSCALE_OAUTH_CLIENT_SECRET environment variable)
   -t, --tailscale-tailnet string               Tailscale tailnet (can also be set via TAILSCALE_TAILNET environment variable)
+      --write-timeout duration                 HTTP server write timeout. Must exceed the slowest scrape. Set to 0 to disable. (can also be set via WRITE_TIMEOUT environment variable) (default 2m0s)
 ```
 
 
