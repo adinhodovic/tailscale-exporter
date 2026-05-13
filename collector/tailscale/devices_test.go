@@ -60,12 +60,8 @@ func TestTailscaleDevicesCollector_Update(t *testing.T) {
 									"lax": {LatencyMilliseconds: 100},
 								},
 							},
-						},
-					},
-					routes: map[string]*tailscale.DeviceRoutes{
-						"device-123": {
-							Advertised: []string{"192.168.1.0/24"},
-							Enabled:    []string{"192.168.1.0/24"},
+							AdvertisedRoutes: []string{"192.168.1.0/24"},
+							EnabledRoutes:    []string{"192.168.1.0/24"},
 						},
 					},
 				},

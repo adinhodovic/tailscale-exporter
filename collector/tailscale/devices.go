@@ -229,28 +229,10 @@ func (c TailscaleDevicesCollector) Update(
 				device.ID, device.Name, device.Hostname, device.OS, device.User)
 		}
 
-		// Routes metrics - fetch from separate API endpoint
-		routes, err := client.Devices().SubnetRoutes(ctx, device.ID)
-		if err != nil {
-			c.log.DebugContext(
-				ctx,
-				"Error getting device routes",
-				"device_id",
-				device.ID,
-				"error",
-				err.Error(),
-			)
-			// If we can't get routes, emit 0
-			ch <- prometheus.MustNewConstMetric(devicesRoutesAdvertisedDesc, prometheus.GaugeValue, 0,
-				device.ID, device.Name, device.Hostname, device.OS, device.User)
-			ch <- prometheus.MustNewConstMetric(devicesRoutesEnabledDesc, prometheus.GaugeValue, 0,
-				device.ID, device.Name, device.Hostname, device.OS, device.User)
-		} else {
-			ch <- prometheus.MustNewConstMetric(devicesRoutesAdvertisedDesc, prometheus.GaugeValue, float64(len(routes.Advertised)),
-				device.ID, device.Name, device.Hostname, device.OS, device.User)
-			ch <- prometheus.MustNewConstMetric(devicesRoutesEnabledDesc, prometheus.GaugeValue, float64(len(routes.Enabled)),
-				device.ID, device.Name, device.Hostname, device.OS, device.User)
-		}
+		ch <- prometheus.MustNewConstMetric(devicesRoutesAdvertisedDesc, prometheus.GaugeValue, float64(len(device.AdvertisedRoutes)),
+			device.ID, device.Name, device.Hostname, device.OS, device.User)
+		ch <- prometheus.MustNewConstMetric(devicesRoutesEnabledDesc, prometheus.GaugeValue, float64(len(device.EnabledRoutes)),
+			device.ID, device.Name, device.Hostname, device.OS, device.User)
 
 		// Latency metrics
 		if device.ClientConnectivity != nil &&
