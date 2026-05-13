@@ -2,6 +2,16 @@ apiVersion: v1
 entries:
   tailscale-exporter:
   - apiVersion: v2
+    appVersion: 0.6.1
+    created: "2026-05-13T09:37:29.804642652Z"
+    description: A Helm chart for Kubernetes
+    digest: 2020d0b2680348bc47f61313c2a6c2ab87495cef9dabeb3b307189713c3268b2
+    name: tailscale-exporter
+    type: application
+    urls:
+    - https://github.com/adinhodovic/tailscale-exporter/releases/download/tailscale-exporter-chart-0.5.0/tailscale-exporter-0.5.0.tgz
+    version: 0.5.0
+  - apiVersion: v2
     appVersion: 0.4.0
     created: "2026-03-08T12:54:55.18354571Z"
     description: A Helm chart for Kubernetes
@@ -61,4 +71,4 @@ entries:
     urls:
     - https://github.com/adinhodovic/tailscale-exporter/releases/download/tailscale-exporter-chart-0.1.0/tailscale-exporter-0.1.0.tgz
     version: 0.1.0
-generated: "2026-03-08T12:54:55.183588591Z"
+generated: "2026-05-13T09:37:29.804670394Z"
