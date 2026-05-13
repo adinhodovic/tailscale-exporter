@@ -31,6 +31,8 @@ var (
 	// Global flags.
 	listenAddress string
 	metricsPath   string
+	readTimeout   time.Duration
+	writeTimeout  time.Duration
 
 	// Tailscale
 	tailscaleTailnet           string
@@ -70,6 +72,10 @@ func init() {
 	rootCmd.PersistentFlags().
 		StringVarP(&metricsPath, "metrics-path", "m", "/metrics", "Path under which to expose metrics")
 	rootCmd.PersistentFlags().
+		DurationVar(&readTimeout, "read-timeout", 30*time.Second, "HTTP server read timeout. Set to 0 to disable. (can also be set via READ_TIMEOUT environment variable)")
+	rootCmd.PersistentFlags().
+		DurationVar(&writeTimeout, "write-timeout", 2*time.Minute, "HTTP server write timeout. Must exceed the slowest scrape. Set to 0 to disable. (can also be set via WRITE_TIMEOUT environment variable)")
+	rootCmd.PersistentFlags().
 		StringVarP(&tailscaleTailnet, "tailscale-tailnet", "t", "", "Tailscale tailnet (can also be set via TAILSCALE_TAILNET environment variable)")
 	rootCmd.PersistentFlags().
 		StringVar(&headscaleAddress, "headscale-address", "", "Headscale gRPC address (can also be set via HEADSCALE_ADDRESS environment variable)")
@@ -89,6 +95,8 @@ func init() {
 
 	mustBindFlag("listen-address")
 	mustBindFlag("metrics-path")
+	mustBindFlag("read-timeout")
+	mustBindFlag("write-timeout")
 
 	// Tailscale flags
 	mustBindFlag("tailscale-tailnet")
@@ -109,6 +117,10 @@ func init() {
 	mustBindEnv("headscale-address", "HEADSCALE_ADDRESS")
 	mustBindEnv("headscale-api-key", "HEADSCALE_API_KEY")
 	mustBindEnv("headscale-insecure", "HEADSCALE_INSECURE")
+
+	// Server timeouts
+	mustBindEnv("read-timeout", "READ_TIMEOUT")
+	mustBindEnv("write-timeout", "WRITE_TIMEOUT")
 }
 
 func runExporter(cmd *cobra.Command, args []string) error {
@@ -127,6 +139,8 @@ func runExporter(cmd *cobra.Command, args []string) error {
 
 	listenAddress = strings.TrimSpace(viper.GetString("listen-address"))
 	metricsPath = strings.TrimSpace(viper.GetString("metrics-path"))
+	readTimeout = viper.GetDuration("read-timeout")
+	writeTimeout = viper.GetDuration("write-timeout")
 
 	// Tailscale
 	tailscaleTailnet = strings.TrimSpace(viper.GetString("tailscale-tailnet"))
@@ -162,6 +176,7 @@ func runExporter(cmd *cobra.Command, args []string) error {
 		}
 
 		httpClient := oauthConfig.Client(context.Background())
+		httpClient.Transport = newRetryTransport(httpClient.Transport)
 		token, err := oauthConfig.Token(context.Background())
 		if err != nil {
 			return fmt.Errorf("failed to obtain OAuth token: %w", err)
@@ -268,8 +283,8 @@ func runExporter(cmd *cobra.Command, args []string) error {
 	server := &http.Server{
 		Addr:         listenAddress,
 		Handler:      nil,
-		ReadTimeout:  30 * time.Second,
-		WriteTimeout: 30 * time.Second,
+		ReadTimeout:  readTimeout,
+		WriteTimeout: writeTimeout,
 	}
 
 	// Handle graceful shutdown
@@ -287,7 +302,11 @@ func runExporter(cmd *cobra.Command, args []string) error {
 		}
 	}()
 
-	logger.Info("Listening", "address", listenAddress)
+	logger.Info("Listening",
+		"address", listenAddress,
+		"read_timeout", readTimeout,
+		"write_timeout", writeTimeout,
+	)
 	if err := server.ListenAndServe(); err != http.ErrServerClosed {
 		return fmt.Errorf("HTTP server failed: %w", err)
 	}
