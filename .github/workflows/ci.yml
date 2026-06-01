@@ -61,7 +61,7 @@ jobs:
 
       - name: Docker meta
         id: meta
-        uses: docker/metadata-action@v5
+        uses: docker/metadata-action@v6
         with:
           images: adinhodovic/tailscale-exporter
 
@@ -101,7 +101,7 @@ jobs:
 
       - name: Docker meta
         id: meta
-        uses: docker/metadata-action@v5
+        uses: docker/metadata-action@v6
         with:
           images: adinhodovic/tailscale-exporter
           tags: |
