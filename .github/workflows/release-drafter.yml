@@ -18,7 +18,7 @@ jobs:
     permissions:
       pull-requests: write
     steps:
-      - uses: release-drafter/release-drafter/autolabeler@5de93583980a40bd78603b6dfdcda5b4df377b32 # v7.2.0
+      - uses: release-drafter/release-drafter/autolabeler@c2e2804cc59f45f57076a99af580d0fedb697927 # v7.3.0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -37,7 +37,7 @@ jobs:
         run: |
           echo "PUBLISH_DRAFT=true" >> $GITHUB_ENV
 
-      - uses: release-drafter/release-drafter@5de93583980a40bd78603b6dfdcda5b4df377b32 # v7.2.0
+      - uses: release-drafter/release-drafter@c2e2804cc59f45f57076a99af580d0fedb697927 # v7.3.0
         with:
           publish: ${{ env.PUBLISH_DRAFT }}
         env:
