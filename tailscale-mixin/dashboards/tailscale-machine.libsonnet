@@ -67,7 +67,7 @@ local tbOverride = tbStandardOptions.override;
                 %(tailscaled)s
               }[$__rate_interval]
             )
-          ) by (exported_service)
+          ) by (service)
         ||| % defaultFilters,
         tailscaledServeOutboundBytesByServiceRate: |||
           sum(
@@ -76,7 +76,7 @@ local tbOverride = tbStandardOptions.override;
                 %(tailscaled)s
               }[$__rate_interval]
             )
-          ) by (exported_service)
+          ) by (service)
         ||| % defaultFilters,
 
         tailscaledServeInboundBytesMachineByServiceRate: |||
@@ -512,7 +512,7 @@ local tbOverride = tbStandardOptions.override;
             'Service Inbound Traffic',
             'bps',
             queries.tailscaledServeInboundBytesByServiceRate,
-            '{{ exported_service }}',
+            '{{ service }}',
             description='Inbound traffic handled by Tailscale Services, grouped by service.',
             stack='normal',
           ),
@@ -522,7 +522,7 @@ local tbOverride = tbStandardOptions.override;
             'Service Outbound Traffic',
             'bps',
             queries.tailscaledServeOutboundBytesByServiceRate,
-            '{{ exported_service }}',
+            '{{ service }}',
             description='Outbound traffic handled by Tailscale Services, grouped by service.',
             stack='normal',
           ),
