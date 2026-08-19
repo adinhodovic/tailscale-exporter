@@ -88,8 +88,8 @@ Metrics related to Tailscale Services in the tailnet:
 | Metric Name | Type | Description | Labels |
 |-------------|------|-------------|---------|
 | `tailscale_services_info` | Gauge | Tailscale Service information | `name`, `comment`, `tags` |
-| `tailscale_services_address` | Gauge | Whether a Tailscale Service has an advertised address | `service`, `address` |
-| `tailscale_services_port` | Gauge | Whether a Tailscale Service advertises a port | `service`, `port` |
+| `tailscale_services_address` | Gauge | Whether a Tailscale Service has an advertised address | `name`, `address` |
+| `tailscale_services_port` | Gauge | Whether a Tailscale Service advertises a port | `name`, `port` |
 
 Tailscale client versions 1.102 and later also expose per-Service throughput metrics directly from each device:
 

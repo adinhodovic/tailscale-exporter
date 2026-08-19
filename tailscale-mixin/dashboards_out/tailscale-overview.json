@@ -4,7 +4,7 @@
    "annotations": {
       "list": [ ]
    },
-   "description": "An overview of Tailscale API metrics including tailnet settings, devices (OS, version, authorization, routes), users (role, status, login state), and auth keys. The dashboards were generated using [tailscale-mixin](https://github.com/adinhodovic/tailscale-exporter/tree/main/tailscale-mixin). Open issues and create feature requests in the repository.",
+   "description": "An overview of Tailscale API metrics including tailnet settings, devices (OS, version, authorization, routes), users (role, status, login state), auth keys, and Services. The dashboards were generated using [tailscale-mixin](https://github.com/adinhodovic/tailscale-exporter/tree/main/tailscale-mixin). Open issues and create feature requests in the repository.",
    "editable": false,
    "links": [
       {
@@ -1853,6 +1853,116 @@
                      "id": "ID",
                      "key_type": "Key Type",
                      "user_id": "User ID"
+                  }
+               }
+            }
+         ],
+         "type": "table"
+      },
+      {
+         "collapsed": false,
+         "gridPos": {
+            "h": 1,
+            "w": 24,
+            "x": 0,
+            "y": 79
+         },
+         "id": 27,
+         "title": "Services",
+         "type": "row"
+      },
+      {
+         "datasource": {
+            "type": "prometheus",
+            "uid": "$datasource"
+         },
+         "description": "A table showing Tailscale Services and their advertised address and port counts.",
+         "fieldConfig": {
+            "defaults": {
+               "links": [ ],
+               "thresholds": {
+                  "steps": [ ]
+               },
+               "unit": "short"
+            },
+            "overrides": [ ]
+         },
+         "gridPos": {
+            "h": 10,
+            "w": 24,
+            "x": 0,
+            "y": 80
+         },
+         "id": 28,
+         "options": {
+            "footer": {
+               "enablePagination": true
+            },
+            "sortBy": [
+               {
+                  "desc": false,
+                  "displayName": "Service"
+               }
+            ]
+         },
+         "pluginVersion": "v11.4.0",
+         "targets": [
+            {
+               "datasource": {
+                  "type": "prometheus",
+                  "uid": "$datasource"
+               },
+               "expr": "tailscale_services_info{\n  cluster=\"$cluster\"\n,\nnamespace=\"$namespace\",\njob=\"$job\",\ntailnet=\"$tailnet\"\n\n}\n",
+               "format": "table",
+               "instant": true
+            },
+            {
+               "datasource": {
+                  "type": "prometheus",
+                  "uid": "$datasource"
+               },
+               "expr": "sum by (name) (\n  tailscale_services_address{\n    cluster=\"$cluster\"\n,\nnamespace=\"$namespace\",\njob=\"$job\",\ntailnet=\"$tailnet\"\n\n  }\n)\n",
+               "format": "table",
+               "instant": true
+            },
+            {
+               "datasource": {
+                  "type": "prometheus",
+                  "uid": "$datasource"
+               },
+               "expr": "sum by (name) (\n  tailscale_services_port{\n    cluster=\"$cluster\"\n,\nnamespace=\"$namespace\",\njob=\"$job\",\ntailnet=\"$tailnet\"\n\n  }\n)\n",
+               "format": "table",
+               "instant": true
+            }
+         ],
+         "title": "Services",
+         "transformations": [
+            {
+               "id": "merge"
+            },
+            {
+               "id": "organize",
+               "options": {
+                  "includeByName": {
+                     "Value #B": true,
+                     "Value #C": true,
+                     "comment": true,
+                     "name": true,
+                     "tags": true
+                  },
+                  "indexByName": {
+                     "Value #B": 3,
+                     "Value #C": 4,
+                     "comment": 1,
+                     "name": 0,
+                     "tags": 2
+                  },
+                  "renameByName": {
+                     "Value #B": "Addresses",
+                     "Value #C": "Ports",
+                     "comment": "Comment",
+                     "name": "Service",
+                     "tags": "Tags"
                   }
                }
             }

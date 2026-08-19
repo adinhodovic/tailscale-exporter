@@ -21,13 +21,13 @@ var (
 		servicesSubsystem,
 		"address",
 		"Whether a Tailscale Service has an advertised address",
-		[]string{"service", "address"},
+		[]string{"name", "address"},
 	)
 	servicesPortDesc = newDesc(
 		servicesSubsystem,
 		"port",
 		"Whether a Tailscale Service advertises a port",
-		[]string{"service", "port"},
+		[]string{"name", "port"},
 	)
 )
 

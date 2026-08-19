@@ -60,6 +60,44 @@ local tbOverride = tbStandardOptions.override;
         tailscaledOutboundBytesRate: std.strReplace(queries.tailscaledInboundBytesRate, 'inbound', 'outbound'),
         tailscaledOutboundBytesRate1h: std.strReplace(queries.tailscaledOutboundBytesRate, '$__rate_interval', '1h'),
 
+        tailscaledServeInboundBytesByServiceRate: |||
+          sum(
+            rate(
+              tailscaled_serve_inbound_bytes_total{
+                %(tailscaled)s
+              }[$__rate_interval]
+            )
+          ) by (exported_service)
+        ||| % defaultFilters,
+        tailscaledServeOutboundBytesByServiceRate: |||
+          sum(
+            rate(
+              tailscaled_serve_outbound_bytes_total{
+                %(tailscaled)s
+              }[$__rate_interval]
+            )
+          ) by (exported_service)
+        ||| % defaultFilters,
+
+        tailscaledServeInboundBytesMachineByServiceRate: |||
+          sum(
+            rate(
+              tailscaled_serve_inbound_bytes_total{
+                %(tailscaledMachine)s
+              }[$__rate_interval]
+            )
+          ) by (exported_service)
+        ||| % defaultFilters,
+        tailscaledServeOutboundBytesMachineByServiceRate: |||
+          sum(
+            rate(
+              tailscaled_serve_outbound_bytes_total{
+                %(tailscaledMachine)s
+              }[$__rate_interval]
+            )
+          ) by (exported_service)
+        ||| % defaultFilters,
+
         tailscaledHealthMessagesByType: |||
           sum(
             tailscaled_health_messages{
@@ -469,6 +507,26 @@ local tbOverride = tbStandardOptions.override;
             stack='normal',
           ),
 
+        tailscaledServeInboundBytesByServiceTimeSeries:
+          mixinUtils.dashboards.timeSeriesPanel(
+            'Service Inbound Traffic',
+            'bps',
+            queries.tailscaledServeInboundBytesByServiceRate,
+            '{{ exported_service }}',
+            description='Inbound traffic handled by Tailscale Services, grouped by service.',
+            stack='normal',
+          ),
+
+        tailscaledServeOutboundBytesByServiceTimeSeries:
+          mixinUtils.dashboards.timeSeriesPanel(
+            'Service Outbound Traffic',
+            'bps',
+            queries.tailscaledServeOutboundBytesByServiceRate,
+            '{{ exported_service }}',
+            description='Outbound traffic handled by Tailscale Services, grouped by service.',
+            stack='normal',
+          ),
+
         // Tailscale Machine
         tailscaledRoutesMachinePieChartPanel:
           mixinUtils.dashboards.pieChartPanel(
@@ -571,6 +629,26 @@ local tbOverride = tbStandardOptions.override;
             description='Outbound packets by path for the selected machine. Sustained relay packet rate is a useful signal when troubleshooting latency or firewall behavior.',
             stack='normal',
           ),
+
+        tailscaledServeInboundBytesMachineByServiceTimeSeries:
+          mixinUtils.dashboards.timeSeriesPanel(
+            'Service Inbound Traffic by Service',
+            'bps',
+            queries.tailscaledServeInboundBytesMachineByServiceRate,
+            '{{ exported_service }}',
+            description='Inbound traffic handled by Tailscale Services for the selected machine, grouped by service.',
+            stack='normal',
+          ),
+
+        tailscaledServeOutboundBytesMachineByServiceTimeSeries:
+          mixinUtils.dashboards.timeSeriesPanel(
+            'Service Outbound Traffic by Service',
+            'bps',
+            queries.tailscaledServeOutboundBytesMachineByServiceRate,
+            '{{ exported_service }}',
+            description='Outbound traffic handled by Tailscale Services for the selected machine, grouped by service.',
+            stack='normal',
+          ),
       };
 
       local rows =
@@ -619,6 +697,8 @@ local tbOverride = tbStandardOptions.override;
             panels.tailscaledInboundPacketByPathTimeSeries,
             panels.tailscaledOutboundBytesByPathTimeSeries,
             panels.tailscaledOutboundPacketByPathTimeSeries,
+            panels.tailscaledServeInboundBytesByServiceTimeSeries,
+            panels.tailscaledServeOutboundBytesByServiceTimeSeries,
           ],
           panelWidth=12,
           panelHeight=5,
@@ -627,7 +707,7 @@ local tbOverride = tbStandardOptions.override;
         [
           row.new('Tailscale Machine $tailscale_machine') +
           row.gridPos.withX(0) +
-          row.gridPos.withY(31) +
+          row.gridPos.withY(36) +
           row.gridPos.withW(24) +
           row.gridPos.withH(1) +
           row.withRepeat('tailscale_machine'),
@@ -640,7 +720,7 @@ local tbOverride = tbStandardOptions.override;
           ],
           panelWidth=8,
           panelHeight=4,
-          startY=32,
+          startY=37,
         ) +
         grid.wrapPanels(
           [
@@ -650,10 +730,12 @@ local tbOverride = tbStandardOptions.override;
             panels.tailscaledInboundPacketMachineByPathTimeSeries,
             panels.tailscaledOutboundBytesMachineByPathTimeSeries,
             panels.tailscaledOutboundPacketMachineByPathTimeSeries,
+            panels.tailscaledServeInboundBytesMachineByServiceTimeSeries,
+            panels.tailscaledServeOutboundBytesMachineByServiceTimeSeries,
           ],
           panelWidth=12,
           panelHeight=5,
-          startY=36,
+          startY=41,
         );
 
       mixinUtils.dashboards.bypassDashboardValidation +
