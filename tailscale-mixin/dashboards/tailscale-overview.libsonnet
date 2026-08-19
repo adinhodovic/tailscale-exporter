@@ -327,9 +327,11 @@ local tbOverride = tbStandardOptions.override;
         ||| % defaultFilters,
 
         servicesInfo: |||
-          tailscale_services_info{
-            %(tailnet)s
-          }
+          sum by (name, comment, tags) (
+            tailscale_services_info{
+              %(tailnet)s
+            }
+          )
         ||| % defaultFilters,
 
         servicesAddresses: |||
