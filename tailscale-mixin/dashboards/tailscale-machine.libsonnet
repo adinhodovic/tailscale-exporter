@@ -60,6 +60,25 @@ local tbOverride = tbStandardOptions.override;
         tailscaledOutboundBytesRate: std.strReplace(queries.tailscaledInboundBytesRate, 'inbound', 'outbound'),
         tailscaledOutboundBytesRate1h: std.strReplace(queries.tailscaledOutboundBytesRate, '$__rate_interval', '1h'),
 
+        tailscaledServeInboundBytesByServiceRate: |||
+          sum(
+            rate(
+              tailscaled_serve_inbound_bytes_total{
+                %(tailscaledMachine)s
+              }[$__rate_interval]
+            )
+          ) by (service)
+        ||| % defaultFilters,
+        tailscaledServeOutboundBytesByServiceRate: |||
+          sum(
+            rate(
+              tailscaled_serve_outbound_bytes_total{
+                %(tailscaledMachine)s
+              }[$__rate_interval]
+            )
+          ) by (service)
+        ||| % defaultFilters,
+
         tailscaledHealthMessagesByType: |||
           sum(
             tailscaled_health_messages{
@@ -469,6 +488,26 @@ local tbOverride = tbStandardOptions.override;
             stack='normal',
           ),
 
+        tailscaledServeInboundBytesByServiceTimeSeries:
+          mixinUtils.dashboards.timeSeriesPanel(
+            'Service Inbound Traffic',
+            'bps',
+            queries.tailscaledServeInboundBytesByServiceRate,
+            '{{ service }}',
+            description='Inbound traffic handled by Tailscale Services, grouped by service.',
+            stack='normal',
+          ),
+
+        tailscaledServeOutboundBytesByServiceTimeSeries:
+          mixinUtils.dashboards.timeSeriesPanel(
+            'Service Outbound Traffic',
+            'bps',
+            queries.tailscaledServeOutboundBytesByServiceRate,
+            '{{ service }}',
+            description='Outbound traffic handled by Tailscale Services, grouped by service.',
+            stack='normal',
+          ),
+
         // Tailscale Machine
         tailscaledRoutesMachinePieChartPanel:
           mixinUtils.dashboards.pieChartPanel(
@@ -625,9 +664,25 @@ local tbOverride = tbStandardOptions.override;
           startY=16,
         ) +
         [
-          row.new('Tailscale Machine $tailscale_machine') +
+          row.new('Tailscale Service Traffic') +
           row.gridPos.withX(0) +
           row.gridPos.withY(31) +
+          row.gridPos.withW(24) +
+          row.gridPos.withH(1),
+        ] +
+        grid.wrapPanels(
+          [
+            panels.tailscaledServeInboundBytesByServiceTimeSeries,
+            panels.tailscaledServeOutboundBytesByServiceTimeSeries,
+          ],
+          panelWidth=12,
+          panelHeight=5,
+          startY=32,
+        ) +
+        [
+          row.new('Tailscale Machine $tailscale_machine') +
+          row.gridPos.withX(0) +
+          row.gridPos.withY(38) +
           row.gridPos.withW(24) +
           row.gridPos.withH(1) +
           row.withRepeat('tailscale_machine'),
@@ -640,7 +695,7 @@ local tbOverride = tbStandardOptions.override;
           ],
           panelWidth=8,
           panelHeight=4,
-          startY=32,
+          startY=39,
         ) +
         grid.wrapPanels(
           [
@@ -653,7 +708,7 @@ local tbOverride = tbStandardOptions.override;
           ],
           panelWidth=12,
           panelHeight=5,
-          startY=36,
+          startY=43,
         );
 
       mixinUtils.dashboards.bypassDashboardValidation +

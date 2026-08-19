@@ -326,6 +326,32 @@ local tbOverride = tbStandardOptions.override;
           ) by (name, id)
         ||| % defaultFilters,
 
+        servicesInfo: |||
+          tailscale_services_info{
+            %(tailnet)s
+          }
+        ||| % defaultFilters,
+
+        servicesAddresses: |||
+          sum by (name) (
+            label_replace(
+              tailscale_services_address{
+                %(tailnet)s
+              }, "name", "$1", "service", "(.*)"
+            )
+          )
+        ||| % defaultFilters,
+
+        servicesPorts: |||
+          sum by (name) (
+            label_replace(
+              tailscale_services_port{
+                %(tailnet)s
+              }, "name", "$1", "service", "(.*)"
+            )
+          )
+        ||| % defaultFilters,
+
         // Keys
         keysInfo: |||
           tailscale_keys_info{
@@ -908,6 +934,56 @@ local tbOverride = tbStandardOptions.override;
             ]
           ),
 
+        servicesInfoTable:
+          mixinUtils.dashboards.tablePanel(
+            'Services',
+            'short',
+            [
+              {
+                expr: queries.servicesInfo,
+              },
+              {
+                expr: queries.servicesAddresses,
+              },
+              {
+                expr: queries.servicesPorts,
+              },
+            ],
+            description='A table showing Tailscale Services and their advertised address and port counts.',
+            sortBy={ name: 'Service', desc: false },
+            transformations=[
+              tbQueryOptions.transformation.withId('merge'),
+              tbQueryOptions.transformation.withId(
+                'organize'
+              ) +
+              tbQueryOptions.transformation.withOptions(
+                {
+                  renameByName: {
+                    name: 'Service',
+                    comment: 'Comment',
+                    tags: 'Tags',
+                    'Value #B': 'Addresses',
+                    'Value #C': 'Ports',
+                  },
+                  indexByName: {
+                    name: 0,
+                    comment: 1,
+                    tags: 2,
+                    'Value #B': 3,
+                    'Value #C': 4,
+                  },
+                  includeByName: {
+                    name: true,
+                    comment: true,
+                    tags: true,
+                    'Value #B': true,
+                    'Value #C': true,
+                  },
+                }
+              ),
+            ],
+          ),
+
         // Keys
         keysInfoTable:
           mixinUtils.dashboards.tablePanel(
@@ -1094,13 +1170,28 @@ local tbOverride = tbStandardOptions.override;
           panelWidth=24,
           panelHeight=10,
           startY=69,
+        ) +
+        [
+          row.new('Services') +
+          row.gridPos.withX(0) +
+          row.gridPos.withY(79) +
+          row.gridPos.withW(24) +
+          row.gridPos.withH(1),
+        ] +
+        grid.wrapPanels(
+          [
+            panels.servicesInfoTable,
+          ],
+          panelWidth=24,
+          panelHeight=6,
+          startY=80,
         );
 
       mixinUtils.dashboards.bypassDashboardValidation +
       dashboard.new(
         'Tailscale / Overview',
       ) +
-      dashboard.withDescription('An overview of Tailscale API metrics including tailnet settings, devices (OS, version, authorization, routes), users (role, status, login state), and auth keys. %s' % mixinUtils.dashboards.dashboardDescriptionLink('tailscale-mixin', 'https://github.com/adinhodovic/tailscale-exporter/tree/main/tailscale-mixin')) +
+      dashboard.withDescription('An overview of Tailscale API metrics including tailnet settings, devices (OS, version, authorization, routes), users (role, status, login state), auth keys, and Services. %s' % mixinUtils.dashboards.dashboardDescriptionLink('tailscale-mixin', 'https://github.com/adinhodovic/tailscale-exporter/tree/main/tailscale-mixin')) +
       dashboard.withUid($._config.dashboardIds[dashboardName]) +
       dashboard.withTags($._config.tags) +
       dashboard.withTimezone('utc') +
