@@ -29,6 +29,7 @@ Dashboards and alerts for both are provided in the `tailscale-mixin`.
 - API key management (auth keys)
 - DNS configuration
 - User management
+- Tailscale Service inventory
 - Tailnet settings
 - API health (Tailscale API accessibility)
 
@@ -50,7 +51,7 @@ You can run the exporter to collect metrics from Tailscale (official cloud) and/
 1. Go to the [Tailscale admin console](https://login.tailscale.com/admin/settings/keys)
 2. Navigate to **Settings** → **Oauth Client**
 3. Click on **Create new OAuth client**
-4. Add read access for DNS, Devices, Users, and Keys
+4. Add read access for DNS, Devices, Services, Users, and Keys
 5. Copy the generated token (it's only shown once)
 
 The following exact scopes are required:
@@ -59,6 +60,7 @@ The following exact scopes are required:
 devices:core:read
 devices:posture_attributes:read
 devices:routes:read
+services:read
 users:read
 dns:read
 auth_keys:read
@@ -207,7 +209,7 @@ You can find the full list of metrics in the [METRICS.md](./docs/METRICS.md) fil
 
 ### Client Side Machine Metrics
 
-This project also makes use of the [Tailscale's client side metrics](https://tailscale.com/kb/1482/client-metrics/) that are exposed by Tailscale clients. These metrics provide insights into individual devices connected to your tailnet.
+This project also makes use of the [Tailscale's client side metrics](https://tailscale.com/kb/1482/client-metrics/) that are exposed by Tailscale clients. These metrics provide insights into individual devices connected to your tailnet. Tailscale v1.102 and later expose `tailscaled_serve_inbound_bytes_total` and `tailscaled_serve_outbound_bytes_total` with a `service` label for Tailscale Services. Scrape each device's `/metrics` endpoint to collect them; they are not available through the Tailscale API.
 
 The dashboards and alerts depend on the `tailscale_machine` label to exist, it makes filtering and grouping the metrics easier. Adding the label is fairly straightforward using Prometheus' `relabel_configs`. Here's an example configuration using the `ServiceMonitor` spec:
 

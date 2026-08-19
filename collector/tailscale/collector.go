@@ -94,6 +94,7 @@ type TailscaleClient interface {
 	Keys() KeysAPI
 	DNS() DNSAPI
 	Devices() DevicesAPI
+	Services() ServicesAPI
 	Users() UsersAPI
 	TailnetSettings() TailnetSettingsAPI
 }
@@ -112,6 +113,11 @@ type DNSAPI interface {
 // DevicesAPI is the subset of *tailscale.DevicesResource you actually use
 type DevicesAPI interface {
 	List(ctx context.Context, opts ...tailscale.ListDevicesOptions) ([]tailscale.Device, error)
+}
+
+// ServicesAPI is the subset of *tailscale.ServicesResource you actually use
+type ServicesAPI interface {
+	List(ctx context.Context) ([]tailscale.Service, error)
 }
 
 // UsersAPI is the subset of *tailscale.UsersResource you actually use
@@ -149,6 +155,10 @@ func (w *TailscaleClientWrapper) DNS() DNSAPI {
 
 func (w *TailscaleClientWrapper) Devices() DevicesAPI {
 	return w.client.Devices()
+}
+
+func (w *TailscaleClientWrapper) Services() ServicesAPI {
+	return w.client.Services()
 }
 
 func (w *TailscaleClientWrapper) Users() UsersAPI {

@@ -63,6 +63,19 @@ type MockDevicesClient struct {
 	devicesErr error
 }
 
+// MockServicesClient implements the ServicesAPI interface for testing
+type MockServicesClient struct {
+	services    []tailscale.Service
+	servicesErr error
+}
+
+func (m *MockServicesClient) List(ctx context.Context) ([]tailscale.Service, error) {
+	if m.servicesErr != nil {
+		return nil, m.servicesErr
+	}
+	return m.services, nil
+}
+
 func (m *MockDevicesClient) List(
 	ctx context.Context,
 	opts ...tailscale.ListDevicesOptions,
@@ -108,6 +121,7 @@ type MockTailscaleClient struct {
 	dnsClient             *MockDNSClient
 	keysClient            *MockKeysClient
 	devicesClient         *MockDevicesClient
+	servicesClient        *MockServicesClient
 	usersClient           *MockUsersClient
 	tailnetSettingsClient *MockTailnetSettingsClient
 }
@@ -122,6 +136,10 @@ func (m *MockTailscaleClient) Keys() KeysAPI {
 
 func (m *MockTailscaleClient) Devices() DevicesAPI {
 	return m.devicesClient
+}
+
+func (m *MockTailscaleClient) Services() ServicesAPI {
+	return m.servicesClient
 }
 
 func (m *MockTailscaleClient) Users() UsersAPI {

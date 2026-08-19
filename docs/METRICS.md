@@ -81,6 +81,25 @@ Metrics related to Tailnet-wide settings:
 | `tailscale_tailnet_settings_info` | Gauge | Information about the Tailscale Tailnet settings | `acls_externally_managed_on`, `acls_external_link`, `devices_approval_on`, `devices_auto_updates_on`, `users_approval_on`, `users_role_allowed_to_join_external_tailnets`, `network_flow_logging_on`, `regional_routing_on`, `posture_identity_collection_on` |
 | `tailscale_tailnet_settings_devices_key_duration_days` | Gauge | Number of days before device key expiry | None |
 
+### Service Metrics
+
+Metrics related to Tailscale Services in the tailnet:
+
+| Metric Name | Type | Description | Labels |
+|-------------|------|-------------|---------|
+| `tailscale_services_info` | Gauge | Tailscale Service information | `name`, `comment`, `tags` |
+| `tailscale_services_address` | Gauge | Whether a Tailscale Service has an advertised address | `service`, `address` |
+| `tailscale_services_port` | Gauge | Whether a Tailscale Service advertises a port | `service`, `port` |
+
+Tailscale client versions 1.102 and later also expose per-Service throughput metrics directly from each device:
+
+| Metric Name | Type | Description | Labels |
+|-------------|------|-------------|---------|
+| `tailscaled_serve_inbound_bytes_total` | Counter | Bytes received from peers on Serve connections for Tailscale Services | `service` |
+| `tailscaled_serve_outbound_bytes_total` | Counter | Bytes sent to peers on Serve connections for Tailscale Services | `service` |
+
+These client-side metrics must be scraped from each device's `/metrics` endpoint. They do not include device-based Serve, Funnel, or layer 3 Tailscale Services.
+
 ## Headscale Metrics
 
 ### General Metrics
