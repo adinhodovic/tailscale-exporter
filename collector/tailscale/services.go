@@ -52,7 +52,12 @@ func (c TailscaleServicesCollector) Update(
 
 	services, err := client.Services().List(ctx)
 	if err != nil {
-		c.log.ErrorContext(ctx, "Error getting Tailscale services", "error", err.Error())
+		c.log.ErrorContext(
+			ctx,
+			"Error getting Tailscale services; ensure the OAuth client has services:read",
+			"error",
+			err.Error(),
+		)
 		return err
 	}
 

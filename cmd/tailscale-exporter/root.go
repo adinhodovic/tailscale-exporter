@@ -167,6 +167,7 @@ func runExporter(cmd *cobra.Command, args []string) error {
 				"devices:core:read",
 				"devices:posture_attributes:read",
 				"devices:routes:read",
+				"services:read",
 				"users:read",
 				"dns:read",
 				"auth_keys:read",
