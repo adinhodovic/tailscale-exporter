@@ -1912,7 +1912,7 @@
                   "type": "prometheus",
                   "uid": "$datasource"
                },
-               "expr": "tailscale_services_info{\n  cluster=\"$cluster\"\n,\nnamespace=\"$namespace\",\njob=\"$job\",\ntailnet=\"$tailnet\"\n\n}\n",
+               "expr": "sum by (name, comment, tags) (\n  tailscale_services_info{\n    cluster=\"$cluster\"\n,\nnamespace=\"$namespace\",\njob=\"$job\",\ntailnet=\"$tailnet\"\n\n  }\n)\n",
                "format": "table",
                "instant": true
             },

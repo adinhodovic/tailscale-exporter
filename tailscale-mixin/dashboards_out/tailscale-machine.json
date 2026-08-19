@@ -1675,8 +1675,8 @@
                   "uid": "$datasource"
                },
                "exemplar": false,
-               "expr": "sum(\n  rate(\n    tailscaled_serve_inbound_bytes_total{\n      cluster=\"$cluster\"\n,\njob=~\"$job\"\n,\ntailscale_machine=~\"$tailscale_machine\"\n\n    }[$__rate_interval]\n  )\n) by (exported_service)\n",
-               "legendFormat": "{{ exported_service }}"
+               "expr": "sum(\n  rate(\n    tailscaled_serve_inbound_bytes_total{\n      cluster=\"$cluster\"\n,\njob=~\"$job\"\n,\ntailscale_machine=~\"$tailscale_machine\"\n\n    }[$__rate_interval]\n  )\n) by (service)\n",
+               "legendFormat": "{{ service }}"
             }
          ],
          "title": "Service Inbound Traffic by Service",
@@ -1734,8 +1734,8 @@
                   "uid": "$datasource"
                },
                "exemplar": false,
-               "expr": "sum(\n  rate(\n    tailscaled_serve_outbound_bytes_total{\n      cluster=\"$cluster\"\n,\njob=~\"$job\"\n,\ntailscale_machine=~\"$tailscale_machine\"\n\n    }[$__rate_interval]\n  )\n) by (exported_service)\n",
-               "legendFormat": "{{ exported_service }}"
+               "expr": "sum(\n  rate(\n    tailscaled_serve_outbound_bytes_total{\n      cluster=\"$cluster\"\n,\njob=~\"$job\"\n,\ntailscale_machine=~\"$tailscale_machine\"\n\n    }[$__rate_interval]\n  )\n) by (service)\n",
+               "legendFormat": "{{ service }}"
             }
          ],
          "title": "Service Outbound Traffic by Service",
