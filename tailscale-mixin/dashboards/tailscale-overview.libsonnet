@@ -337,7 +337,7 @@ local tbOverride = tbStandardOptions.override;
             label_replace(
               tailscale_services_address{
                 %(tailnet)s
-              }, "name", "$1", "service", "(.*)"
+              }, "name", "$1", "exported_service", "(.*)"
             )
           )
         ||| % defaultFilters,
@@ -347,7 +347,7 @@ local tbOverride = tbStandardOptions.override;
             label_replace(
               tailscale_services_port{
                 %(tailnet)s
-              }, "name", "$1", "service", "(.*)"
+              }, "name", "$1", "exported_service", "(.*)"
             )
           )
         ||| % defaultFilters,
@@ -1183,7 +1183,7 @@ local tbOverride = tbStandardOptions.override;
             panels.servicesInfoTable,
           ],
           panelWidth=24,
-          panelHeight=6,
+          panelHeight=10,
           startY=80,
         );
 

@@ -968,18 +968,6 @@
          "type": "timeseries"
       },
       {
-         "collapsed": false,
-         "gridPos": {
-            "h": 1,
-            "w": 24,
-            "x": 0,
-            "y": 31
-         },
-         "id": 18,
-         "title": "Tailscale Service Traffic",
-         "type": "row"
-      },
-      {
          "datasource": {
             "type": "prometheus",
             "uid": "$datasource"
@@ -1003,9 +991,9 @@
             "h": 5,
             "w": 12,
             "x": 0,
-            "y": 32
+            "y": 31
          },
-         "id": 19,
+         "id": 18,
          "options": {
             "legend": {
                "calcs": [
@@ -1031,8 +1019,8 @@
                   "uid": "$datasource"
                },
                "exemplar": false,
-               "expr": "sum(\n  rate(\n    tailscaled_serve_inbound_bytes_total{\n      cluster=\"$cluster\"\n,\njob=~\"$job\"\n,\ntailscale_machine=~\"$tailscale_machine\"\n\n    }[$__rate_interval]\n  )\n) by (service)\n",
-               "legendFormat": "{{ service }}"
+               "expr": "sum(\n  rate(\n    tailscaled_serve_inbound_bytes_total{\n      cluster=\"$cluster\"\n,\njob=~\"$job\"\n\n    }[$__rate_interval]\n  )\n) by (exported_service)\n",
+               "legendFormat": "{{ exported_service }}"
             }
          ],
          "title": "Service Inbound Traffic",
@@ -1062,9 +1050,9 @@
             "h": 5,
             "w": 12,
             "x": 12,
-            "y": 32
+            "y": 31
          },
-         "id": 20,
+         "id": 19,
          "options": {
             "legend": {
                "calcs": [
@@ -1090,8 +1078,8 @@
                   "uid": "$datasource"
                },
                "exemplar": false,
-               "expr": "sum(\n  rate(\n    tailscaled_serve_outbound_bytes_total{\n      cluster=\"$cluster\"\n,\njob=~\"$job\"\n,\ntailscale_machine=~\"$tailscale_machine\"\n\n    }[$__rate_interval]\n  )\n) by (service)\n",
-               "legendFormat": "{{ service }}"
+               "expr": "sum(\n  rate(\n    tailscaled_serve_outbound_bytes_total{\n      cluster=\"$cluster\"\n,\njob=~\"$job\"\n\n    }[$__rate_interval]\n  )\n) by (exported_service)\n",
+               "legendFormat": "{{ exported_service }}"
             }
          ],
          "title": "Service Outbound Traffic",
@@ -1103,9 +1091,9 @@
             "h": 1,
             "w": 24,
             "x": 0,
-            "y": 38
+            "y": 36
          },
-         "id": 21,
+         "id": 20,
          "repeat": "tailscale_machine",
          "title": "Tailscale Machine $tailscale_machine",
          "type": "row"
@@ -1126,9 +1114,9 @@
             "h": 4,
             "w": 8,
             "x": 0,
-            "y": 39
+            "y": 37
          },
-         "id": 22,
+         "id": 21,
          "options": {
             "displayLabels": [
                "percent"
@@ -1186,9 +1174,9 @@
             "h": 4,
             "w": 8,
             "x": 8,
-            "y": 39
+            "y": 37
          },
-         "id": 23,
+         "id": 22,
          "options": {
             "displayLabels": [
                "percent"
@@ -1246,9 +1234,9 @@
             "h": 4,
             "w": 8,
             "x": 16,
-            "y": 39
+            "y": 37
          },
-         "id": 24,
+         "id": 23,
          "options": {
             "displayLabels": [
                "percent"
@@ -1305,9 +1293,9 @@
             "h": 5,
             "w": 12,
             "x": 0,
-            "y": 43
+            "y": 41
          },
-         "id": 25,
+         "id": 24,
          "options": {
             "legend": {
                "calcs": [
@@ -1364,9 +1352,9 @@
             "h": 5,
             "w": 12,
             "x": 12,
-            "y": 43
+            "y": 41
          },
-         "id": 26,
+         "id": 25,
          "options": {
             "legend": {
                "calcs": [
@@ -1423,9 +1411,9 @@
             "h": 5,
             "w": 12,
             "x": 0,
-            "y": 48
+            "y": 46
          },
-         "id": 27,
+         "id": 26,
          "options": {
             "legend": {
                "calcs": [
@@ -1482,9 +1470,9 @@
             "h": 5,
             "w": 12,
             "x": 12,
-            "y": 48
+            "y": 46
          },
-         "id": 28,
+         "id": 27,
          "options": {
             "legend": {
                "calcs": [
@@ -1541,9 +1529,9 @@
             "h": 5,
             "w": 12,
             "x": 0,
-            "y": 53
+            "y": 51
          },
-         "id": 29,
+         "id": 28,
          "options": {
             "legend": {
                "calcs": [
@@ -1600,9 +1588,9 @@
             "h": 5,
             "w": 12,
             "x": 12,
-            "y": 53
+            "y": 51
          },
-         "id": 30,
+         "id": 29,
          "options": {
             "legend": {
                "calcs": [
@@ -1633,6 +1621,124 @@
             }
          ],
          "title": "Outbound Packets by Path",
+         "type": "timeseries"
+      },
+      {
+         "datasource": {
+            "type": "prometheus",
+            "uid": "$datasource"
+         },
+         "description": "Inbound traffic handled by Tailscale Services for the selected machine, grouped by service.",
+         "fieldConfig": {
+            "defaults": {
+               "custom": {
+                  "axisSoftMin": 0,
+                  "fillOpacity": 100,
+                  "lineWidth": 1,
+                  "stacking": {
+                     "mode": "normal"
+                  }
+               },
+               "unit": "bps"
+            },
+            "overrides": [ ]
+         },
+         "gridPos": {
+            "h": 5,
+            "w": 12,
+            "x": 0,
+            "y": 56
+         },
+         "id": 30,
+         "options": {
+            "legend": {
+               "calcs": [
+                  "mean",
+                  "max"
+               ],
+               "displayMode": "table",
+               "placement": "right",
+               "showLegend": true,
+               "sortBy": "Mean",
+               "sortDesc": true
+            },
+            "tooltip": {
+               "mode": "multi",
+               "sort": "desc"
+            }
+         },
+         "pluginVersion": "v11.4.0",
+         "targets": [
+            {
+               "datasource": {
+                  "type": "prometheus",
+                  "uid": "$datasource"
+               },
+               "exemplar": false,
+               "expr": "sum(\n  rate(\n    tailscaled_serve_inbound_bytes_total{\n      cluster=\"$cluster\"\n,\njob=~\"$job\"\n,\ntailscale_machine=~\"$tailscale_machine\"\n\n    }[$__rate_interval]\n  )\n) by (exported_service)\n",
+               "legendFormat": "{{ exported_service }}"
+            }
+         ],
+         "title": "Service Inbound Traffic by Service",
+         "type": "timeseries"
+      },
+      {
+         "datasource": {
+            "type": "prometheus",
+            "uid": "$datasource"
+         },
+         "description": "Outbound traffic handled by Tailscale Services for the selected machine, grouped by service.",
+         "fieldConfig": {
+            "defaults": {
+               "custom": {
+                  "axisSoftMin": 0,
+                  "fillOpacity": 100,
+                  "lineWidth": 1,
+                  "stacking": {
+                     "mode": "normal"
+                  }
+               },
+               "unit": "bps"
+            },
+            "overrides": [ ]
+         },
+         "gridPos": {
+            "h": 5,
+            "w": 12,
+            "x": 12,
+            "y": 56
+         },
+         "id": 31,
+         "options": {
+            "legend": {
+               "calcs": [
+                  "mean",
+                  "max"
+               ],
+               "displayMode": "table",
+               "placement": "right",
+               "showLegend": true,
+               "sortBy": "Mean",
+               "sortDesc": true
+            },
+            "tooltip": {
+               "mode": "multi",
+               "sort": "desc"
+            }
+         },
+         "pluginVersion": "v11.4.0",
+         "targets": [
+            {
+               "datasource": {
+                  "type": "prometheus",
+                  "uid": "$datasource"
+               },
+               "exemplar": false,
+               "expr": "sum(\n  rate(\n    tailscaled_serve_outbound_bytes_total{\n      cluster=\"$cluster\"\n,\njob=~\"$job\"\n,\ntailscale_machine=~\"$tailscale_machine\"\n\n    }[$__rate_interval]\n  )\n) by (exported_service)\n",
+               "legendFormat": "{{ exported_service }}"
+            }
+         ],
+         "title": "Service Outbound Traffic by Service",
          "type": "timeseries"
       }
    ],

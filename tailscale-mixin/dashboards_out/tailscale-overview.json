@@ -1888,7 +1888,7 @@
             "overrides": [ ]
          },
          "gridPos": {
-            "h": 6,
+            "h": 10,
             "w": 24,
             "x": 0,
             "y": 80
@@ -1921,7 +1921,7 @@
                   "type": "prometheus",
                   "uid": "$datasource"
                },
-               "expr": "sum by (name) (\n  label_replace(\n    tailscale_services_address{\n      cluster=\"$cluster\"\n,\nnamespace=\"$namespace\",\njob=\"$job\",\ntailnet=\"$tailnet\"\n\n    }, \"name\", \"$1\", \"service\", \"(.*)\"\n  )\n)\n",
+               "expr": "sum by (name) (\n  label_replace(\n    tailscale_services_address{\n      cluster=\"$cluster\"\n,\nnamespace=\"$namespace\",\njob=\"$job\",\ntailnet=\"$tailnet\"\n\n    }, \"name\", \"$1\", \"exported_service\", \"(.*)\"\n  )\n)\n",
                "format": "table",
                "instant": true
             },
@@ -1930,7 +1930,7 @@
                   "type": "prometheus",
                   "uid": "$datasource"
                },
-               "expr": "sum by (name) (\n  label_replace(\n    tailscale_services_port{\n      cluster=\"$cluster\"\n,\nnamespace=\"$namespace\",\njob=\"$job\",\ntailnet=\"$tailnet\"\n\n    }, \"name\", \"$1\", \"service\", \"(.*)\"\n  )\n)\n",
+               "expr": "sum by (name) (\n  label_replace(\n    tailscale_services_port{\n      cluster=\"$cluster\"\n,\nnamespace=\"$namespace\",\njob=\"$job\",\ntailnet=\"$tailnet\"\n\n    }, \"name\", \"$1\", \"exported_service\", \"(.*)\"\n  )\n)\n",
                "format": "table",
                "instant": true
             }
