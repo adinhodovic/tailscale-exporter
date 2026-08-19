@@ -334,21 +334,17 @@ local tbOverride = tbStandardOptions.override;
 
         servicesAddresses: |||
           sum by (name) (
-            label_replace(
-              tailscale_services_address{
-                %(tailnet)s
-              }, "name", "$1", "exported_service", "(.*)"
-            )
+            tailscale_services_address{
+              %(tailnet)s
+            }
           )
         ||| % defaultFilters,
 
         servicesPorts: |||
           sum by (name) (
-            label_replace(
-              tailscale_services_port{
-                %(tailnet)s
-              }, "name", "$1", "exported_service", "(.*)"
-            )
+            tailscale_services_port{
+              %(tailnet)s
+            }
           )
         ||| % defaultFilters,
 

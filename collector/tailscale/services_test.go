@@ -44,14 +44,14 @@ func TestTailscaleServicesCollector_Update(t *testing.T) {
 	if err := testutil.GatherAndCompare(reg, strings.NewReader(`
 # HELP tailscale_services_address Whether a Tailscale Service has an advertised address
 # TYPE tailscale_services_address gauge
-tailscale_services_address{address="100.100.100.1",service="svc:web"} 1
+tailscale_services_address{address="100.100.100.1",name="svc:web"} 1
 # HELP tailscale_services_info Tailscale Service information
 # TYPE tailscale_services_info gauge
 tailscale_services_info{comment="Web service",name="svc:web",tags="tag:prod,tag:web"} 1
 # HELP tailscale_services_port Whether a Tailscale Service advertises a port
 # TYPE tailscale_services_port gauge
-tailscale_services_port{port="tcp:443",service="svc:web"} 1
-tailscale_services_port{port="tcp:80",service="svc:web"} 1
+tailscale_services_port{name="svc:web",port="tcp:443"} 1
+tailscale_services_port{name="svc:web",port="tcp:80"} 1
 `)); err != nil {
 		t.Errorf("metrics mismatch: %v", err)
 	}
