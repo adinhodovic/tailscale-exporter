@@ -5,11 +5,11 @@ go 1.27.0
 require (
 	github.com/Kunde21/markdownfmt/v3 v3.1.0
 	github.com/cloudflare/pint v0.88.0
-	github.com/errata-ai/vale/v3 v3.14.0
 	github.com/google/go-jsonnet v0.22.0
 	github.com/grafana/dashboard-linter v0.3.0
 	github.com/jsonnet-bundler/jsonnet-bundler v0.6.0
 	github.com/prometheus/prometheus v0.314.0
+	github.com/vale-cli/vale/v3 v3.23.0
 )
 
 require (
@@ -48,6 +48,7 @@ require (
 	github.com/alecthomas/kingpin/v2 v2.4.0 // indirect
 	github.com/alecthomas/template v0.0.0-20190718012654-fb15b899a751 // indirect
 	github.com/alecthomas/units v0.0.0-20240927000941-0f3dac36c52b // indirect
+	github.com/andybalholm/cascadia v1.3.6-0.20260923003020-d56114046656 // indirect
 	github.com/apparentlymart/go-textseg/v15 v15.0.0 // indirect
 	github.com/apparentlymart/go-textseg/v17 v17.0.1 // indirect
 	github.com/armon/go-metrics v0.4.1 // indirect
@@ -94,6 +95,7 @@ require (
 	github.com/dgryski/go-rendezvous v0.0.0-20200823014737-9f7001d12a5f // indirect
 	github.com/digitalocean/godo v1.201.0 // indirect
 	github.com/distribution/reference v0.6.0 // indirect
+	github.com/dlclark/regexp2/v2 v2.5.2 // indirect
 	github.com/docker/go-connections v0.7.0 // indirect
 	github.com/docker/go-units v0.5.0 // indirect
 	github.com/dustin/go-humanize v1.0.1 // indirect
@@ -103,7 +105,6 @@ require (
 	github.com/envoyproxy/go-control-plane/envoy v1.37.0 // indirect
 	github.com/envoyproxy/protoc-gen-validate v1.3.3 // indirect
 	github.com/errata-ai/ini v1.63.0 // indirect
-	github.com/errata-ai/regexp2 v1.7.0 // indirect
 	github.com/expr-lang/expr v1.17.7 // indirect
 	github.com/facette/natsort v0.0.0-20181210072756-2cd4dd1e2dcb // indirect
 	github.com/fatih/color v1.19.0 // indirect
@@ -197,7 +198,8 @@ require (
 	github.com/ionos-cloud/sdk-go/v6 v6.3.11 // indirect
 	github.com/jaegertracing/jaeger-idl v0.6.0 // indirect
 	github.com/jdkato/go-tree-sitter-julia v0.1.0 // indirect
-	github.com/jdkato/twine v0.10.2 // indirect
+	github.com/jdkato/prose/v3 v3.2.1 // indirect
+	github.com/jdkato/regexp2/v2 v2.5.6 // indirect
 	github.com/jmespath/go-jmespath v0.4.0 // indirect
 	github.com/jpillora/backoff v1.0.0 // indirect
 	github.com/json-iterator/go v1.1.12 // indirect
@@ -223,7 +225,6 @@ require (
 	github.com/moby/moby/client v0.5.0 // indirect
 	github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd // indirect
 	github.com/modern-go/reflect2 v1.0.3-0.20250322232337-35a7c28c31ee // indirect
-	github.com/montanaflynn/stats v0.7.1 // indirect
 	github.com/munnerz/goautoneg v0.0.0-20191010083416-a7dc8b61c822 // indirect
 	github.com/mwitkow/go-conntrack v0.0.0-20190716064945-2f068394615f // indirect
 	github.com/niklasfasching/go-org v1.7.0 // indirect
@@ -281,7 +282,7 @@ require (
 	github.com/subosito/gotenv v1.6.0 // indirect
 	github.com/tjhop/slog-gokit v0.1.6 // indirect
 	github.com/tomwright/dasel/v2 v2.8.1 // indirect
-	github.com/tomwright/dasel/v3 v3.3.1 // indirect
+	github.com/tomwright/dasel/v3 v3.11.2 // indirect
 	github.com/uber/jaeger-client-go v2.30.0+incompatible // indirect
 	github.com/uber/jaeger-lib v2.4.1+incompatible // indirect
 	github.com/urfave/cli/v3 v3.11.0 // indirect
@@ -293,7 +294,7 @@ require (
 	github.com/xhit/go-str2duration/v2 v2.1.0 // indirect
 	github.com/xo/terminfo v0.0.0-20220910002029-abceb7e1c41e // indirect
 	github.com/youmark/pkcs8 v0.0.0-20240726163527-a2c0da244d78 // indirect
-	github.com/yuin/goldmark v1.7.8 // indirect
+	github.com/yuin/goldmark v1.8.6 // indirect
 	github.com/zclconf/go-cty v1.19.0 // indirect
 	github.com/zeitlinger/conflate v0.0.0-20240927101413-c06be92f798f // indirect
 	gitlab.com/gitlab-org/api/client-go/v3 v3.0.0 // indirect
@@ -375,3 +376,5 @@ require (
 
 // TODO: This could be removed after https://github.com/mholt/archiver/pull/396 merged
 replace github.com/mholt/archiver/v3 => github.com/anchore/archiver/v3 v3.5.2
+
+replace github.com/hashicorp/memberlist => github.com/grafana/memberlist v0.3.1-0.20251126142931-6f9f62ab6f86
