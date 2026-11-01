@@ -33,7 +33,7 @@ func TestTailnetSettingsCollector_Update(t *testing.T) {
 						UsersApprovalOn:                        true,
 						UsersRoleAllowedToJoinExternalTailnets: "admin",
 						NetworkFlowLoggingOn:                   true,
-						RegionalRoutingOn:                      false,
+						RouteSelection:                         tailscale.RouteSelectionActivePassiveFailover,
 						PostureIdentityCollectionOn:            true,
 					},
 				},
