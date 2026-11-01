@@ -6,6 +6,7 @@ import (
 	"strconv"
 
 	"github.com/prometheus/client_golang/prometheus"
+	"tailscale.com/client/tailscale/v2"
 )
 
 const tailnetSettingsSubsystem = "tailnet_settings"
@@ -77,7 +78,7 @@ func (c TailscaleTailnetSettingsCollector) Update(
 		strconv.FormatBool(settings.UsersApprovalOn),
 		string(settings.UsersRoleAllowedToJoinExternalTailnets),
 		strconv.FormatBool(settings.NetworkFlowLoggingOn),
-		strconv.FormatBool(settings.RegionalRoutingOn),
+		strconv.FormatBool(settings.RouteSelection == tailscale.RouteSelectionRegionalRouting),
 		strconv.FormatBool(settings.PostureIdentityCollectionOn),
 	)
 	ch <- prometheus.MustNewConstMetric(

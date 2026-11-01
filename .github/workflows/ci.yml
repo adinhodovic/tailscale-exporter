@@ -23,12 +23,10 @@ permissions:
   contents: read
 
 jobs:
-  test:
-    strategy:
-      matrix:
-        os: [ubuntu-latest]
-    name: Test
-    runs-on: ${{ matrix.os }}
+  lint:
+    name: Lint
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
     steps:
       - name: Check out code
         uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
@@ -36,7 +34,6 @@ jobs:
           persist-credentials: false
 
       - name: Setup Go
-        id: go
         uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v6.0.0
         with:
           go-version: ^1.25
@@ -47,14 +44,36 @@ jobs:
           install-mode: goinstall
           version: latest
 
+  unit:
+    name: Unit tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Check out code
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        with:
+          persist-credentials: false
+
+      - name: Setup Go
+        uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v6.0.0
+        with:
+          go-version: ^1.25
+
       - name: Build
         run: make build
 
       - name: Run unit tests
-        run: go install github.com/go-delve/delve/cmd/dlv@latest && go test ./... -v -covermode=count -coverprofile=coverage.txt
+        run: go test ./... -v -covermode=count -coverprofile=coverage.txt
 
-      - name: Set up QEMU
-        uses: docker/setup-qemu-action@99012661954931238ded8c8b007157a8430204e1 # v4.4.0
+  docker:
+    name: Docker build
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Check out code
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        with:
+          persist-credentials: false
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@f87e5991a6d7451dcb8d9637bfbc97413f497069 # v4.4.1
@@ -65,12 +84,37 @@ jobs:
         with:
           images: adinhodovic/tailscale-exporter
 
+      # Only main writes the layer cache; PRs read it. Keeps PR runs
+      # from filling the repo's Actions cache quota.
       - name: Build Test
         uses: docker/build-push-action@c3c9e263c25d99ce0380d002d59b67737d91b0dc # v7.0.0
         with:
           push: false
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha,scope=ci-docker
+          cache-to: ${{ github.event_name == 'push' && 'type=gha,mode=max,scope=ci-docker' || '' }}
+
+  # Single required status check for the `default` ruleset; keep the
+  # name in sync with it.
+  test:
+    name: Test (ubuntu-latest)
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    if: always()
+    needs:
+      - lint
+      - unit
+      - docker
+    steps:
+      - name: Check job results
+        env:
+          RESULTS: ${{ join(needs.*.result, ' ') }}
+        run: |
+          echo "$RESULTS"
+          for r in $RESULTS; do
+            [ "$r" = success ] || exit 1
+          done
 
   release:
     name: Release
